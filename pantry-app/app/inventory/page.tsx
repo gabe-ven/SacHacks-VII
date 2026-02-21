@@ -97,10 +97,15 @@ export default function InventoryPage() {
   // ── Derived values (memoised) ─────────────────────────────────────────────
   const allCategories = useMemo(() => getAllCategories(inventory), [inventory]);
   const allTags = useMemo(() => getAllTags(inventory), [inventory]);
-  const filteredItems = useMemo(
-    () => filterInventory(inventory, filters),
-    [inventory, filters]
-  );
+  const filteredItems = useMemo(() => {
+    const items = filterInventory(inventory, filters);
+    const stockOrder = { in_stock: 0, low_stock: 0, out_of_stock: 1 } as const;
+    return [...items].sort((a, b) => {
+      const diff = (stockOrder[a.stockStatus] ?? 2) - (stockOrder[b.stockStatus] ?? 2);
+      if (diff !== 0) return diff;
+      return a.name.localeCompare(b.name);
+    });
+  }, [inventory, filters]);
   const selectedItems = useMemo(
     () => inventory.filter((item) => selectedIds.has(item.id)),
     [inventory, selectedIds]
