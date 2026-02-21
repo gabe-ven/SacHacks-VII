@@ -2,15 +2,42 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { motion } from "framer-motion";
+import { motion, useInView } from "framer-motion";
+import { useEffect, useRef, useState } from "react";
 import { ease } from "./animations";
 
 const stats = [
-  { number: "50K+", label: "Visits per year" },
-  { number: "3 pts", label: "Per student/day" },
-  { number: "Free", label: "No questions asked" },
-  { number: "Est. 2010", label: "UC Davis" },
+  { from: 0, to: 50, suffix: "K+", label: "Visits per year" },
+  { from: 0, to: 3,  suffix: " pts", label: "Per student/day" },
+  { from: 0, to: 100, suffix: "% Free", label: "No questions asked" },
+  { from: 2005, to: 2010, suffix: "", prefix: "Est. ", label: "UC Davis" },
 ];
+
+function CountUp({ from, to, suffix = "", prefix = "", duration = 1.4, delay = 0 }: {
+  from: number; to: number; suffix?: string; prefix?: string; duration?: number; delay?: number;
+}) {
+  const ref = useRef<HTMLSpanElement>(null);
+  const inView = useInView(ref, { once: true, margin: "-40px" });
+  const [val, setVal] = useState(from);
+
+  useEffect(() => {
+    if (!inView) return;
+    let start: number | null = null;
+    const range = to - from;
+    const step = (ts: number) => {
+      if (!start) start = ts + delay * 1000;
+      const elapsed = Math.max(0, ts - start);
+      const progress = Math.min(elapsed / (duration * 1000), 1);
+      // ease-out cubic
+      const eased = 1 - Math.pow(1 - progress, 3);
+      setVal(Math.round(from + range * eased));
+      if (progress < 1) requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+  }, [inView, from, to, duration, delay]);
+
+  return <span ref={ref}>{prefix}{val}{suffix}</span>;
+}
 
 export default function Hero() {
   return (
@@ -98,7 +125,7 @@ export default function Hero() {
             transition={{ duration: 1, delay: 0.7 }}
             className="mt-16 grid grid-cols-2 sm:grid-cols-4 gap-6 sm:gap-10 border-t border-[#1a1a1a]/8 pt-10 w-full"
           >
-            {stats.map(({ number, label }, i) => (
+            {stats.map(({ from, to, suffix, prefix, label }, i) => (
               <motion.div
                 key={label}
                 initial={{ opacity: 0, y: 10 }}
@@ -106,7 +133,9 @@ export default function Hero() {
                 transition={{ duration: 0.5, delay: 0.75 + i * 0.08, ease }}
                 className="flex flex-col gap-1"
               >
-                <span className="text-2xl sm:text-3xl font-black text-pantry-green">{number}</span>
+                <span className="text-2xl sm:text-3xl font-black text-pantry-green">
+                  <CountUp from={from} to={to} suffix={suffix} prefix={prefix} delay={0.8 + i * 0.08} />
+                </span>
                 <span className="text-[10px] text-[#1a1a1a]/40 uppercase tracking-wider">{label}</span>
               </motion.div>
             ))}
