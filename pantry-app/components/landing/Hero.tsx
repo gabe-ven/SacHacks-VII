@@ -69,14 +69,20 @@ export default function Hero() {
 
         {/* Text block — left half only so image shows on right */}
         <div className="flex flex-col items-start max-w-xl">
-          <motion.span
+          <motion.div
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, ease }}
-            className="bg-pantry-green/10 text-pantry-green text-xs font-bold uppercase tracking-[0.18em] px-4 py-1.5 rounded-full mb-8 inline-block border border-pantry-green/20"
+            className="mb-8"
           >
-            The Pantry at ASUCD · UC Davis
-          </motion.span>
+            <Image
+              src="/pantrylogo.png"
+              alt="The Pantry"
+              width={280}
+              height={160}
+              className="w-56 h-auto object-contain"
+            />
+          </motion.div>
 
           <motion.h1
             initial={{ opacity: 0, y: 20 }}

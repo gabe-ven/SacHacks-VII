@@ -5,7 +5,7 @@ import { Reveal } from "./animations";
 
 export default function CallToAction() {
   return (
-    <section className="px-6 py-16 bg-pantry-cream relative overflow-hidden">
+    <section className="px-6 py-16 bg-white relative overflow-hidden">
       <div className="absolute -top-40 -right-40 w-[32rem] h-[32rem] bg-pantry-amber/20 rounded-full blur-3xl pointer-events-none" />
       <div className="absolute -bottom-40 -left-40 w-[32rem] h-[32rem] bg-pantry-coral/10 rounded-full blur-3xl pointer-events-none" />
 

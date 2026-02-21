@@ -2,6 +2,16 @@
 
 import type { KeyboardEvent } from "react";
 import type { InventoryItem } from "@/types/inventory";
+import Badge from "@/components/ui/Badge";
+
+type TagVariant = "green" | "tan" | "amber" | "coral";
+
+const TAG_VARIANTS: Record<string, TagVariant> = {
+  vegan: "green",
+  halal: "tan",
+  "gluten-free": "amber",
+  "dairy-free": "coral",
+};
 
 const CATEGORY_STYLE: Record<string, { bg: string; text: string }> = {
   Produce:        { bg: "#5E7F64", text: "#fff" },
@@ -67,8 +77,8 @@ export default function InventoryCard({ item, isSelected, onToggle, selectionCou
           : isSelected
           ? "ring-2 ring-pantry-green ring-offset-1 shadow-md -translate-y-0.5 cursor-pointer"
           : canToggle
-          ? "hover:-translate-y-1 hover:shadow-lg cursor-pointer"
-          : "cursor-not-allowed opacity-55",
+          ? "bg-white border-[#1a1a1a]/6 hover:border-pantry-green/30 hover:shadow-lg cursor-pointer"
+          : "bg-[#f9f9f7] border-[#1a1a1a]/6 cursor-not-allowed opacity-60",
         !isOut ? "focus:outline-none focus-visible:ring-2 focus-visible:ring-pantry-green" : "",
       ].join(" ")}
     >

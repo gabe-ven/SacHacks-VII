@@ -14,8 +14,7 @@ export function filterInventory(
     // Text search: match name or any dietary tag
     if (query) {
       const inName = item.name.toLowerCase().includes(query);
-      const inTags =
-        item.tags?.some((t) => t.toLowerCase().includes(query)) ?? false;
+      const inTags = item.tags.some((t) => t.toLowerCase().includes(query));
       if (!inName && !inTags) return false;
     }
 
@@ -34,8 +33,7 @@ export function filterInventory(
 
     // Dietary tag multi-select (item must have ALL selected tags)
     if (filters.tags.length > 0) {
-      const itemTags = item.tags ?? [];
-      if (!filters.tags.every((t) => itemTags.includes(t))) return false;
+      if (!filters.tags.every((t) => item.tags.includes(t))) return false;
     }
 
     return true;
@@ -50,7 +48,7 @@ export function getAllCategories(items: InventoryItem[]): string[] {
 /** Returns sorted list of unique dietary tags present across all items. */
 export function getAllTags(items: InventoryItem[]): string[] {
   const tagSet = new Set<string>();
-  items.forEach((item) => item.tags?.forEach((t) => tagSet.add(t)));
+  items.forEach((item) => item.tags.forEach((t) => tagSet.add(t)));
   return [...tagSet].sort();
 }
 
