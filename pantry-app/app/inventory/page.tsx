@@ -277,7 +277,6 @@ export default function InventoryPage() {
             aria-label="Selected items"
           >
             <div className="p-5 flex flex-col rounded-2xl bg-white border border-pantry-amber/40">
-            <Card className="p-5 flex flex-col hover:shadow-none border border-[#1a1a1a]/10 shadow-sm">
               <SelectedItemsPanel
                 selectedItems={selectedItems}
                 onRemove={handleRemove}
