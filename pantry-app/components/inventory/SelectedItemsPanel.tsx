@@ -2,8 +2,26 @@
 
 import type { InventoryItem } from "@/types/inventory";
 import Button from "@/components/ui/Button";
+import StockBadge from "./StockBadge";
 
 const MAX_SELECTION = 20;
+
+const CATEGORY_META: Record<string, { color: string }> = {
+  Produce:        { color: "#5E7F64" },
+  Dairy:          { color: "#DDBE86" },
+  Milk:           { color: "#DDBE86" },
+  Snacks:         { color: "#EEB467" },
+  "Canned Goods": { color: "#E37861" },
+  Canned:         { color: "#E37861" },
+  Grains:         { color: "#DDBE86" },
+  Necessities:    { color: "#5E7F64" },
+  Beverages:      { color: "#EEB467" },
+  Protein:        { color: "#E37861" },
+  Bakery:         { color: "#EEB467" },
+  Frozen:         { color: "#92A9C0" },
+  Pantry:         { color: "#DDBE86" },
+  Hygiene:        { color: "#92A9C0" },
+};
 
 type Props = {
   selectedItems: InventoryItem[];
@@ -34,7 +52,7 @@ export default function SelectedItemsPanel({
           <button
             onClick={onClear}
             aria-label="Clear all selected items"
-            className="text-xs text-pantry-coral hover:text-pantry-green underline underline-offset-2 transition-colors focus:outline-none"
+            className="text-xs text-pantry-coral hover:text-pantry-green underline underline-offset-2 transition-colors focus:outline-none cursor-pointer"
           >
             Clear all
           </button>
@@ -66,42 +84,57 @@ export default function SelectedItemsPanel({
           </p>
         </div>
       ) : (
-        <ul className="space-y-2" aria-label="Selected items list">
-          {selectedItems.map((item) => (
-            <li
-              key={item.id}
-              className="flex items-center gap-3 px-3 py-2.5 rounded-xl bg-white border border-[#1a1a1a]/6 shadow-sm"
-            >
-              {/* Green check dot */}
-              <span className="shrink-0 w-2 h-2 rounded-full bg-pantry-green mt-0.5" aria-hidden="true" />
-
-              {/* Name + category */}
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-[#1a1a1a] leading-snug truncate">
-                  {item.name}
-                </p>
-                <p className="text-[11px] text-[#1a1a1a]/40 mt-0.5">{item.category}</p>
-              </div>
-
-              {/* Remove button */}
-              <button
-                onClick={() => onRemove(item.id)}
-                aria-label={`Remove ${item.name}`}
-                className="shrink-0 w-8 h-8 flex items-center justify-center rounded-full text-pantry-coral/50 hover:bg-pantry-coral/10 hover:text-pantry-coral transition-colors focus:outline-none cursor-pointer"
+        <ul className="space-y-3" aria-label="Selected items list">
+          {selectedItems.map((item) => {
+            const meta = CATEGORY_META[item.category] ?? { color: "#DDBE86" };
+            return (
+              <li
+                key={item.id}
+                className="rounded-2xl border border-[#1a1a1a]/6 bg-white shadow-sm overflow-hidden"
               >
-                <svg
-                  className="w-4 h-4"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  strokeWidth={2}
-                  aria-hidden="true"
-                >
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6" />
-                </svg>
-              </button>
-            </li>
-          ))}
+                {/* Category accent bar */}
+                <div className="h-1.5 w-full" style={{ backgroundColor: meta.color }} />
+
+                {/* Card body */}
+                <div className="px-4 py-3 flex items-start gap-3">
+                  {/* Name + category */}
+                  <div className="flex-1 min-w-0">
+                    <p className="font-semibold text-sm leading-snug text-[#1a1a1a] truncate">
+                      {item.name}
+                    </p>
+                    <p className="text-[11px] font-medium uppercase tracking-wide text-[#1a1a1a]/35 mt-0.5">
+                      {item.category}
+                    </p>
+                  </div>
+
+                  {/* Remove button */}
+                  <div className="shrink-0">
+                    <button
+                      onClick={() => onRemove(item.id)}
+                      aria-label={`Remove ${item.name}`}
+                      className="w-8 h-8 flex items-center justify-center rounded-full text-pantry-coral/50 hover:bg-pantry-coral/10 hover:text-pantry-coral transition-colors focus:outline-none cursor-pointer"
+                    >
+                      <svg
+                        className="w-4 h-4"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                        strokeWidth={2}
+                        aria-hidden="true"
+                      >
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6" />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+
+                {/* Stock badge */}
+                <div className="px-4 pb-3">
+                  <StockBadge stockStatus={item.stockStatus} />
+                </div>
+              </li>
+            );
+          })}
         </ul>
       )}
 
