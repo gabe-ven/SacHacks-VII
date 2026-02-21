@@ -67,8 +67,8 @@ export default function InventoryCard({ item, isSelected, onToggle, selectionCou
           : isSelected
           ? "ring-2 ring-pantry-green ring-offset-1 shadow-md -translate-y-0.5 cursor-pointer"
           : canToggle
-          ? "hover:-translate-y-1 hover:shadow-lg cursor-pointer"
-          : "cursor-not-allowed opacity-55",
+          ? "bg-white border-[#1a1a1a]/6 hover:border-pantry-green/30 hover:shadow-lg cursor-pointer"
+          : "bg-[#f9f9f7] border-[#1a1a1a]/6 cursor-not-allowed opacity-60",
         !isOut ? "focus:outline-none focus-visible:ring-2 focus-visible:ring-pantry-green" : "",
       ].join(" ")}
     >
@@ -138,6 +138,17 @@ export default function InventoryCard({ item, isSelected, onToggle, selectionCou
               </svg>
             </span>
           )}
+        </div>
+
+        {/* Stock + tags */}
+        <div className="flex flex-wrap items-center gap-1.5 mt-auto">
+          <StockBadge stockStatus={item.stockStatus} />
+          {item.tags.length > 0 &&
+            item.tags.map((tag) => (
+              <Badge key={tag} variant={TAG_VARIANTS[tag] ?? "tan"}>
+                {tag}
+              </Badge>
+            ))}
         </div>
 
         {atMax && !isOut && (
