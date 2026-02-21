@@ -122,8 +122,8 @@ export default function InventoryCard({ item, isSelected, onToggle, selectionCou
         {/* Stock + tags */}
         <div className="flex flex-wrap items-center gap-1.5 mt-auto">
           <StockBadge stockStatus={item.stockStatus} />
-          {(item.tags?.length ?? 0) > 0 &&
-            item.tags!.map((tag) => (
+          {item.tags.length > 0 &&
+            item.tags.map((tag) => (
               <Badge key={tag} variant={TAG_VARIANTS[tag] ?? "tan"}>
                 {tag}
               </Badge>

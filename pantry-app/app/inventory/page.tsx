@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 
-import { fetchInventory } from "@/lib/mockInventory";
+import { getInventory as fetchInventory } from "@/lib/getInventory";
 import {
   filterInventory,
   getAllCategories,
