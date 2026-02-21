@@ -2,19 +2,14 @@ export type InventoryItem = {
   id: string;
   name: string;
   category: string;
-  unit?: string;
-  quantityAvailable: number | null;
-  /** true = known in stock, false = known out, null = unknown */
-  inStock: boolean | null;
+  quantityAvailable?: number;
+  stockStatus: "in_stock" | "low_stock" | "out_of_stock";
   tags?: string[];
-  expiresSoon?: boolean;
 };
-
-export type StockStatus = "in-stock" | "out" | "unknown";
 
 export type FilterState = {
   search: string;
   categories: string[];
-  stockStatus: "all" | StockStatus;
+  stockStatus: "all" | "in_stock" | "low_stock" | "out_of_stock";
   tags: string[];
 };
