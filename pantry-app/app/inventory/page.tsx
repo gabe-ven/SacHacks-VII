@@ -148,24 +148,29 @@ export default function InventoryPage() {
 
   // ── Render ────────────────────────────────────────────────────────────────
   return (
-    // Extra bottom padding on mobile so content isn't hidden behind the fixed bar
-    <div className="min-h-screen pb-24 lg:pb-0">
-      <div className="max-w-screen-xl mx-auto px-4 sm:px-6 py-10">
+    <div className="min-h-screen bg-white pb-24 lg:pb-0">
+      <div className="max-w-screen-xl mx-auto px-4 sm:px-6 py-12">
 
-        {/* ── Page header — mirrors homepage section rhythm ── */}
-        <div className="mb-8">
-          <p className="text-pantry-green text-sm font-semibold uppercase tracking-widest mb-2">
+        {/* ── Page header ── */}
+        <div className="mb-10 relative overflow-hidden rounded-3xl bg-pantry-green px-8 py-12 flex flex-col gap-3">
+          <div
+            className="absolute inset-0 opacity-[0.04] pointer-events-none"
+            style={{
+              backgroundImage: "linear-gradient(#fff 1px, transparent 1px), linear-gradient(90deg, #fff 1px, transparent 1px)",
+              backgroundSize: "48px 48px",
+            }}
+          />
+          <span className="relative z-10 text-pantry-amber text-[11px] font-bold uppercase tracking-[0.2em]">
             The Pantry at ASUCD · UC Davis
-          </p>
+          </span>
           <h1
-            className="text-4xl sm:text-5xl text-pantry-green mb-3"
+            className="relative z-10 text-5xl sm:text-6xl text-white"
             style={{ fontFamily: "Dancing Script, cursive" }}
           >
             Browse the Pantry
           </h1>
-          <p className="text-foreground/70 max-w-xl">
-            Pick the items you grabbed this week and we&apos;ll turn them into a
-            real meal.
+          <p className="relative z-10 text-pantry-cream/60 max-w-md text-sm leading-relaxed">
+            Pick the items you grabbed this week and we&apos;ll generate a real meal from them.
           </p>
         </div>
 

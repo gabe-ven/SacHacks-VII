@@ -14,6 +14,21 @@ const TAG_VARIANTS: Record<string, TagVariant> = {
   "dairy-free": "coral",
 };
 
+const CATEGORY_META: Record<string, { color: string }> = {
+  Produce:        { color: "#5E7F64" },
+  Dairy:          { color: "#DDBE86" },
+  Milk:           { color: "#DDBE86" },
+  Snacks:         { color: "#EEB467" },
+  "Canned Goods": { color: "#E37861" },
+  Canned:         { color: "#E37861" },
+  Grains:         { color: "#DDBE86" },
+  Necessities:    { color: "#5E7F64" },
+  Beverages:      { color: "#EEB467" },
+  Protein:        { color: "#E37861" },
+  Bakery:         { color: "#EEB467" },
+  Frozen:         { color: "#92A9C0" },
+};
+
 const MAX_SELECTION = 20;
 
 type Props = {
@@ -23,16 +38,13 @@ type Props = {
   selectionCount: number;
 };
 
-export default function InventoryCard({
-  item,
-  isSelected,
-  onToggle,
-  selectionCount,
-}: Props) {
+export default function InventoryCard({ item, isSelected, onToggle, selectionCount }: Props) {
   const isOut = item.stockStatus === "out_of_stock";
   const isLow = item.stockStatus === "low_stock";
   const atMax = selectionCount >= MAX_SELECTION && !isSelected;
   const canToggle = !isOut && !atMax;
+
+  const meta = CATEGORY_META[item.category] ?? { color: "#DDBE86" };
 
   const ariaLabel = isOut
     ? `${item.name} is out of stock`
@@ -61,88 +73,81 @@ export default function InventoryCard({
       onClick={handleCardClick}
       onKeyDown={handleKeyDown}
       className={[
-        "relative flex flex-col gap-2.5 rounded-2xl border p-5 transition-all duration-150 h-full select-none",
+        "relative flex flex-col rounded-2xl border overflow-hidden transition-all duration-200 h-full select-none group",
         isOut
-          ? "bg-white/40 border-pantry-tan/40 opacity-50 grayscale cursor-not-allowed"
+          ? "bg-[#f9f9f7] border-[#1a1a1a]/6 opacity-50 grayscale cursor-not-allowed"
           : isSelected
-          ? "bg-pantry-green/10 border-pantry-green/40 ring-2 ring-pantry-green cursor-pointer"
+          ? "bg-white border-pantry-green ring-2 ring-pantry-green shadow-md cursor-pointer"
           : canToggle
-          ? isLow
-            ? "bg-white/60 border-pantry-amber/50 hover:bg-white hover:border-pantry-amber cursor-pointer"
-            : "bg-white/60 border-pantry-tan hover:bg-white hover:border-pantry-green/40 cursor-pointer"
-          : "bg-white/60 border-pantry-tan cursor-not-allowed opacity-70",
+          ? "bg-white border-[#1a1a1a]/6 hover:border-pantry-green/30 hover:shadow-lg cursor-pointer"
+          : "bg-[#f9f9f7] border-[#1a1a1a]/6 cursor-not-allowed opacity-60",
         !isOut ? "focus:outline-none focus-visible:ring-2 focus-visible:ring-pantry-green" : "",
       ].join(" ")}
     >
-      {/* Top row: name/category + check icon */}
-      <div className="flex items-start gap-2.5">
-        {/* Hidden checkbox — screen-reader accessible, stopPropagation prevents double-toggle */}
-        <input
-          type="checkbox"
-          checked={isSelected}
-          disabled={isOut}
-          aria-label={ariaLabel}
-          tabIndex={-1}
-          onChange={() => { if (canToggle) onToggle(item.id); }}
-          onClick={(e) => e.stopPropagation()}
-          className="sr-only"
-        />
+      {/* colour accent bar */}
+      <div
+        className="h-1.5 w-full shrink-0 transition-opacity duration-200"
+        style={{ backgroundColor: meta.color, opacity: isOut ? 0.3 : 1 }}
+      />
 
-        {/* Name + category */}
-        <div className="flex-1 min-w-0">
-          <h3
-            className={[
-              "font-semibold leading-snug",
-              isOut ? "text-foreground/40" : "text-foreground",
-            ].join(" ")}
-          >
-            {item.name}
-          </h3>
-          <p className="text-xs text-foreground/50 mt-0.5">{item.category}</p>
+      <div className="flex flex-col gap-3 p-5 flex-1">
+        {/* Top row: emoji + name + checkmark */}
+        <div className="flex items-start gap-3">
+          <div className="flex-1 min-w-0">
+            <h3
+              className={[
+                "font-semibold text-base leading-snug",
+                isOut ? "text-[#1a1a1a]/30" : "text-[#1a1a1a]",
+              ].join(" ")}
+            >
+              {item.name}
+            </h3>
+            <p className="text-[11px] font-medium uppercase tracking-wide text-[#1a1a1a]/35 mt-0.5">
+              {item.category}
+            </p>
+          </div>
+
+          {isSelected && (
+            <span
+              aria-hidden="true"
+              className="shrink-0 w-5 h-5 rounded-full bg-pantry-green flex items-center justify-center mt-0.5"
+            >
+              <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+              </svg>
+            </span>
+          )}
         </div>
 
-        {/* SVG checkmark when selected */}
-        {isSelected && (
-          <span aria-hidden="true" className="shrink-0 mt-0.5">
-            <svg
-              className="w-5 h-5 text-pantry-green"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              strokeWidth={2.5}
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M4.5 12.75l6 6 9-13.5"
-              />
-            </svg>
-          </span>
+        {/* Stock + tags */}
+        <div className="flex flex-wrap items-center gap-1.5 mt-auto">
+          <StockBadge stockStatus={item.stockStatus} />
+          {(item.tags?.length ?? 0) > 0 &&
+            item.tags!.map((tag) => (
+              <Badge key={tag} variant={TAG_VARIANTS[tag] ?? "tan"}>
+                {tag}
+              </Badge>
+            ))}
+        </div>
+
+        {atMax && !isOut && (
+          <p className="text-[11px] text-[#1a1a1a]/35 mt-1" role="note">
+            Max {MAX_SELECTION} items reached
+          </p>
         )}
       </div>
 
-      {/* Stock badge — always shown, even when selected */}
-      <div className="flex flex-wrap items-center gap-2">
-        <StockBadge stockStatus={item.stockStatus} />
-      </div>
-
-      {/* Dietary tags */}
-      {(item.tags?.length ?? 0) > 0 && (
-        <div className="flex flex-wrap gap-1" aria-label="Dietary tags">
-          {item.tags!.map((tag) => (
-            <Badge key={tag} variant={TAG_VARIANTS[tag] ?? "tan"}>
-              {tag}
-            </Badge>
-          ))}
-        </div>
-      )}
-
-      {/* At-max note */}
-      {atMax && !isOut && (
-        <p className="text-xs text-foreground/40 mt-auto" role="note">
-          Max {MAX_SELECTION} items selected
-        </p>
-      )}
+      {/* hidden accessible checkbox */}
+      <input
+        type="checkbox"
+        checked={isSelected}
+        disabled={isOut}
+        aria-label={ariaLabel}
+        tabIndex={-1}
+        onChange={() => { if (canToggle) onToggle(item.id); }}
+        onClick={(e) => e.stopPropagation()}
+        className="sr-only"
+      />
     </article>
   );
 }
