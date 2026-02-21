@@ -81,8 +81,6 @@ export default function InventoryCard({ item, isSelected, onToggle, selectionCou
           : canToggle
           ? "bg-white border-[#1a1a1a]/6 hover:border-pantry-green/30 hover:shadow-lg cursor-pointer"
           : "bg-[#f9f9f7] border-[#1a1a1a]/6 cursor-not-allowed opacity-60",
-          : isSelected
-          : canToggle
         !isOut ? "focus:outline-none focus-visible:ring-2 focus-visible:ring-pantry-green" : "",
       ].join(" ")}
     >
