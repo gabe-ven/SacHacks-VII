@@ -3,14 +3,18 @@
 import type { KeyboardEvent } from "react";
 import type { InventoryItem } from "@/types/inventory";
 import Badge from "@/components/ui/Badge";
+import StockBadge from "./StockBadge";
 
 type TagVariant = "green" | "tan" | "amber" | "coral";
 
 const TAG_VARIANTS: Record<string, TagVariant> = {
   vegan: "green",
+  vegetarian: "green",
   halal: "tan",
   "gluten-free": "amber",
+  gluten_free: "amber",
   "dairy-free": "coral",
+  dairy_free: "coral",
 };
 
 const CATEGORY_STYLE: Record<string, { bg: string; text: string }> = {
@@ -71,30 +75,36 @@ export default function InventoryCard({ item, isSelected, onToggle, selectionCou
       onClick={handleCardClick}
       onKeyDown={handleKeyDown}
       className={[
-        "relative flex rounded-xl overflow-hidden h-full select-none transition-all duration-200 border border-[#1a1a1a]/8",
+        "relative flex rounded-xl overflow-hidden h-full select-none transition-all duration-200 border border-[#1a1a1a]/8 ring-1",
         isOut
-          ? "opacity-40 grayscale cursor-not-allowed"
+          ? "ring-[#1a1a1a]/8 opacity-40 grayscale cursor-not-allowed"
           : isSelected
-          ? "ring-2 ring-pantry-green ring-offset-1 shadow-md -translate-y-0.5 cursor-pointer"
+          ? "ring-2 ring-pantry-green shadow-md cursor-pointer"
           : canToggle
-          ? "bg-white border-[#1a1a1a]/6 hover:border-pantry-green/30 hover:shadow-lg cursor-pointer"
-          : "bg-[#f9f9f7] border-[#1a1a1a]/6 cursor-not-allowed opacity-60",
-        !isOut ? "focus:outline-none focus-visible:ring-2 focus-visible:ring-pantry-green" : "",
+          ? "ring-[#1a1a1a]/10 hover:ring-pantry-green/40 hover:shadow-lg cursor-pointer"
+          : "ring-[#1a1a1a]/8 cursor-not-allowed opacity-60",
+        !isOut && !isSelected ? "focus:outline-none focus-visible:ring-2 focus-visible:ring-pantry-green" : "focus:outline-none",
       ].join(" ")}
     >
       {/* Left color block with rotated category label */}
       <div
-        className="w-10 shrink-0 flex items-center justify-center"
+        className="w-10 shrink-0 flex items-center justify-center overflow-hidden"
         style={{ backgroundColor: style.bg }}
         aria-hidden="true"
       >
         <span
-          className="text-[9px] font-black uppercase tracking-[0.2em] whitespace-nowrap"
+          className="font-black uppercase"
           style={{
             writingMode: "vertical-rl",
             transform: "rotate(180deg)",
             color: style.text,
             opacity: 0.7,
+            fontSize: "9px",
+            letterSpacing: "0.2em",
+            whiteSpace: "nowrap",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            maxHeight: "100%",
           }}
         >
           {item.category}
@@ -103,6 +113,26 @@ export default function InventoryCard({ item, isSelected, onToggle, selectionCou
 
       {/* Right: content */}
       <div className="flex flex-col justify-between gap-3 p-4 bg-white flex-1 min-w-0">
+
+        {/* Name + checkmark */}
+        <div className="flex items-start justify-between gap-2">
+          <h3 className={[
+            "text-[1.05rem] font-bold leading-snug tracking-tight",
+            isOut ? "text-[#1a1a1a]/25" : "text-[#1a1a1a]",
+          ].join(" ")}>
+            {item.name}
+          </h3>
+          {isSelected && (
+            <span
+              aria-hidden="true"
+              className="shrink-0 w-4 h-4 rounded-full bg-pantry-green flex items-center justify-center mt-0.5"
+            >
+              <svg className="w-2.5 h-2.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+              </svg>
+            </span>
+          )}
+        </div>
 
         {/* Stock indicator */}
         <div className="flex items-center gap-1.5">
@@ -120,35 +150,16 @@ export default function InventoryCard({ item, isSelected, onToggle, selectionCou
           </span>
         </div>
 
-        {/* Item name */}
-        <h3 className={[
-          "text-[1.05rem] font-bold leading-snug tracking-tight",
-          isOut ? "text-[#1a1a1a]/25" : "text-[#1a1a1a]",
-        ].join(" ")}>
-          {item.name}
-        </h3>
-
-        {/* Tags + checkmark */}
-        <div className="flex items-center justify-between gap-1 min-h-[16px]">
-          {(item.tags?.length ?? 0) > 0 ? (
-            <p className="text-[10px] text-[#1a1a1a]/30 truncate">
-              {item.tags!.join(" · ")}
-            </p>
-          ) : (
-            <span />
-          )}
-
-          {isSelected && (
-            <span
-              aria-hidden="true"
-              className="shrink-0 w-4 h-4 rounded-full bg-pantry-green flex items-center justify-center ml-auto"
-            >
-              <svg className="w-2.5 h-2.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3.5}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
-              </svg>
-            </span>
-          )}
-        </div>
+        {/* Dietary tags */}
+        {item.tags.length > 0 && (
+          <div className="flex flex-wrap items-center gap-1.5 mt-auto">
+            {item.tags.map((tag) => (
+              <Badge key={tag} variant={TAG_VARIANTS[tag] ?? "tan"}>
+                {tag}
+              </Badge>
+            ))}
+          </div>
+        )}
 
         {atMax && !isOut && (
           <p className="text-[10px] text-[#1a1a1a]/30" role="note">Max {MAX_SELECTION} selected</p>
