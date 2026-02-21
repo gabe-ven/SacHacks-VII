@@ -253,7 +253,7 @@ export default function InventoryPage() {
             {/* Item grid */}
             {!error && !loading && filteredItems.length > 0 && (
               <div
-                className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4"
+                className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 auto-rows-[8rem]"
                 role="list"
                 aria-label={`${filteredItems.length} pantry items`}
               >
