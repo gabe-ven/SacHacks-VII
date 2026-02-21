@@ -14,7 +14,7 @@ const stats = [
 
 export default function Hero() {
   return (
-    <section className="relative min-h-[94vh] flex flex-col justify-center overflow-hidden">
+    <section className="relative min-h-[94vh] flex flex-col justify-center overflow-hidden -mt-16">
 
       {/* Full-bleed background image */}
       <div className="absolute inset-0 z-0">
@@ -30,7 +30,7 @@ export default function Hero() {
           className="absolute inset-0"
           style={{
             background:
-              "linear-gradient(to right, rgba(255,255,255,1) 30%, rgba(255,255,255,0.85) 52%, rgba(255,255,255,0.35) 72%, rgba(255,255,255,0) 100%)",
+              "linear-gradient(to right, rgba(255,255,255,1) 42%, rgba(255,255,255,0.85) 60%, rgba(255,255,255,0.35) 78%, rgba(255,255,255,0) 100%)",
           }}
         />
         {/* Subtle top+bottom fade for depth */}
