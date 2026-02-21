@@ -66,34 +66,38 @@ export default function SelectedItemsPanel({
           </p>
         </div>
       ) : (
-        <ul
-          className="space-y-1.5"
-          aria-label="Selected items list"
-        >
+        <ul className="space-y-2" aria-label="Selected items list">
           {selectedItems.map((item) => (
             <li
               key={item.id}
-              className="flex items-center justify-between gap-2 py-1.5 px-3 rounded-full bg-pantry-cream border border-pantry-tan"
+              className="flex items-center gap-3 px-3 py-2.5 rounded-xl bg-white border border-[#1a1a1a]/6 shadow-sm"
             >
-              <span className="text-sm text-foreground truncate">{item.name}</span>
+              {/* Green check dot */}
+              <span className="shrink-0 w-2 h-2 rounded-full bg-pantry-green mt-0.5" aria-hidden="true" />
+
+              {/* Name + category */}
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium text-[#1a1a1a] leading-snug truncate">
+                  {item.name}
+                </p>
+                <p className="text-[11px] text-[#1a1a1a]/40 mt-0.5">{item.category}</p>
+              </div>
+
+              {/* Remove button */}
               <button
                 onClick={() => onRemove(item.id)}
                 aria-label={`Remove ${item.name}`}
-                className="shrink-0 w-5 h-5 flex items-center justify-center rounded-full text-foreground/40 hover:text-pantry-coral transition-colors focus:outline-none"
+                className="shrink-0 w-8 h-8 flex items-center justify-center rounded-full text-pantry-coral/50 hover:bg-pantry-coral/10 hover:text-pantry-coral transition-colors focus:outline-none cursor-pointer"
               >
                 <svg
-                  className="w-3 h-3"
+                  className="w-4 h-4"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
-                  strokeWidth={2.5}
+                  strokeWidth={2}
                   aria-hidden="true"
                 >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M6 18L18 6M6 6l12 12"
-                  />
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6" />
                 </svg>
               </button>
             </li>
