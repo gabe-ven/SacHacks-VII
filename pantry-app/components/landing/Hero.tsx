@@ -112,17 +112,19 @@ export default function Hero() {
             className="mt-9 flex flex-col sm:flex-row gap-3"
           >
             <Link
-              href="/ingredients"
+              href="/inventory"
               className="bg-pantry-green text-white px-8 py-3.5 rounded-full font-semibold text-sm hover:bg-pantry-coral transition-all duration-300 shadow-sm hover:shadow-md active:scale-95 text-center"
             >
               Start Cooking →
             </Link>
-            <Link
-              href="/inventory"
+            <a
+              href="https://thepantry.ucdavis.edu/"
+              target="_blank"
+              rel="noopener noreferrer"
               className="border border-[#1a1a1a]/15 text-[#1a1a1a]/60 px-8 py-3.5 rounded-full font-semibold text-sm hover:border-pantry-green/50 hover:text-pantry-green transition-all duration-300 text-center bg-white/50 backdrop-blur-sm"
             >
-              This Week&apos;s Inventory
-            </Link>
+              About the Pantry ↗
+            </a>
           </motion.div>
 
           <motion.div
