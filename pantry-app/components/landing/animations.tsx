@@ -4,7 +4,10 @@ import { motion, useInView } from "framer-motion";
 import { useRef } from "react";
 
 export const ease = [0.16, 1, 0.3, 1] as const;
+export const spring = { type: "spring", stiffness: 280, damping: 22 } as const;
+export const springBouncy = { type: "spring", stiffness: 400, damping: 18 } as const;
 
+/* ── flat fade + rise (original) ───────────────────────────── */
 export function Reveal({ children, delay = 0, className = "" }: { children: React.ReactNode; delay?: number; className?: string }) {
   const ref = useRef(null);
   const inView = useInView(ref, { once: true, margin: "-50px" });
@@ -21,14 +24,78 @@ export function Reveal({ children, delay = 0, className = "" }: { children: Reac
   );
 }
 
+/* ── 3-D flip up from flat ──────────────────────────────────── */
+export function Reveal3D({ children, delay = 0, className = "" }: { children: React.ReactNode; delay?: number; className?: string }) {
+  const ref = useRef(null);
+  const inView = useInView(ref, { once: true, margin: "-60px" });
+  return (
+    <div style={{ perspective: "900px" }} className={className}>
+      <motion.div
+        ref={ref}
+        initial={{ opacity: 0, y: 40, rotateX: 18 }}
+        animate={inView ? { opacity: 1, y: 0, rotateX: 0 } : {}}
+        transition={{ duration: 0.75, delay, ease }}
+        style={{ transformOrigin: "top center" }}
+      >
+        {children}
+      </motion.div>
+    </div>
+  );
+}
+
+/* ── slide in from a side ───────────────────────────────────── */
+export function SlideIn({ children, from = "left", delay = 0, className = "" }: {
+  children: React.ReactNode; from?: "left" | "right" | "bottom"; delay?: number; className?: string;
+}) {
+  const ref = useRef(null);
+  const inView = useInView(ref, { once: true, margin: "-50px" });
+  const initial =
+    from === "left"   ? { opacity: 0, x: -60, rotateY: 12 } :
+    from === "right"  ? { opacity: 0, x:  60, rotateY: -12 } :
+                        { opacity: 0, y:  60 };
+  return (
+    <div style={{ perspective: "1000px" }} className={className}>
+      <motion.div
+        ref={ref}
+        initial={initial}
+        animate={inView ? { opacity: 1, x: 0, y: 0, rotateY: 0 } : {}}
+        transition={{ ...spring, delay }}
+      >
+        {children}
+      </motion.div>
+    </div>
+  );
+}
+
+/* ── pop in with bounce ─────────────────────────────────────── */
+export function PopIn({ children, delay = 0, className = "" }: { children: React.ReactNode; delay?: number; className?: string }) {
+  const ref = useRef(null);
+  const inView = useInView(ref, { once: true, margin: "-40px" });
+  return (
+    <motion.div
+      ref={ref}
+      initial={{ opacity: 0, scale: 0.75, y: 20 }}
+      animate={inView ? { opacity: 1, scale: 1, y: 0 } : {}}
+      transition={{ ...springBouncy, delay }}
+      className={className}
+    >
+      {children}
+    </motion.div>
+  );
+}
+
+/* ── stagger grid ───────────────────────────────────────────── */
 export const staggerContainer = {
   hidden: {},
-  show: { transition: { staggerChildren: 0.08, delayChildren: 0.05 } },
+  show: { transition: { staggerChildren: 0.1, delayChildren: 0.05 } },
 };
 
 export const staggerItem = {
-  hidden: { opacity: 0, y: 20 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.45, ease } },
+  hidden: { opacity: 0, y: 30, rotateX: 12, scale: 0.96 },
+  show: {
+    opacity: 1, y: 0, rotateX: 0, scale: 1,
+    transition: { duration: 0.55, ease },
+  },
 };
 
 export function StaggerGrid({ children, className = "" }: { children: React.ReactNode; className?: string }) {
@@ -40,6 +107,7 @@ export function StaggerGrid({ children, className = "" }: { children: React.Reac
       variants={staggerContainer}
       initial="hidden"
       animate={inView ? "show" : "hidden"}
+      style={{ perspective: "1200px" }}
       className={className}
     >
       {children}
@@ -49,7 +117,7 @@ export function StaggerGrid({ children, className = "" }: { children: React.Reac
 
 export function StaggerItem({ children, className = "" }: { children: React.ReactNode; className?: string }) {
   return (
-    <motion.div variants={staggerItem} className={className}>
+    <motion.div variants={staggerItem} style={{ transformOrigin: "top center" }} className={className}>
       {children}
     </motion.div>
   );
