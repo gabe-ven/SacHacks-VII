@@ -7,7 +7,7 @@ import CallToAction from "@/components/landing/CallToAction";
 
 export default function HomePage() {
   return (
-    <div className="flex flex-col bg-white text-[#1a1a1a] overflow-x-hidden">
+    <div className="flex flex-col bg-background text-foreground overflow-x-hidden">
       <Hero />
       <HowItWorks />
       <MissionQuote />

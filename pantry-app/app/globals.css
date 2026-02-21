@@ -2,19 +2,42 @@
 @import "tailwindcss";
 
 :root {
-  --background: #F4E8D0;
-  --foreground: #312F2D;
+  --background: #ffffff;
+  --foreground: #1a1a1a;
+  --surface: #f9f9f7;
+  --surface-card: #ffffff;
+  --border: rgba(26, 26, 26, 0.08);
+  --muted: rgba(26, 26, 26, 0.45);
 
   --pantry-amber:  #EEB467;
   --pantry-coral:  #E37861;
   --pantry-tan:    #DDBE86;
   --pantry-cream:  #F4E8D0;
   --pantry-green:  #5E7F64;
+
+  --hero-gradient: linear-gradient(to right, #fff 42%, rgba(255,255,255,0.85) 60%, rgba(255,255,255,0.35) 78%, transparent 100%);
+  --hero-vignette: linear-gradient(to bottom, rgba(255,255,255,0.3), transparent 50%, rgba(255,255,255,0.6));
+}
+
+[data-theme="dark"] {
+  --background: #0d0d0d;
+  --foreground: #e8e1d5;
+  --surface: #141414;
+  --surface-card: #1a1a1a;
+  --border: rgba(255, 255, 255, 0.07);
+  --muted: rgba(255, 255, 255, 0.4);
+
+  --hero-gradient: linear-gradient(to right, #0d0d0d 42%, rgba(13,13,13,0.85) 60%, rgba(13,13,13,0.35) 78%, transparent 100%);
+  --hero-vignette: linear-gradient(to bottom, rgba(13,13,13,0.4), transparent 50%, rgba(13,13,13,0.6));
 }
 
 @theme inline {
   --color-background:     var(--background);
   --color-foreground:     var(--foreground);
+  --color-surface:        var(--surface);
+  --color-surface-card:   var(--surface-card);
+  --color-border:         var(--border);
+  --color-muted:          var(--muted);
   --color-pantry-amber:   var(--pantry-amber);
   --color-pantry-coral:   var(--pantry-coral);
   --color-pantry-tan:     var(--pantry-tan);

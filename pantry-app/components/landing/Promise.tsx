@@ -1,34 +1,74 @@
 "use client";
 
-import { Reveal, StaggerGrid, StaggerItem } from "./animations";
+import { motion, useInView } from "framer-motion";
+import { useRef } from "react";
+import { Reveal, ease } from "./animations";
 
 const promises = [
-  { word: "Warm", desc: "A welcoming, inclusive team empathetic to every student's situation." },
-  { word: "Reliable", desc: "Here every single week. Just swipe your ID — no explanation needed." },
-  { word: "Confidential", desc: "We don't judge. Grab your items and go. Your privacy is sacred." },
+  {
+    num: "1",
+    word: "Warm",
+    desc: "A welcoming, inclusive team empathetic to every student's situation.",
+    color: "text-pantry-green",
+    line: "bg-pantry-green",
+  },
+  {
+    num: "2",
+    word: "Reliable",
+    desc: "Here every single week. Just swipe your ID — no explanation needed.",
+    color: "text-pantry-amber",
+    line: "bg-pantry-amber",
+  },
+  {
+    num: "3",
+    word: "Confidential",
+    desc: "We don't judge. Grab your items and go. Your privacy is sacred.",
+    color: "text-pantry-coral",
+    line: "bg-pantry-coral",
+  },
 ];
+
+function Card({ num, word, desc, color, line, index }: typeof promises[0] & { index: number }) {
+  const ref = useRef(null);
+  const inView = useInView(ref, { once: true, margin: "-40px" });
+
+  return (
+    <motion.div
+      ref={ref}
+      initial={{ opacity: 0, y: 24 }}
+      animate={inView ? { opacity: 1, y: 0 } : {}}
+      transition={{ duration: 0.6, delay: index * 0.1, ease }}
+      className="flex flex-col items-center text-center gap-4"
+    >
+      <div className={`h-px w-12 ${line}`} />
+      <span className="text-[10px] font-bold text-muted/40 tabular-nums">{num}</span>
+      <span
+        className={`${color} leading-none`}
+        style={{ fontFamily: "Dancing Script, cursive", fontSize: "clamp(2.4rem, 4vw, 3rem)" }}
+      >
+        {word}
+      </span>
+      <p className="text-sm text-muted leading-relaxed max-w-[220px]">{desc}</p>
+    </motion.div>
+  );
+}
 
 export default function Promise() {
   return (
-    <section className="px-6 py-24 bg-white">
-      <div className="max-w-4xl mx-auto">
-        <Reveal className="text-center mb-14">
+    <section className="px-6 py-24 bg-background">
+      <div className="max-w-4xl mx-auto flex flex-col items-center">
+        <Reveal className="text-center mb-16">
           <span className="text-pantry-green text-[11px] font-bold uppercase tracking-[0.2em]">Our Promise</span>
-          <h2 className="text-5xl sm:text-6xl text-[#1a1a1a] mt-3" style={{ fontFamily: "Dancing Script, cursive" }}>
-            Warm. <span className="text-pantry-amber">Reliable.</span> Confidential.
+          <h2 className="text-4xl sm:text-5xl text-foreground mt-3 whitespace-nowrap" style={{ fontFamily: "Dancing Script, cursive" }}>
+            Built on <span className="text-pantry-coral">three promises.</span>
           </h2>
         </Reveal>
 
-        <StaggerGrid className="grid grid-cols-1 sm:grid-cols-3">
-          {promises.map(({ word, desc }) => (
-            <StaggerItem key={word}>
-              <div className="flex flex-col gap-3 text-center px-8 py-6 sm:py-0 border-b sm:border-b-0 sm:border-r border-[#1a1a1a]/6 last:border-0">
-                <h3 className="text-4xl text-pantry-coral" style={{ fontFamily: "Dancing Script, cursive" }}>{word}</h3>
-                <p className="text-sm text-[#1a1a1a]/45 leading-relaxed">{desc}</p>
-              </div>
-            </StaggerItem>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-12 sm:gap-8 w-full">
+          {promises.map((p, i) => (
+            <Card key={p.word} {...p} index={i} />
           ))}
-        </StaggerGrid>
+        </div>
       </div>
     </section>
   );
