@@ -61,7 +61,7 @@ export default function InventoryCard({ item, isSelected, onToggle, selectionCou
       onClick={handleCardClick}
       onKeyDown={handleKeyDown}
       className={[
-        "relative flex rounded-xl overflow-hidden h-full select-none transition-all duration-200",
+        "relative flex rounded-xl overflow-hidden h-full select-none transition-all duration-200 border border-[#1a1a1a]/8",
         isOut
           ? "opacity-40 grayscale cursor-not-allowed"
           : isSelected
