@@ -28,12 +28,8 @@ export function filterInventory(
     }
 
     // Stock status filter
-    if (filters.stockStatus !== "all") {
-      if (filters.stockStatus === "in-stock" && item.inStock !== true)
-        return false;
-      if (filters.stockStatus === "out" && item.inStock !== false) return false;
-      if (filters.stockStatus === "unknown" && item.inStock !== null)
-        return false;
+    if (filters.stockStatus !== "all" && item.stockStatus !== filters.stockStatus) {
+      return false;
     }
 
     // Dietary tag multi-select (item must have ALL selected tags)

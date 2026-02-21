@@ -29,10 +29,16 @@ export default function InventoryCard({
   onToggle,
   selectionCount,
 }: Props) {
-  const isOut = item.inStock === false;
-  const isUnknown = item.inStock === null;
+  const isOut = item.stockStatus === "out_of_stock";
+  const isLow = item.stockStatus === "low_stock";
   const atMax = selectionCount >= MAX_SELECTION && !isSelected;
   const canToggle = !isOut && !atMax;
+
+  const ariaLabel = isOut
+    ? `${item.name} is out of stock`
+    : isLow
+    ? `Select ${item.name} (Low stock)`
+    : `Select ${item.name} (In stock)`;
 
   function handleCardClick() {
     if (canToggle) onToggle(item.id);
@@ -40,7 +46,7 @@ export default function InventoryCard({
 
   function handleKeyDown(e: KeyboardEvent<HTMLElement>) {
     if (e.key === "Enter" || e.key === " ") {
-      e.preventDefault(); // prevent Space from scrolling
+      e.preventDefault();
       if (canToggle) onToggle(item.id);
     }
   }
@@ -50,37 +56,39 @@ export default function InventoryCard({
       role="checkbox"
       aria-checked={isSelected}
       aria-disabled={isOut || (!canToggle && !isSelected)}
-      aria-label={item.name}
+      aria-label={ariaLabel}
       tabIndex={isOut ? -1 : 0}
       onClick={handleCardClick}
       onKeyDown={handleKeyDown}
       className={[
         "relative flex flex-col gap-2.5 rounded-2xl border p-5 transition-all duration-150 h-full select-none",
         isOut
-          ? "bg-white/40 border-pantry-tan/40 opacity-60 grayscale cursor-not-allowed"
+          ? "bg-white/40 border-pantry-tan/40 opacity-50 grayscale cursor-not-allowed"
           : isSelected
-          ? "bg-white border-pantry-green ring-2 ring-pantry-green/40 cursor-pointer"
+          ? "bg-pantry-green/10 border-pantry-green/40 ring-2 ring-pantry-green cursor-pointer"
           : canToggle
-          ? "bg-white/60 border-pantry-tan hover:bg-white hover:border-pantry-green/40 cursor-pointer"
+          ? isLow
+            ? "bg-white/60 border-pantry-amber/50 hover:bg-white hover:border-pantry-amber cursor-pointer"
+            : "bg-white/60 border-pantry-tan hover:bg-white hover:border-pantry-green/40 cursor-pointer"
           : "bg-white/60 border-pantry-tan cursor-not-allowed opacity-70",
-        !isOut ? "focus:outline-none focus:ring-2 focus:ring-pantry-green focus:ring-offset-1" : "",
+        !isOut ? "focus:outline-none focus-visible:ring-2 focus-visible:ring-pantry-green" : "",
       ].join(" ")}
     >
-      {/* Top row: name/category + check icon or expires badge */}
+      {/* Top row: name/category + check icon */}
       <div className="flex items-start gap-2.5">
-        {/* Hidden checkbox — screen-reader accessible but not visible */}
+        {/* Hidden checkbox — screen-reader accessible, stopPropagation prevents double-toggle */}
         <input
           type="checkbox"
           checked={isSelected}
           disabled={isOut}
-          aria-label={`Select ${item.name}`}
+          aria-label={ariaLabel}
           tabIndex={-1}
-          onChange={() => onToggle(item.id)}
+          onChange={() => { if (canToggle) onToggle(item.id); }}
           onClick={(e) => e.stopPropagation()}
           className="sr-only"
         />
 
-        {/* Name + category + unit */}
+        {/* Name + category */}
         <div className="flex-1 min-w-0">
           <h3
             className={[
@@ -90,14 +98,11 @@ export default function InventoryCard({
           >
             {item.name}
           </h3>
-          <p className="text-xs text-foreground/50 mt-0.5">
-            {item.category}
-            {item.unit && <span className="ml-1.5">· {item.unit}</span>}
-          </p>
+          <p className="text-xs text-foreground/50 mt-0.5">{item.category}</p>
         </div>
 
-        {/* Top-right: check icon when selected, expires badge otherwise */}
-        {isSelected ? (
+        {/* SVG checkmark when selected */}
+        {isSelected && (
           <span aria-hidden="true" className="shrink-0 mt-0.5">
             <svg
               className="w-5 h-5 text-pantry-green"
@@ -113,16 +118,12 @@ export default function InventoryCard({
               />
             </svg>
           </span>
-        ) : item.expiresSoon ? (
-          <Badge variant="coral" className="shrink-0" aria-label="Expires soon">
-            Expires soon
-          </Badge>
-        ) : null}
+        )}
       </div>
 
-      {/* Stock badge */}
+      {/* Stock badge — always shown, even when selected */}
       <div className="flex flex-wrap items-center gap-2">
-        <StockBadge inStock={item.inStock} />
+        <StockBadge stockStatus={item.stockStatus} />
       </div>
 
       {/* Dietary tags */}
@@ -136,14 +137,7 @@ export default function InventoryCard({
         </div>
       )}
 
-      {/* Unknown availability note */}
-      {isUnknown && (
-        <p className="text-xs text-pantry-amber" role="note">
-          ⚠ Availability may vary
-        </p>
-      )}
-
-      {/* At-max note (shown when unselected and cap is reached) */}
+      {/* At-max note */}
       {atMax && !isOut && (
         <p className="text-xs text-foreground/40 mt-auto" role="note">
           Max {MAX_SELECTION} items selected

@@ -1,11 +1,11 @@
 import Badge from "@/components/ui/Badge";
 
 type Props = {
-  inStock: boolean | null;
+  stockStatus: "in_stock" | "low_stock" | "out_of_stock";
 };
 
-export default function StockBadge({ inStock }: Props) {
-  if (inStock === true) {
+export default function StockBadge({ stockStatus }: Props) {
+  if (stockStatus === "in_stock") {
     return (
       <Badge variant="green" dot aria-label="In stock">
         In stock
@@ -13,17 +13,17 @@ export default function StockBadge({ inStock }: Props) {
     );
   }
 
-  if (inStock === false) {
+  if (stockStatus === "low_stock") {
     return (
-      <Badge variant="tan" dot aria-label="Out of stock">
-        Out
+      <Badge variant="amber" dot aria-label="Low stock">
+        Low stock
       </Badge>
     );
   }
 
   return (
-    <Badge variant="amber" dot aria-label="Stock status unknown">
-      Unknown
+    <Badge variant="tan" dot aria-label="Out of stock">
+      Out of stock
     </Badge>
   );
 }
