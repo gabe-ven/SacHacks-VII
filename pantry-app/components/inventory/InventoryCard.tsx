@@ -2,6 +2,16 @@
 
 import type { KeyboardEvent } from "react";
 import type { InventoryItem } from "@/types/inventory";
+import Badge from "@/components/ui/Badge";
+
+type TagVariant = "green" | "tan" | "amber" | "coral";
+
+const TAG_VARIANTS: Record<string, TagVariant> = {
+  vegan: "green",
+  halal: "tan",
+  "gluten-free": "amber",
+  "dairy-free": "coral",
+};
 
 const CATEGORY_STYLE: Record<string, { bg: string; text: string }> = {
   Produce:        { bg: "#5E7F64", text: "#fff" },
@@ -138,17 +148,6 @@ export default function InventoryCard({ item, isSelected, onToggle, selectionCou
               </svg>
             </span>
           )}
-        </div>
-
-        {/* Stock + tags */}
-        <div className="flex flex-wrap items-center gap-1.5 mt-auto">
-          <StockBadge stockStatus={item.stockStatus} />
-          {item.tags.length > 0 &&
-            item.tags.map((tag) => (
-              <Badge key={tag} variant={TAG_VARIANTS[tag] ?? "tan"}>
-                {tag}
-              </Badge>
-            ))}
         </div>
 
         {atMax && !isOut && (
