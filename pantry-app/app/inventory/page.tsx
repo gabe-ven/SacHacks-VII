@@ -276,14 +276,14 @@ export default function InventoryPage() {
             className="hidden lg:flex lg:flex-col w-64 shrink-0 sticky top-6"
             aria-label="Selected items"
           >
-            <Card className="p-5 flex flex-col hover:shadow-none">
+            <div className="p-5 flex flex-col rounded-2xl bg-white border border-pantry-amber/40">
               <SelectedItemsPanel
                 selectedItems={selectedItems}
                 onRemove={handleRemove}
                 onClear={handleClearSelection}
                 onFindRecipes={handleFindRecipes}
               />
-            </Card>
+            </div>
           </aside>
         </div>
       </div>

@@ -26,7 +26,7 @@ export default function SelectedItemsPanel({
       <div className="flex items-center justify-between">
         <h2 className="font-semibold text-pantry-green text-sm">
           Selected{" "}
-          <span className="text-foreground/50 font-normal">
+          <span className="text-[#1a1a1a]/40 font-normal">
             ({count}/{MAX_SELECTION})
           </span>
         </h2>
@@ -34,7 +34,7 @@ export default function SelectedItemsPanel({
           <button
             onClick={onClear}
             aria-label="Clear all selected items"
-            className="text-xs text-pantry-coral hover:text-pantry-green underline underline-offset-2 transition-colors focus:outline-none"
+            className="text-xs text-pantry-green hover:text-pantry-green/70 underline underline-offset-2 transition-colors focus:outline-none"
           >
             Clear all
           </button>
@@ -43,61 +43,39 @@ export default function SelectedItemsPanel({
 
       {/* Item list or empty state */}
       {count === 0 ? (
-        <div className="flex flex-col items-center justify-center py-6 text-center">
-          <div className="w-10 h-10 rounded-full bg-pantry-tan/30 flex items-center justify-center mb-2">
-            <svg
-              className="w-5 h-5 text-pantry-green/60"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              strokeWidth={1.5}
-              aria-hidden="true"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2 4h14"
-              />
+        <div className="flex flex-col items-center justify-center py-8 text-center">
+          <div className="w-10 h-10 rounded-full bg-pantry-amber/15 flex items-center justify-center mb-3">
+            <svg className="w-5 h-5 text-pantry-green/50" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5} aria-hidden="true">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2 4h14" />
             </svg>
           </div>
-          <p className="text-sm text-foreground/60">No items selected</p>
-          <p className="text-xs text-foreground/40 mt-1">
-            Add items from the grid
-          </p>
+          <p className="text-sm font-medium text-[#1a1a1a]/50">Nothing here yet</p>
+          <p className="text-xs text-[#1a1a1a]/30 mt-1">Tap items to add them</p>
         </div>
       ) : (
         <ul className="space-y-2" aria-label="Selected items list">
           {selectedItems.map((item) => (
             <li
               key={item.id}
-              className="flex items-center gap-3 px-3 py-2.5 rounded-xl bg-white border border-[#1a1a1a]/6 shadow-sm"
+              className="flex items-center gap-2.5 bg-white rounded-xl border border-[#1a1a1a]/6 overflow-hidden shadow-sm"
             >
-              {/* Green check dot */}
-              <span className="shrink-0 w-2 h-2 rounded-full bg-pantry-green mt-0.5" aria-hidden="true" />
+              {/* Category color strip */}
+              <div className="w-1 self-stretch bg-pantry-amber shrink-0" aria-hidden="true" />
 
               {/* Name + category */}
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-[#1a1a1a] leading-snug truncate">
-                  {item.name}
-                </p>
-                <p className="text-[11px] text-[#1a1a1a]/40 mt-0.5">{item.category}</p>
+              <div className="flex-1 min-w-0 py-2.5">
+                <p className="text-sm font-semibold text-[#1a1a1a] leading-snug truncate">{item.name}</p>
+                <p className="text-[10px] font-medium uppercase tracking-wide text-[#1a1a1a]/35 mt-0.5">{item.category}</p>
               </div>
 
               {/* Remove button */}
               <button
                 onClick={() => onRemove(item.id)}
                 aria-label={`Remove ${item.name}`}
-                className="shrink-0 w-8 h-8 flex items-center justify-center rounded-full text-pantry-coral/50 hover:bg-pantry-coral/10 hover:text-pantry-coral transition-colors focus:outline-none cursor-pointer"
+                className="shrink-0 mr-2 w-6 h-6 flex items-center justify-center rounded-full text-[#1a1a1a]/20 hover:text-pantry-coral hover:bg-pantry-coral/10 transition-colors focus:outline-none cursor-pointer"
               >
-                <svg
-                  className="w-4 h-4"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  strokeWidth={2}
-                  aria-hidden="true"
-                >
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6" />
+                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5} aria-hidden="true">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
                 </svg>
               </button>
             </li>
