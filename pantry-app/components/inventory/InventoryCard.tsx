@@ -1,8 +1,8 @@
 "use client";
 
+import type { KeyboardEvent } from "react";
 import type { InventoryItem } from "@/types/inventory";
 import Badge from "@/components/ui/Badge";
-import Button from "@/components/ui/Button";
 import StockBadge from "./StockBadge";
 
 type TagVariant = "green" | "tan" | "amber" | "coral";
@@ -19,60 +19,105 @@ const MAX_SELECTION = 20;
 type Props = {
   item: InventoryItem;
   isSelected: boolean;
-  onAdd: (id: string) => void;
-  onRemove: (id: string) => void;
+  onToggle: (id: string) => void;
   selectionCount: number;
 };
 
 export default function InventoryCard({
   item,
   isSelected,
-  onAdd,
-  onRemove,
+  onToggle,
   selectionCount,
 }: Props) {
   const isOut = item.inStock === false;
   const isUnknown = item.inStock === null;
   const atMax = selectionCount >= MAX_SELECTION && !isSelected;
-  const canAdd = !isOut && !isSelected && !atMax;
+  const canToggle = !isOut && !atMax;
+
+  function handleCardClick() {
+    if (canToggle) onToggle(item.id);
+  }
+
+  function handleKeyDown(e: KeyboardEvent<HTMLElement>) {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault(); // prevent Space from scrolling
+      if (canToggle) onToggle(item.id);
+    }
+  }
 
   return (
     <article
+      role="checkbox"
+      aria-checked={isSelected}
+      aria-disabled={isOut || (!canToggle && !isSelected)}
       aria-label={item.name}
+      tabIndex={isOut ? -1 : 0}
+      onClick={handleCardClick}
+      onKeyDown={handleKeyDown}
       className={[
-        "relative flex flex-col gap-2.5 rounded-2xl border p-5 transition-all duration-150 h-full",
+        "relative flex flex-col gap-2.5 rounded-2xl border p-5 transition-all duration-150 h-full select-none",
         isOut
-          ? "bg-white/40 border-pantry-tan/40 opacity-60"
+          ? "bg-white/40 border-pantry-tan/40 opacity-60 grayscale cursor-not-allowed"
           : isSelected
-          ? "bg-white border-pantry-green ring-2 ring-pantry-green/30"
-          : "bg-white/60 border-pantry-tan hover:bg-white hover:border-pantry-green/40",
+          ? "bg-white border-pantry-green ring-2 ring-pantry-green/40 cursor-pointer"
+          : canToggle
+          ? "bg-white/60 border-pantry-tan hover:bg-white hover:border-pantry-green/40 cursor-pointer"
+          : "bg-white/60 border-pantry-tan cursor-not-allowed opacity-70",
+        !isOut ? "focus:outline-none focus:ring-2 focus:ring-pantry-green focus:ring-offset-1" : "",
       ].join(" ")}
     >
-      {/* Expires soon badge — top-right */}
-      {item.expiresSoon && (
-        <Badge
-          variant="coral"
-          className="absolute top-3 right-3"
-          aria-label="Expires soon"
-        >
-          Expires soon
-        </Badge>
-      )}
+      {/* Top row: name/category + check icon or expires badge */}
+      <div className="flex items-start gap-2.5">
+        {/* Hidden checkbox — screen-reader accessible but not visible */}
+        <input
+          type="checkbox"
+          checked={isSelected}
+          disabled={isOut}
+          aria-label={`Select ${item.name}`}
+          tabIndex={-1}
+          onChange={() => onToggle(item.id)}
+          onClick={(e) => e.stopPropagation()}
+          className="sr-only"
+        />
 
-      {/* Name + category + unit */}
-      <div className={item.expiresSoon ? "pr-24" : ""}>
-        <h3
-          className={[
-            "font-semibold leading-snug",
-            isOut ? "text-foreground/40" : "text-foreground",
-          ].join(" ")}
-        >
-          {item.name}
-        </h3>
-        <p className="text-xs text-foreground/50 mt-0.5">
-          {item.category}
-          {item.unit && <span className="ml-1.5">· {item.unit}</span>}
-        </p>
+        {/* Name + category + unit */}
+        <div className="flex-1 min-w-0">
+          <h3
+            className={[
+              "font-semibold leading-snug",
+              isOut ? "text-foreground/40" : "text-foreground",
+            ].join(" ")}
+          >
+            {item.name}
+          </h3>
+          <p className="text-xs text-foreground/50 mt-0.5">
+            {item.category}
+            {item.unit && <span className="ml-1.5">· {item.unit}</span>}
+          </p>
+        </div>
+
+        {/* Top-right: check icon when selected, expires badge otherwise */}
+        {isSelected ? (
+          <span aria-hidden="true" className="shrink-0 mt-0.5">
+            <svg
+              className="w-5 h-5 text-pantry-green"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={2.5}
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M4.5 12.75l6 6 9-13.5"
+              />
+            </svg>
+          </span>
+        ) : item.expiresSoon ? (
+          <Badge variant="coral" className="shrink-0" aria-label="Expires soon">
+            Expires soon
+          </Badge>
+        ) : null}
       </div>
 
       {/* Stock badge */}
@@ -98,38 +143,12 @@ export default function InventoryCard({
         </p>
       )}
 
-      {/* Action button — pinned to bottom */}
-      <div className="mt-auto pt-1">
-        {isSelected ? (
-          <Button
-            variant="selected"
-            fullWidth
-            onClick={() => onRemove(item.id)}
-            aria-label={`Remove ${item.name} from selection`}
-          >
-            ✓ Added — Remove
-          </Button>
-        ) : isOut ? (
-          <Button variant="secondary" fullWidth disabled aria-label={`${item.name} is unavailable`}>
-            Unavailable
-          </Button>
-        ) : (
-          <Button
-            variant="secondary"
-            fullWidth
-            disabled={!canAdd}
-            onClick={() => canAdd && onAdd(item.id)}
-            aria-label={
-              atMax
-                ? `Max ${MAX_SELECTION} items reached`
-                : `Add ${item.name} to selection`
-            }
-            title={atMax ? `Max ${MAX_SELECTION} items selected` : undefined}
-          >
-            + Add
-          </Button>
-        )}
-      </div>
+      {/* At-max note (shown when unselected and cap is reached) */}
+      {atMax && !isOut && (
+        <p className="text-xs text-foreground/40 mt-auto" role="note">
+          Max {MAX_SELECTION} items selected
+        </p>
+      )}
     </article>
   );
 }

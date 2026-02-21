@@ -108,14 +108,19 @@ export default function InventoryPage() {
   );
 
   // ── Selection handlers ────────────────────────────────────────────────────
-  const handleAdd = useCallback(
-    (id: string) => {
-      if (selectedIds.size >= MAX_SELECTION) return;
-      setSelectedIds((prev) => new Set([...prev, id]));
-    },
-    [selectedIds.size]
-  );
+  const handleToggle = useCallback((id: string) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        if (next.size < MAX_SELECTION) next.add(id);
+      }
+      return next;
+    });
+  }, []);
 
+  // Used by SelectedItemsPanel chips (explicit removal, not a toggle)
   const handleRemove = useCallback((id: string) => {
     setSelectedIds((prev) => {
       const next = new Set(prev);
@@ -322,8 +327,7 @@ export default function InventoryPage() {
                     <InventoryCard
                       item={item}
                       isSelected={selectedIds.has(item.id)}
-                      onAdd={handleAdd}
-                      onRemove={handleRemove}
+                      onToggle={handleToggle}
                       selectionCount={selectedIds.size}
                     />
                   </div>
