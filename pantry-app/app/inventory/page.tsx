@@ -149,12 +149,12 @@ export default function InventoryPage() {
   // ── Render ────────────────────────────────────────────────────────────────
   return (
     // Extra bottom padding on mobile so content isn't hidden behind the fixed bar
-    <div className="min-h-screen pb-24 lg:pb-0">
-      <div className="max-w-screen-xl mx-auto px-4 sm:px-6 py-10">
+    <div className="min-h-screen pb-24 lg:pb-0 bg-[#f9f9f7] text-[#1a1a1a]">
+      <div className="max-w-5xl mx-auto px-6 py-20">
 
         {/* ── Page header — mirrors homepage section rhythm ── */}
         <div className="mb-8">
-          <p className="text-pantry-green text-sm font-semibold uppercase tracking-widest mb-2">
+          <p className="text-pantry-coral text-[11px] font-bold uppercase tracking-[0.2em] mb-2">
             The Pantry at ASUCD · UC Davis
           </p>
           <h1
@@ -163,7 +163,7 @@ export default function InventoryPage() {
           >
             Browse the Pantry
           </h1>
-          <p className="text-foreground/70 max-w-xl">
+          <p className="text-[#1a1a1a]/45 max-w-xl">
             Pick the items you grabbed this week and we&apos;ll turn them into a
             real meal.
           </p>
@@ -271,7 +271,7 @@ export default function InventoryPage() {
             className="hidden lg:flex lg:flex-col w-64 shrink-0 sticky top-6"
             aria-label="Selected items"
           >
-            <Card className="p-5 flex flex-col">
+            <Card className="p-5 flex flex-col hover:shadow-none">
               <SelectedItemsPanel
                 selectedItems={selectedItems}
                 onRemove={handleRemove}

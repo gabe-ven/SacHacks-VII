@@ -63,14 +63,14 @@ export default function InventoryCard({
       className={[
         "relative flex flex-col gap-2.5 rounded-2xl border p-5 transition-all duration-150 h-full select-none",
         isOut
-          ? "bg-white/40 border-pantry-tan/40 opacity-50 grayscale cursor-not-allowed"
+          ? "bg-white border-[#1a1a1a]/5 shadow-sm opacity-40 grayscale cursor-not-allowed"
           : isSelected
-          ? "bg-pantry-green/10 border-pantry-green/40 ring-2 ring-pantry-green cursor-pointer"
+          ? "bg-pantry-green/10 border-pantry-green/40 ring-2 ring-pantry-green shadow-md cursor-pointer"
           : canToggle
           ? isLow
-            ? "bg-white/60 border-pantry-amber/50 hover:bg-white hover:border-pantry-amber cursor-pointer"
-            : "bg-white/60 border-pantry-tan hover:bg-white hover:border-pantry-green/40 cursor-pointer"
-          : "bg-white/60 border-pantry-tan cursor-not-allowed opacity-70",
+            ? "bg-white border-pantry-amber/40 shadow-sm hover:shadow-md hover:border-pantry-amber/60 cursor-pointer"
+            : "bg-white border-[#1a1a1a]/6 shadow-sm hover:shadow-md hover:border-pantry-green/25 cursor-pointer"
+          : "bg-white border-[#1a1a1a]/5 shadow-sm cursor-not-allowed opacity-70",
         !isOut ? "focus:outline-none focus-visible:ring-2 focus-visible:ring-pantry-green" : "",
       ].join(" ")}
     >

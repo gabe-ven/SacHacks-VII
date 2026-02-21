@@ -10,7 +10,7 @@ export default function Card({ id, className = "", children }: Props) {
     <div
       id={id}
       className={[
-        "bg-white/60 border border-pantry-tan rounded-2xl",
+        "bg-white border border-[#1a1a1a]/5 rounded-2xl hover:shadow-lg transition-all duration-300",
         className,
       ]
         .filter(Boolean)
