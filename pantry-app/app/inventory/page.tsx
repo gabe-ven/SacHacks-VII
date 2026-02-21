@@ -50,7 +50,6 @@ export default function InventoryPage() {
   const [hydrated, setHydrated] = useState(false);
 
   // ── Mobile UI toggles ─────────────────────────────────────────────────────
-  const [showMobileFilters, setShowMobileFilters] = useState(false);
   const [showMobileSelected, setShowMobileSelected] = useState(false);
 
   // ── Load inventory ────────────────────────────────────────────────────────
@@ -170,97 +169,28 @@ export default function InventoryPage() {
           </p>
         </div>
 
-        <div className="flex gap-6 items-start">
+        {/* ── Search + filter bar — full width above the grid ── */}
+        <div className="space-y-3 mb-6">
+          <SearchBar
+            value={filters.search}
+            onChange={(val) =>
+              setFilters((prev) => ({ ...prev, search: val }))
+            }
+          />
+          <FilterPanel
+            filters={filters}
+            onChange={setFilters}
+            allCategories={allCategories}
+            allTags={allTags}
+            resultCount={loading ? 0 : filteredItems.length}
+            onClear={handleClearFilters}
+          />
+        </div>
 
-          {/* ── Left: filter sidebar (desktop only) ── */}
-          <aside
-            className="hidden lg:block w-56 shrink-0 sticky top-6"
-            aria-label="Inventory filters"
-          >
-            <Card className="p-5">
-              <FilterPanel
-                filters={filters}
-                onChange={setFilters}
-                allCategories={allCategories}
-                allTags={allTags}
-                resultCount={filteredItems.length}
-                onClear={handleClearFilters}
-              />
-            </Card>
-          </aside>
+        <div className="flex gap-6 items-start">
 
           {/* ── Center: main content area ── */}
           <div className="flex-1 min-w-0 space-y-4">
-
-            {/* Search */}
-            <SearchBar
-              value={filters.search}
-              onChange={(val) =>
-                setFilters((prev) => ({ ...prev, search: val }))
-              }
-            />
-
-            {/* Mobile: filter toggle button */}
-            <div className="lg:hidden">
-              <button
-                onClick={() => setShowMobileFilters((v) => !v)}
-                aria-expanded={showMobileFilters}
-                aria-controls="mobile-filter-panel"
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-pantry-tan text-sm font-medium text-pantry-green hover:bg-pantry-tan/20 transition-colors focus:outline-none focus:ring-2 focus:ring-pantry-green"
-              >
-                <svg
-                  className="w-4 h-4"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  strokeWidth={2}
-                  aria-hidden="true"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M3 4h18M7 8h10M10 12h4"
-                  />
-                </svg>
-                Filters
-                {isFiltersActive(filters) && (
-                  <span
-                    className="w-2 h-2 rounded-full bg-pantry-coral"
-                    aria-label="Filters active"
-                  />
-                )}
-              </button>
-
-              {showMobileFilters && (
-                <Card id="mobile-filter-panel" className="mt-2 p-5">
-                  <FilterPanel
-                    filters={filters}
-                    onChange={setFilters}
-                    allCategories={allCategories}
-                    allTags={allTags}
-                    resultCount={filteredItems.length}
-                    onClear={handleClearFilters}
-                  />
-                </Card>
-              )}
-            </div>
-
-            {/* Results meta row (desktop) */}
-            <div className="hidden lg:flex items-center justify-between text-sm text-foreground/60">
-              <span>
-                {loading
-                  ? "Loading…"
-                  : `${filteredItems.length} result${filteredItems.length !== 1 ? "s" : ""}`}
-              </span>
-              {isFiltersActive(filters) && !loading && (
-                <button
-                  onClick={handleClearFilters}
-                  className="text-pantry-coral hover:text-pantry-green underline underline-offset-2 transition-colors focus:outline-none"
-                >
-                  Clear filters
-                </button>
-              )}
-            </div>
 
             {/* ── Content states ── */}
 
