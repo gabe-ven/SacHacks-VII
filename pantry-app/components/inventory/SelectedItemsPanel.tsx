@@ -21,7 +21,7 @@ export default function SelectedItemsPanel({
   const count = selectedItems.length;
 
   return (
-    <div className="flex flex-col gap-3 h-full" aria-label="Selected items panel">
+    <div className="flex flex-col gap-3" aria-label="Selected items panel">
       {/* Header */}
       <div className="flex items-center justify-between">
         <h2 className="font-semibold text-pantry-green text-sm">
@@ -43,7 +43,7 @@ export default function SelectedItemsPanel({
 
       {/* Item list or empty state */}
       {count === 0 ? (
-        <div className="flex-1 flex flex-col items-center justify-center py-8 text-center">
+        <div className="flex flex-col items-center justify-center py-6 text-center">
           <div className="w-10 h-10 rounded-full bg-pantry-tan/30 flex items-center justify-center mb-2">
             <svg
               className="w-5 h-5 text-pantry-green/60"
@@ -67,7 +67,7 @@ export default function SelectedItemsPanel({
         </div>
       ) : (
         <ul
-          className="flex-1 overflow-y-auto space-y-1.5 pr-0.5"
+          className="space-y-1.5"
           aria-label="Selected items list"
         >
           {selectedItems.map((item) => (

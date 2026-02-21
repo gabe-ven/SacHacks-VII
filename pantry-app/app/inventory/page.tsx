@@ -339,10 +339,9 @@ export default function InventoryPage() {
           {/* ── Right: selected items panel (desktop only) ── */}
           <aside
             className="hidden lg:flex lg:flex-col w-64 shrink-0 sticky top-6"
-            style={{ height: "calc(100vh - 6rem)" }}
             aria-label="Selected items"
           >
-            <Card className="p-5 h-full flex flex-col">
+            <Card className="p-5 flex flex-col">
               <SelectedItemsPanel
                 selectedItems={selectedItems}
                 onRemove={handleRemove}
