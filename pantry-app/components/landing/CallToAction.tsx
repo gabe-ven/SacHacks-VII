@@ -1,12 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { Reveal } from "./animations";
+import { PopIn } from "./animations";
 
 export default function CallToAction() {
   return (
     <section className="px-6 py-20 bg-surface">
-      <Reveal className="flex flex-col items-center text-center gap-5 max-w-lg mx-auto">
+      <PopIn className="flex flex-col items-center text-center gap-5 max-w-lg mx-auto">
         <h2 className="text-5xl sm:text-6xl text-foreground" style={{ fontFamily: "Dancing Script, cursive" }}>
           What&apos;s in your bag today?
         </h2>
@@ -45,7 +45,7 @@ export default function CallToAction() {
             </a>
           </div>
         </div>
-      </Reveal>
+      </PopIn>
     </section>
   );
 }

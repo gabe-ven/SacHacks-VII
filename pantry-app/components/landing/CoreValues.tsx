@@ -1,6 +1,6 @@
 "use client";
 
-import { Reveal, StaggerGrid, StaggerItem } from "./animations";
+import { Reveal3D, StaggerGrid, StaggerItem } from "./animations";
 
 const values = [
   {
@@ -48,12 +48,12 @@ export default function CoreValues() {
   return (
     <section className="px-6 py-28 bg-surface">
       <div className="max-w-5xl mx-auto">
-        <Reveal className="text-center mb-16">
+        <Reveal3D className="text-center mb-16">
           <span className="text-pantry-coral text-[11px] font-bold uppercase tracking-[0.2em]">Core Values</span>
           <h2 className="text-5xl sm:text-6xl text-foreground mt-3" style={{ fontFamily: "Dancing Script, cursive" }}>
-            What we <span className="text-pantry-coral">stand for</span>
+            What we <span className="text-pantry-green">stand for</span>
           </h2>
-        </Reveal>
+        </Reveal3D>
 
         <StaggerGrid className="grid grid-cols-1 sm:grid-cols-3 gap-5">
           {values.map(({ label, desc, bg, tint, icon, stat }) => (
