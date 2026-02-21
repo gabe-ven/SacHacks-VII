@@ -3,12 +3,12 @@ import type { ButtonHTMLAttributes } from "react";
 type Variant = "primary" | "secondary" | "ghost" | "selected";
 
 const VARIANTS: Record<Variant, string> = {
-  // Coral pill — matches homepage "Start Cooking" CTA
+  // Green pill — matches landing page "Start Cooking" CTA
   primary:
-    "bg-pantry-coral text-white hover:bg-pantry-amber hover:text-pantry-green",
-  // Outlined pill — matches homepage ghost secondary
+    "bg-pantry-green text-white hover:bg-pantry-coral",
+  // Outlined pill — matches landing page secondary button
   secondary:
-    "border border-pantry-tan text-pantry-green bg-transparent hover:bg-pantry-tan/20",
+    "border border-[#1a1a1a]/12 text-[#1a1a1a]/60 bg-transparent hover:border-pantry-green/50 hover:text-pantry-green",
   // Text-only — for inline actions
   ghost:
     "text-pantry-coral hover:text-pantry-green bg-transparent",
