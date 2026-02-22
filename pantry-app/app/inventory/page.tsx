@@ -130,7 +130,7 @@ export default function InventoryPage() {
   const allTags = useMemo(() => getAllTags(inventory), [inventory]);
   const filteredItems = useMemo(() => {
     const items = filterInventory(inventory, filters);
-    const stockOrder = { in_stock: 0, out_of_stock: 1 } as const;
+    const stockOrder: Record<string, number> = { in_stock: 0, low_stock: 1, out_of_stock: 2 };
     return [...items].sort((a, b) => {
       const diff = (stockOrder[a.stockStatus] ?? 2) - (stockOrder[b.stockStatus] ?? 2);
       if (diff !== 0) return diff;

@@ -58,6 +58,7 @@ export default function InventoryCard({
   onBlockedSelect,
 }: Props) {
   const isOut = item.stockStatus === "out_of_stock";
+  const isLow = item.stockStatus === "low_stock";
   const isPersonalCare = item.category.trim().toLowerCase() === "personal care";
   const atMax = selectionCount >= MAX_SELECTION && !isSelected;
   const canToggle = !isOut && !atMax && !isPersonalCare;
@@ -175,7 +176,7 @@ export default function InventoryCard({
             "text-[10px] font-semibold uppercase tracking-wide",
             isOut ? "text-muted" : isLow ? "text-pantry-amber" : "text-pantry-green",
           ].join(" ")}>
-            {isOut ? "Out of stock" : "In stock"}
+            {isOut ? "Out of stock" : isLow ? "Low stock" : "In stock"}
           </span>
         </div>
 
