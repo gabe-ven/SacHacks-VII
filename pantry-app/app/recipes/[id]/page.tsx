@@ -47,7 +47,7 @@ export default function RecipeDetailPage() {
         <p className="text-foreground font-semibold">Recipe not found.</p>
         <p className="text-sm text-muted">It may have expired. Go back and generate new recipes.</p>
         <button onClick={() => router.push("/inventory")}
-          className="mt-2 px-5 py-2 bg-pantry-green text-white text-sm font-semibold rounded-full hover:bg-pantry-coral transition-colors">
+          className="cursor-pointer mt-2 px-5 py-2 bg-pantry-green text-white text-sm font-semibold rounded-full hover:bg-pantry-coral transition-colors">
           Back to inventory →
         </button>
       </div>
@@ -60,19 +60,21 @@ export default function RecipeDetailPage() {
   const total = recipe.haveIngredients.length + recipe.needIngredients.length;
   const pct = total > 0 ? Math.round((recipe.haveIngredients.length / total) * 100) : 0;
 
+  const allIngredients = [
+    ...recipe.haveIngredients.map((ing) => ({ text: ing, have: true })),
+    ...recipe.needIngredients.map((ing) => ({ text: ing, have: false })),
+  ];
+
   return (
     <div className="min-h-screen bg-background">
-      {/* Hero band */}
-      <div className="h-2 w-full" style={{ backgroundColor: accent }} />
+      <div className="max-w-2xl mx-auto px-6 py-10 sm:py-16">
 
-      <div className="max-w-2xl mx-auto px-4 pt-10 pb-20">
-
-        {/* Back */}
+        {/* ── Back ── */}
         <motion.button
-          initial={{ opacity: 0, x: -10 }}
+          initial={{ opacity: 0, x: -8 }}
           animate={{ opacity: 1, x: 0 }}
           onClick={() => router.back()}
-          className="flex items-center gap-1.5 text-sm text-muted hover:text-foreground transition-colors mb-10 group"
+          className="cursor-pointer inline-flex items-center gap-2 text-sm text-muted hover:text-foreground transition-colors group"
         >
           <svg className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
@@ -80,160 +82,141 @@ export default function RecipeDetailPage() {
           All recipes
         </motion.button>
 
-        {/* Title */}
+        {/* ── Hero ── */}
         <motion.div
-          initial={{ opacity: 0, y: 24 }}
+          initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ type: "spring", stiffness: 260, damping: 22 }}
-          className="mb-6"
+          transition={{ type: "spring", stiffness: 280, damping: 24 }}
+          className="mt-12"
         >
-          <h1
-            className="text-5xl sm:text-6xl font-black leading-tight tracking-tight"
-            style={{ fontFamily: "Dancing Script, cursive", color: accent }}
-          >
-            {recipe.name}
-          </h1>
-
-          {/* Meta row */}
-          <div className="flex flex-wrap items-center gap-3 mt-4">
-            <span className="flex items-center gap-1.5 text-sm text-muted">
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <div className="flex flex-wrap items-center gap-2 mb-4">
+            <span className={`text-[11px] font-semibold uppercase tracking-wider px-3 py-1 rounded-full border ${DIFFICULTY_COLOR[recipe.difficulty] ?? DIFFICULTY_COLOR.Easy}`}>
+              {recipe.difficulty}
+            </span>
+            <span className="inline-flex items-center gap-1.5 text-sm text-muted">
+              <svg className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <circle cx="12" cy="12" r="10" /><path d="M12 6v6l4 2" />
               </svg>
               {recipe.cookTime}
             </span>
-            <span className={`text-xs font-bold uppercase tracking-widest px-3 py-1 rounded-full border ${DIFFICULTY_COLOR[recipe.difficulty] ?? DIFFICULTY_COLOR.Easy}`}>
-              {recipe.difficulty}
-            </span>
-            <span className="text-sm text-muted">{total} ingredients · {recipe.steps.length} steps</span>
           </div>
+
+          <h1
+            className="text-4xl sm:text-5xl leading-[1.15]"
+            style={{ fontFamily: "var(--font-display)", color: accent }}
+          >
+            {recipe.name}
+          </h1>
+
+          <p className="text-sm text-muted mt-4">
+            {total} ingredients · {recipe.steps.length} steps
+          </p>
         </motion.div>
 
-        {/* Progress bar */}
-        <motion.div
+        {/* ── Ingredients ── */}
+        <motion.section
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 0.2 }}
-          className="mb-8 p-4 bg-surface-card border border-border rounded-2xl"
+          transition={{ delay: 0.15 }}
+          className="mt-16"
         >
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-xs text-muted">Ingredients you already have</span>
-            <span className="text-xs font-bold" style={{ color: accent }}>{recipe.haveIngredients.length} of {total}</span>
-          </div>
-          <div className="h-2 w-full bg-border rounded-full overflow-hidden">
-            <motion.div
-              className="h-full rounded-full"
-              style={{ backgroundColor: accent }}
-              initial={{ width: 0 }}
-              animate={{ width: `${pct}%` }}
-              transition={{ duration: 0.9, ease: "easeOut", delay: 0.3 }}
-            />
-          </div>
-        </motion.div>
+          <h2 className="text-xs font-semibold uppercase tracking-widest text-muted mb-6">
+            Ingredients
+          </h2>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-10">
-          {/* You have */}
-          {recipe.haveIngredients.length > 0 && (
-            <motion.section
-              initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.25 }}
-              className="bg-pantry-green/5 border border-pantry-green/15 rounded-2xl p-5"
-            >
-              <h2 className="text-xs font-bold uppercase tracking-widest text-pantry-green mb-4">
-                ✓ You have
-              </h2>
-              <ul className="space-y-2.5">
-                {recipe.haveIngredients.map((ing, i) => (
-                  <li key={i} className="flex items-center gap-3">
-                    <span className="w-5 h-5 rounded-full bg-pantry-green flex items-center justify-center shrink-0">
-                      <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
-                      </svg>
-                    </span>
-                    <span className="text-sm text-foreground">{ing}</span>
-                  </li>
-                ))}
-              </ul>
-            </motion.section>
-          )}
-
-          {/* Also need */}
-          {recipe.needIngredients.length > 0 && (
-            <motion.section
-              initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.32 }}
-              className="bg-pantry-amber/6 border border-pantry-amber/15 rounded-2xl p-5"
-            >
-              <h2 className="text-xs font-bold uppercase tracking-widest text-pantry-amber mb-4">
-                + Also grab
-              </h2>
-              <ul className="space-y-2.5">
-                {recipe.needIngredients.map((ing, i) => (
-                  <li key={i} className="flex items-center gap-3">
-                    <span className="w-5 h-5 rounded-full border border-pantry-amber/40 bg-pantry-amber/10 flex items-center justify-center shrink-0 text-pantry-amber text-xs font-bold">
-                      +
-                    </span>
-                    <span className="text-sm text-foreground">{ing}</span>
-                  </li>
-                ))}
-              </ul>
-            </motion.section>
-          )}
-        </div>
-
-        {/* Steps */}
-        <motion.section
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.38 }}
-        >
-          <h2 className="text-xs font-bold uppercase tracking-widest text-muted mb-6">Instructions</h2>
-          <ol className="space-y-6">
-            {recipe.steps.map((step, i) => (
-              <motion.li
-                key={i}
-                initial={{ opacity: 0, x: -16 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.45 + i * 0.06 }}
-                className="flex gap-5"
-              >
-                <span
-                  className="shrink-0 w-9 h-9 rounded-full flex items-center justify-center text-white font-black text-sm mt-0.5"
-                  style={{ backgroundColor: accent }}
-                >
-                  {i + 1}
+          <ul className="space-y-0 divide-y divide-border">
+            {allIngredients.map((ing, i) => (
+              <li key={i} className="flex items-center gap-4 py-3.5">
+                {ing.have ? (
+                  <span className="w-5 h-5 rounded-full shrink-0 flex items-center justify-center" style={{ backgroundColor: accent }}>
+                    <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                    </svg>
+                  </span>
+                ) : (
+                  <span className="w-5 h-5 rounded-full border-2 border-border shrink-0" />
+                )}
+                <span className={`text-sm flex-1 ${ing.have ? "text-foreground" : "text-muted"}`}>
+                  {ing.text}
                 </span>
-                <div className="pt-1.5">
-                  <p className="text-base text-foreground leading-relaxed">{step}</p>
-                </div>
-              </motion.li>
+                {ing.have && (
+                  <span className="text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full" style={{ backgroundColor: accent + "18", color: accent }}>
+                    On hand
+                  </span>
+                )}
+              </li>
             ))}
-          </ol>
+          </ul>
+
+          {/* Progress */}
+          <div className="mt-6 flex items-center gap-4">
+            <div className="flex-1 h-1.5 bg-border rounded-full overflow-hidden">
+              <motion.div
+                className="h-full rounded-full"
+                style={{ backgroundColor: accent }}
+                initial={{ width: 0 }}
+                animate={{ width: `${pct}%` }}
+                transition={{ duration: 1, ease: "easeOut", delay: 0.3 }}
+              />
+            </div>
+            <span className="text-xs font-semibold shrink-0" style={{ color: accent }}>{pct}% ready</span>
+          </div>
         </motion.section>
 
-        {/* Back CTA */}
+        {/* ── Steps ── */}
+        <motion.section
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.3 }}
+          className="mt-16"
+        >
+          <h2 className="text-xs font-semibold uppercase tracking-widest text-muted">
+            How to make it
+          </h2>
+
+          <div className="h-10" />
+
+          {recipe.steps.map((step, i) => (
+            <motion.div
+              key={i}
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.35 + i * 0.05 }}
+              className={`flex gap-5 ${i > 0 ? "mt-8" : ""}`}
+            >
+              <span
+                className="shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-white font-bold text-sm"
+                style={{ backgroundColor: accent }}
+              >
+                {i + 1}
+              </span>
+              <p className="text-[15px] text-foreground leading-relaxed pt-1 flex-1 min-w-0">{step}</p>
+            </motion.div>
+          ))}
+        </motion.section>
+
+        {/* ── Footer ── */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 0.6 }}
-          className="mt-14 pt-8 border-t border-border flex items-center justify-between"
+          transition={{ delay: 0.5 }}
+          className="mt-20 pt-8 border-t border-border flex items-center justify-between"
         >
           <button
             onClick={() => router.back()}
-            className="text-sm text-muted hover:text-foreground transition-colors"
+            className="cursor-pointer text-sm text-muted hover:text-foreground transition-colors"
           >
             ← Other recipes
           </button>
           <button
             onClick={() => router.push("/inventory")}
-            className="text-sm font-semibold text-white px-5 py-2.5 rounded-full transition-colors"
+            className="cursor-pointer text-sm font-semibold text-white px-5 py-2.5 rounded-full hover:opacity-90 transition-opacity"
             style={{ backgroundColor: accent }}
           >
             New haul →
           </button>
         </motion.div>
+
       </div>
     </div>
   );

@@ -92,7 +92,7 @@ export default function InventoryCard({
       onClick={handleCardClick}
       onKeyDown={handleKeyDown}
       className={[
-        "relative flex rounded-2xl overflow-hidden select-none transition-all duration-200 h-[96px]",
+        "relative flex rounded-xl sm:rounded-2xl overflow-hidden select-none transition-all duration-200 h-[96px]",
         "border",
         isOut
           ? "opacity-40 grayscale cursor-not-allowed border-border"
@@ -134,7 +134,7 @@ export default function InventoryCard({
       {/* Card body */}
       <div
         className={[
-          "flex flex-col justify-between p-3.5 flex-1 min-w-0 transition-colors duration-200 overflow-hidden",
+          "flex flex-col justify-between p-3 sm:p-3.5 flex-1 min-w-0 transition-colors duration-200 overflow-hidden",
           isSelected ? "bg-pantry-green/5" : "bg-surface-card",
         ].join(" ")}
       >

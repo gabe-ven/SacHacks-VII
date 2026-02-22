@@ -125,6 +125,13 @@ export default function InventoryPage() {
     localStorage.setItem(STORAGE_KEY, JSON.stringify([...selectedIds]));
   }, [selectedIds, hydrated]);
 
+  // ── Clear selection when leaving the inventory page ───────────────────────
+  useEffect(() => {
+    return () => {
+      localStorage.removeItem(STORAGE_KEY);
+    };
+  }, []);
+
   // ── Derived values (memoised) ─────────────────────────────────────────────
   const allCategories = useMemo(() => getAllCategories(inventory), [inventory]);
   const allTags = useMemo(() => getAllTags(inventory), [inventory]);
@@ -218,11 +225,11 @@ export default function InventoryPage() {
 
   // ── Render ────────────────────────────────────────────────────────────────
   return (
-    <div className="min-h-screen bg-background pb-24 lg:pb-0">
-      <div className="max-w-screen-xl mx-auto px-4 sm:px-6 py-12">
+    <div className="min-h-screen bg-background pb-20 lg:pb-0">
+      <div className="max-w-screen-xl mx-auto px-3 sm:px-6 py-6 sm:py-12">
 
         {/* ── Page header ── */}
-        <div className="mb-10 relative overflow-hidden rounded-3xl bg-pantry-green px-8 py-12 flex flex-col gap-3">
+        <div className="mb-8 relative overflow-hidden rounded-2xl sm:rounded-3xl bg-pantry-green px-5 py-8 sm:px-8 sm:py-12 flex flex-col gap-2 sm:gap-3">
           <div
             className="absolute inset-0 opacity-[0.04] pointer-events-none"
             style={{
@@ -230,16 +237,16 @@ export default function InventoryPage() {
               backgroundSize: "48px 48px",
             }}
           />
-          <span className="relative z-10 text-pantry-amber text-[11px] font-bold uppercase tracking-[0.2em]">
+          <span className="relative z-10 text-pantry-amber text-[10px] sm:text-[11px] font-bold uppercase tracking-[0.2em]">
             The Pantry at ASUCD · UC Davis
           </span>
           <h1
-            className="relative z-10 text-5xl sm:text-6xl text-white"
+            className="relative z-10 text-4xl sm:text-5xl md:text-6xl text-white"
             style={{ fontFamily: "var(--font-display)" }}
           >
             Browse the Pantry
           </h1>
-          <p className="relative z-10 text-pantry-cream/60 max-w-md text-sm leading-relaxed">
+          <p className="relative z-10 text-pantry-cream/60 max-w-md text-xs sm:text-sm leading-relaxed">
             Pick the items you grabbed this week and we&apos;ll generate a real meal from them.
           </p>
         </div>
@@ -344,7 +351,7 @@ export default function InventoryPage() {
             {!error && !loading && filteredItems.length > 0 && (
               <div className="space-y-4">
                 <div
-                  className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 auto-rows-[8rem]"
+                  className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3 sm:gap-4 auto-rows-[96px]"
                   role="list"
                   aria-label={`${filteredItems.length} pantry items, page ${currentPage} of ${totalPages}`}
                 >

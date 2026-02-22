@@ -86,87 +86,85 @@ function RecipeCard({
     >
       <button
         onClick={onClick}
-        className="group w-full text-left bg-surface-card border border-border rounded-3xl overflow-hidden shadow-sm hover:shadow-xl hover:border-transparent transition-all duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-pantry-green"
+        className="cursor-pointer group w-full text-left bg-surface-card border border-border rounded-2xl overflow-hidden hover:shadow-2xl hover:-translate-y-0.5 transition-all duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-pantry-green"
       >
-        <div className="h-2 w-full" style={{ backgroundColor: accent }} />
-        <div className="p-7">
-          <div className="flex items-start justify-between gap-4 mb-4">
-            <h3
-              className="text-2xl font-black leading-tight tracking-tight group-hover:opacity-80 transition-opacity"
-              style={{ fontFamily: "Dancing Script, cursive", color: accent }}
-            >
-              {recipe.name}
-            </h3>
-            <span className={`shrink-0 text-[10px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-full border mt-1 ${DIFFICULTY_COLOR[recipe.difficulty] ?? DIFFICULTY_COLOR.Easy}`}>
-              {recipe.difficulty}
-            </span>
-          </div>
+        <div className="flex">
+          {/* Left accent bar */}
+          <div className="w-1 shrink-0" style={{ backgroundColor: accent }} />
 
-          <div className="flex items-center gap-4 text-xs text-muted mb-6">
-            <span className="flex items-center gap-1.5">
-              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <div className="flex-1 p-6">
+            {/* Header */}
+            <div className="flex items-start justify-between gap-3 mb-2">
+              <h3
+                className="text-[1.6rem] leading-tight font-black"
+                style={{ fontFamily: "Dancing Script, cursive", color: accent }}
+              >
+                {recipe.name}
+              </h3>
+              <span className={`shrink-0 text-[10px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-full border mt-0.5 ${DIFFICULTY_COLOR[recipe.difficulty] ?? DIFFICULTY_COLOR.Easy}`}>
+                {recipe.difficulty}
+              </span>
+            </div>
+
+            {/* Meta */}
+            <div className="flex items-center gap-2.5 text-xs text-muted mb-5">
+              <svg className="w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <circle cx="12" cy="12" r="10" /><path d="M12 6v6l4 2" />
               </svg>
-              {recipe.cookTime}
-            </span>
-            <span>·</span>
-            <span>{total} ingredients</span>
-            <span>·</span>
-            <span>{recipe.steps.length} steps</span>
-          </div>
-
-          {recipe.haveIngredients.length > 0 && (
-            <div className="mb-4">
-              <p className="text-[10px] font-bold uppercase tracking-widest text-pantry-green mb-2">
-                ✓ You have ({recipe.haveIngredients.length})
-              </p>
-              <div className="flex flex-wrap gap-2">
-                {recipe.haveIngredients.map((ing) => (
-                  <span key={ing} className="text-xs font-medium px-3 py-1 rounded-full bg-pantry-green/10 border border-pantry-green/20 text-pantry-green">
-                    {ing}
-                  </span>
-                ))}
-              </div>
+              <span>{recipe.cookTime}</span>
+              <span className="opacity-30">·</span>
+              <span>{total} ingredients</span>
+              <span className="opacity-30">·</span>
+              <span>{recipe.steps.length} steps</span>
             </div>
-          )}
 
-          {recipe.needIngredients.length > 0 && (
-            <div className="mb-6">
-              <p className="text-[10px] font-bold uppercase tracking-widest text-muted mb-2">
-                + Also need ({recipe.needIngredients.length})
-              </p>
-              <div className="flex flex-wrap gap-2">
-                {recipe.needIngredients.map((ing) => (
-                  <span key={ing} className="text-xs font-medium px-3 py-1 rounded-full bg-surface border border-border text-muted">
-                    {ing}
-                  </span>
-                ))}
-              </div>
+            {/* Ingredients */}
+            <div className="space-y-2 mb-5">
+              {recipe.haveIngredients.length > 0 && (
+                <div className="flex flex-wrap gap-1.5">
+                  {recipe.haveIngredients.map((ing) => (
+                    <span
+                      key={ing}
+                      className="text-xs font-medium px-2.5 py-1 rounded-full"
+                      style={{ backgroundColor: accent + "22", color: accent }}
+                    >
+                      {ing}
+                    </span>
+                  ))}
+                </div>
+              )}
+              {recipe.needIngredients.length > 0 && (
+                <div className="flex flex-wrap gap-1.5">
+                  {recipe.needIngredients.map((ing) => (
+                    <span key={ing} className="text-xs font-medium px-2.5 py-1 rounded-full bg-surface border border-border text-muted">
+                      {ing}
+                    </span>
+                  ))}
+                </div>
+              )}
             </div>
-          )}
 
-          <div className="flex items-center justify-between gap-4 pt-4 border-t border-border">
-            <div className="flex-1">
-              <div className="flex items-center justify-between mb-1">
-                <span className="text-[10px] text-muted">Ingredients you have</span>
-                <span className="text-[10px] font-bold" style={{ color: accent }}>{pct}%</span>
+            {/* Footer */}
+            <div className="flex items-center gap-4 pt-4 border-t border-border">
+              <div className="flex-1 flex items-center gap-2.5">
+                <div className="flex-1 h-1 bg-border rounded-full overflow-hidden">
+                  <motion.div
+                    className="h-full rounded-full"
+                    style={{ backgroundColor: accent }}
+                    initial={{ width: 0 }}
+                    animate={{ width: `${pct}%` }}
+                    transition={{ duration: 0.8, ease: "easeOut", delay: 0.4 + index * 0.07 }}
+                  />
+                </div>
+                <span className="text-[11px] text-muted shrink-0">{pct}% on hand</span>
               </div>
-              <div className="h-1 w-full bg-border rounded-full overflow-hidden">
-                <motion.div
-                  className="h-full rounded-full"
-                  style={{ backgroundColor: accent }}
-                  initial={{ width: 0 }}
-                  animate={{ width: `${pct}%` }}
-                  transition={{ duration: 0.8, ease: "easeOut", delay: 0.4 + index * 0.07 }}
-                />
-              </div>
+              <span
+                className="shrink-0 text-xs font-semibold px-4 py-2 rounded-full text-white group-hover:opacity-90 transition-opacity"
+                style={{ backgroundColor: accent }}
+              >
+                See recipe →
+              </span>
             </div>
-            <span
-              className="shrink-0 text-xs font-bold px-4 py-2 rounded-full text-white transition-all duration-200 group-hover:scale-105"
-              style={{ backgroundColor: accent }}
-            >
-              See recipe →
-            </span>
           </div>
         </div>
       </button>
@@ -263,7 +261,7 @@ export default function RecipesPage() {
           initial={{ opacity: 0, x: -10 }}
           animate={{ opacity: 1, x: 0 }}
           onClick={() => router.push("/inventory")}
-          className="flex items-center gap-1.5 text-sm text-muted hover:text-foreground transition-colors mb-10 group"
+          className="cursor-pointer flex items-center gap-1.5 text-sm text-muted hover:text-foreground transition-colors mb-10 group"
         >
           <svg className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
@@ -274,25 +272,26 @@ export default function RecipesPage() {
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.45 }} className="mb-3">
           <h1 className="text-4xl sm:text-5xl font-black tracking-tight text-foreground leading-tight">
             {loading
-              ? <>Cooking up<br /><span className="text-pantry-green">your recipes…</span></>
+              ? <><span className="text-pantry-green">Cooking up</span> your recipes…</>
               : error ? "Something went wrong"
               : recipes.length > 0
-              ? <><span className="text-pantry-green">{recipes.length} recipes</span><br />for your haul</>
+              ? <><span className="text-pantry-green">{recipes.length} recipes</span> for your haul</>
               : "No recipes found"}
           </h1>
           <p className="text-sm text-muted mt-2">
             {loading
               ? `Generating ideas from ${selectedNames.length} item${selectedNames.length !== 1 ? "s" : ""}…`
               : error ? error
-              : recipes.length > 0 ? "Green = you have it · Grey = easy to grab"
+              : recipes.length > 0
+              ? `From ${selectedNames.length} item${selectedNames.length !== 1 ? "s" : ""} in your haul`
               : "Try selecting more items from the inventory"}
           </p>
         </motion.div>
 
         {selectedNames.length > 0 && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }} className="flex flex-wrap gap-2 mb-10">
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }} className="flex flex-wrap gap-1.5 mt-4 mb-10">
             {selectedNames.map((name) => (
-              <span key={name} className="text-xs font-medium px-3 py-1 rounded-full bg-pantry-green/10 border border-pantry-green/20 text-pantry-green">
+              <span key={name} className="text-xs font-medium px-3 py-1 rounded-full bg-surface-card border border-border text-muted">
                 {name}
               </span>
             ))}

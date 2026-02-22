@@ -47,6 +47,39 @@ function findIngredientId(name: string, ingredientMap: Map<string, string>): str
   return null;
 }
 
+/** Return true if this ingredient string matches one of the user's selected items. */
+function matchesSelected(ingredientStr: string, selectedItems: string[]): boolean {
+  const norm = normalize(ingredientStr);
+  if (!norm) return false;
+  for (const selected of selectedItems) {
+    const selNorm = normalize(selected);
+    if (!selNorm) continue;
+    if (norm.includes(selNorm) || selNorm.includes(norm)) return true;
+  }
+  return false;
+}
+
+/** Ensure haveIngredients only contains items that match the user's selection; move the rest to needIngredients. */
+function filterHaveIngredientsToSelectedOnly(
+  recipe: GeneratedRecipe,
+  selectedItems: string[]
+): GeneratedRecipe {
+  const have: string[] = [];
+  const movedToNeed: string[] = [];
+  for (const ing of recipe.haveIngredients) {
+    if (matchesSelected(ing, selectedItems)) {
+      have.push(ing);
+    } else {
+      movedToNeed.push(ing);
+    }
+  }
+  return {
+    ...recipe,
+    haveIngredients: have,
+    needIngredients: [...movedToNeed, ...recipe.needIngredients],
+  };
+}
+
 // ── POST /api/generate-recipes ─────────────────────────────────────────────
 
 export async function POST(req: NextRequest) {
@@ -71,13 +104,12 @@ export async function POST(req: NextRequest) {
           content: `You are a practical college meal assistant for UC Davis students using The Pantry food bank.
 Your job is to suggest REAL, COMPLETE, DELICIOUS recipes that feature the student's selected ingredients.
 
-Rules:
-- Generate as many distinct recipes as you can (aim for 5–6) — more variety is better.
-- Each recipe MUST prominently use at least 1–2 of the student's selected ingredients.
-- Make them REAL complete recipes with proper names — not just "toast with avocado" but "Smashed Avocado Toast with Chili Flakes", etc.
-- In "haveIngredients" list the selected items used in this recipe (with quantities).
-- In "needIngredients" list any additional common ingredients needed (salt, pepper, garlic, butter, lemon, oil, etc.) that a student would easily find or buy cheap. Keep it short and practical.
-- Steps should be clear and beginner-friendly (4–6 steps each).
+CRITICAL RULES:
+- "haveIngredients" must contain ONLY ingredients from the student's list below. You may add quantities (e.g. "1 apple", "2 tablespoons peanut butter") but do NOT add bread, eggs, butter, oil, salt, or any item the student did not list. If a recipe normally needs bread but the student did not pick bread, put bread in "needIngredients" instead.
+- "needIngredients" = everything else needed for the recipe that the student did NOT pick (bread, eggs, oil, salt, spices, etc.).
+- Each recipe must use at least 1–2 of the student's selected ingredients; list only those in haveIngredients.
+- Generate 5–6 distinct recipes. Make them real complete recipes with proper names.
+- Steps: 4–6 clear, beginner-friendly steps.
 
 Respond ONLY with valid JSON:
 {
@@ -86,23 +118,25 @@ Respond ONLY with valid JSON:
       "name": "Recipe name",
       "cookTime": "X min",
       "difficulty": "Easy" | "Medium" | "Hard",
-      "haveIngredients": ["1 ripe avocado", "2 slices bread"],
-      "needIngredients": ["1 egg", "salt and pepper", "red pepper flakes"],
-      "steps": ["Step 1.", "Step 2.", "Step 3."]
+      "haveIngredients": ["only items from student list with quantities"],
+      "needIngredients": ["everything else needed"],
+      "steps": ["Step 1.", "Step 2."]
     }
   ]
 }`,
         },
         {
           role: "user",
-          content: `I picked up these food items from the UC Davis Pantry:\n${foodItems.join(", ")}\n\nSuggest as many real complete recipes as you can (aim for 5–6). Use these as the main ingredients and tell me what else I need.`,
+          content: `These are the ONLY items I have (do not put anything else in haveIngredients):\n${foodItems.join("\n")}\n\nSuggest 5–6 real recipes using these. For each recipe, haveIngredients = only items from the list above (with quantities). needIngredients = everything else I need to get.`,
         },
       ],
     });
 
     const raw = completion.choices[0].message.content ?? "{}";
     const parsed: OpenAIResponse = JSON.parse(raw);
-    const generated = parsed.recipes ?? [];
+    const generated = (parsed.recipes ?? []).map((r: GeneratedRecipe) =>
+      filterHaveIngredientsToSelectedOnly(r, foodItems)
+    );
 
     if (generated.length === 0) {
       return NextResponse.json({ error: "OpenAI returned no recipes" }, { status: 500 });
