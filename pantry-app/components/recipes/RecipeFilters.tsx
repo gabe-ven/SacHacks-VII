@@ -55,7 +55,7 @@ export default function RecipeFilters({
           <button
             key={d}
             onClick={() => onDifficultyChange(d)}
-            className={`px-3.5 py-2 rounded-full text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-pantry-green/30 cursor-pointer ${
+            className={`px-3.5 py-2 rounded-full text-xs font-semibold transition-colors focus:outline-none cursor-pointer ${
               difficulty === d
                 ? "bg-pantry-green text-pantry-cream"
                 : "border border-border text-foreground/60 bg-surface-card hover:border-pantry-green/40 hover:text-pantry-green"
@@ -71,7 +71,7 @@ export default function RecipeFilters({
         <select
           value={sortKey}
           onChange={(e) => onSortChange(e.target.value as SortKey)}
-          className="appearance-none pl-4 pr-9 py-2.5 rounded-full border border-border bg-surface-card text-sm text-foreground/70 font-medium focus:outline-none focus:ring-2 focus:ring-pantry-green/30 transition-colors cursor-pointer hover:border-pantry-green/40 hover:text-pantry-green"
+          className="appearance-none pl-4 pr-9 py-2.5 rounded-full border border-border bg-surface-card text-sm text-foreground/70 font-medium focus:outline-none transition-colors cursor-pointer hover:border-pantry-green/40 hover:text-pantry-green"
         >
           {(Object.keys(SORT_LABELS) as SortKey[]).map((k) => (
             <option key={k} value={k}>{SORT_LABELS[k]}</option>
