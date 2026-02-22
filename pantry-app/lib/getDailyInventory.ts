@@ -9,7 +9,7 @@ export async function getDailyInventory(dayOfWeek: number): Promise<InventoryIte
   if (isWeekend) {
     const { data, error } = await supabase
       .from("ingredients")
-      .select("id, name, category, item_tags")
+      .select("id, name, category, item_tags, image_url")
       .order("name", { ascending: true });
 
     if (error) throw new Error(error.message);
@@ -20,12 +20,13 @@ export async function getDailyInventory(dayOfWeek: number): Promise<InventoryIte
       category: row.category as string,
       stockStatus: "in_stock" as const,
       tags: (row.item_tags as string[] | null) ?? [],
+      imageUrl: (row.image_url as string | null) ?? null,
     }));
   }
 
   const { data, error } = await supabase
     .from("daily_inventory")
-    .select("in_stock, ingredient:ingredients(id,name,category,item_tags)")
+    .select("in_stock, ingredient:ingredients(id,name,category,item_tags,image_url)")
     .eq("day_of_week", normalizedDay);
 
   if (error) throw new Error(error.message);
@@ -46,6 +47,7 @@ export async function getDailyInventory(dayOfWeek: number): Promise<InventoryIte
       category: ingredient.category as string,
       stockStatus: row.in_stock ? "in_stock" : "out_of_stock",
       tags: (ingredient.item_tags as string[] | null) ?? [],
+      imageUrl: (ingredient.image_url as string | null) ?? null,
     });
   }
 
