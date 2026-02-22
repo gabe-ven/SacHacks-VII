@@ -26,6 +26,7 @@ import Card from "@/components/ui/Card";
 const STORAGE_KEY = "pantry_selected_items_v1";
 const MAX_SELECTION = 20;
 const SKELETON_COUNT = 12;
+const ITEMS_PER_PAGE = 24;
 
 const DEFAULT_FILTERS: FilterState = {
   search: "",
@@ -61,6 +62,7 @@ export default function InventoryPage() {
   // ── Mobile UI toggles ─────────────────────────────────────────────────────
   const [showMobileSelected, setShowMobileSelected] = useState(false);
   const [selectionWarning, setSelectionWarning] = useState<string | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
   const isWeekendView = dayOfWeek === 0 || dayOfWeek === 6;
 
   // ── Load inventory for selected day ───────────────────────────────────────
@@ -135,6 +137,11 @@ export default function InventoryPage() {
       return a.name.localeCompare(b.name);
     });
   }, [inventory, filters]);
+  const totalPages = Math.max(1, Math.ceil(filteredItems.length / ITEMS_PER_PAGE));
+  const paginatedItems = useMemo(() => {
+    const start = (currentPage - 1) * ITEMS_PER_PAGE;
+    return filteredItems.slice(start, start + ITEMS_PER_PAGE);
+  }, [currentPage, filteredItems]);
   const selectedItems = useMemo(
     () => inventory.filter((item) => selectedIds.has(item.id)),
     [inventory, selectedIds]
@@ -196,6 +203,16 @@ export default function InventoryPage() {
     const timeoutId = window.setTimeout(() => setSelectionWarning(null), 2800);
     return () => window.clearTimeout(timeoutId);
   }, [selectionWarning]);
+
+  // Reset pagination when filter/day context changes.
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [dayOfWeek, filters]);
+
+  // Keep current page in bounds as data changes.
+  useEffect(() => {
+    setCurrentPage((prev) => Math.min(prev, totalPages));
+  }, [totalPages]);
 
   // ── Render ────────────────────────────────────────────────────────────────
   return (
@@ -323,22 +340,62 @@ export default function InventoryPage() {
 
             {/* Item grid */}
             {!error && !loading && filteredItems.length > 0 && (
-              <div
-                className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 auto-rows-[8rem]"
-                role="list"
-                aria-label={`${filteredItems.length} pantry items`}
-              >
-                {filteredItems.map((item) => (
-                  <div key={item.id} role="listitem" className="h-full">
-                    <InventoryCard
-                      item={item}
-                      isSelected={selectedIds.has(item.id)}
-                      onToggle={handleToggle}
-                      selectionCount={selectedIds.size}
-                      onBlockedSelect={handleBlockedSelection}
-                    />
+              <div className="space-y-4">
+                <div
+                  className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 auto-rows-[8rem]"
+                  role="list"
+                  aria-label={`${filteredItems.length} pantry items, page ${currentPage} of ${totalPages}`}
+                >
+                  {paginatedItems.map((item) => (
+                    <div key={item.id} role="listitem" className="h-full">
+                      <InventoryCard
+                        item={item}
+                        isSelected={selectedIds.has(item.id)}
+                        onToggle={handleToggle}
+                        selectionCount={selectedIds.size}
+                        onBlockedSelect={handleBlockedSelection}
+                      />
+                    </div>
+                  ))}
+                </div>
+
+                {totalPages > 1 && (
+                  <div className="flex items-center justify-center gap-2" aria-label="Inventory pagination">
+                    <button
+                      onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                      disabled={currentPage === 1}
+                      aria-label="Previous page"
+                      className={[
+                        "w-9 h-9 flex items-center justify-center rounded-full border transition-colors focus:outline-none cursor-pointer",
+                        currentPage === 1
+                          ? "border-[#1a1a1a]/10 text-[#1a1a1a]/30 cursor-not-allowed"
+                          : "border-pantry-tan text-pantry-green hover:bg-pantry-tan/20",
+                      ].join(" ")}
+                    >
+                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5} aria-hidden="true">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+                      </svg>
+                    </button>
+                    <span className="text-sm text-foreground/60 min-w-24 text-center">
+                      Page {currentPage} of {totalPages}
+                    </span>
+                    <button
+                      onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                      disabled={currentPage === totalPages}
+                      aria-label="Next page"
+                      className={[
+                        "w-9 h-9 flex items-center justify-center rounded-full border transition-colors focus:outline-none cursor-pointer",
+                        currentPage === totalPages
+                          ? "border-[#1a1a1a]/10 text-[#1a1a1a]/30 cursor-not-allowed"
+                          : "border-pantry-tan text-pantry-green hover:bg-pantry-tan/20",
+                      ].join(" ")}
+                    >
+                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5} aria-hidden="true">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                      </svg>
+                    </button>
                   </div>
-                ))}
+                )}
               </div>
             )}
           </div>
