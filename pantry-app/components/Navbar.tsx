@@ -20,7 +20,7 @@ export default function Navbar() {
       </Link>
       <div className="flex-1 flex justify-center gap-8 text-pantry-cream text-base font-semibold">
         <Link href="/" className="hover:text-pantry-amber transition-colors">Home</Link>
-        <Link href="/inventory" className="hover:text-pantry-amber transition-colors">Pantry Inventory</Link>
+        <Link href="/inventory" className="hover:text-pantry-amber transition-colors">Inventory</Link>
         <Link href="/recipes" className="hover:text-pantry-amber transition-colors">Recipes</Link>
       </div>
       <div className="shrink-0 w-[200px] flex justify-end">
