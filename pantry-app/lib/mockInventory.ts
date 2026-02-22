@@ -31,14 +31,14 @@ const MOCK_INVENTORY: InventoryItem[] = [
     id: "p4",
     name: "Spinach",
     category: "Produce",
-    stockStatus: "low_stock",
+    stockStatus: "in_stock",
     tags: ["vegan", "gluten-free"],
   },
   {
     id: "p5",
     name: "Onions",
     category: "Produce",
-    stockStatus: "low_stock",
+    stockStatus: "in_stock",
     tags: ["vegan", "gluten-free"],
   },
   {
@@ -52,7 +52,7 @@ const MOCK_INVENTORY: InventoryItem[] = [
     id: "p7",
     name: "Broccoli",
     category: "Produce",
-    stockStatus: "low_stock",
+    stockStatus: "in_stock",
     tags: ["vegan", "gluten-free"],
   },
   {
@@ -82,7 +82,7 @@ const MOCK_INVENTORY: InventoryItem[] = [
     id: "d3",
     name: "Almond Milk",
     category: "Dairy",
-    stockStatus: "low_stock",
+    stockStatus: "in_stock",
     tags: ["vegan", "dairy-free"],
   },
   {
@@ -126,7 +126,7 @@ const MOCK_INVENTORY: InventoryItem[] = [
     id: "pa5",
     name: "Red Lentils",
     category: "Pantry",
-    stockStatus: "low_stock",
+    stockStatus: "in_stock",
     tags: ["vegan", "gluten-free", "halal"],
   },
   {
@@ -154,7 +154,7 @@ const MOCK_INVENTORY: InventoryItem[] = [
     id: "pa9",
     name: "All-Purpose Flour",
     category: "Pantry",
-    stockStatus: "low_stock",
+    stockStatus: "in_stock",
     tags: ["vegan"],
   },
 
@@ -177,14 +177,14 @@ const MOCK_INVENTORY: InventoryItem[] = [
     id: "pr3",
     name: "Eggs",
     category: "Protein",
-    stockStatus: "low_stock",
+    stockStatus: "in_stock",
     tags: ["gluten-free", "halal"],
   },
   {
     id: "pr4",
     name: "Canned Chicken",
     category: "Protein",
-    stockStatus: "low_stock",
+    stockStatus: "in_stock",
     tags: ["gluten-free", "halal"],
   },
   {
@@ -207,7 +207,7 @@ const MOCK_INVENTORY: InventoryItem[] = [
     id: "f2",
     name: "Frozen Mixed Vegetables",
     category: "Frozen",
-    stockStatus: "low_stock",
+    stockStatus: "in_stock",
     tags: ["vegan", "gluten-free"],
   },
   {
@@ -237,7 +237,7 @@ const MOCK_INVENTORY: InventoryItem[] = [
     id: "s3",
     name: "Trail Mix",
     category: "Snacks",
-    stockStatus: "low_stock",
+    stockStatus: "in_stock",
     tags: ["vegan", "gluten-free"],
   },
   {
@@ -267,7 +267,7 @@ const MOCK_INVENTORY: InventoryItem[] = [
     id: "bv2",
     name: "Orange Juice",
     category: "Beverages",
-    stockStatus: "low_stock",
+    stockStatus: "in_stock",
     tags: ["vegan", "gluten-free"],
   },
   {
@@ -283,7 +283,7 @@ const MOCK_INVENTORY: InventoryItem[] = [
     id: "hy1",
     name: "Toothpaste",
     category: "Hygiene",
-    stockStatus: "low_stock",
+    stockStatus: "in_stock",
     tags: [],
   },
   {

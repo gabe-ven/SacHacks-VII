@@ -34,6 +34,10 @@ const DEFAULT_FILTERS: FilterState = {
   tags: [],
 };
 
+function isRecipeEligibleCategory(category: string): boolean {
+  return category.trim().toLowerCase() !== "personal care";
+}
+
 // ── Page component ─────────────────────────────────────────────────────────
 export default function InventoryPage() {
   const router = useRouter();
@@ -56,6 +60,7 @@ export default function InventoryPage() {
 
   // ── Mobile UI toggles ─────────────────────────────────────────────────────
   const [showMobileSelected, setShowMobileSelected] = useState(false);
+  const [selectionWarning, setSelectionWarning] = useState<string | null>(null);
 
   // ── Load inventory for selected day ───────────────────────────────────────
   const loadInventory = useCallback(async (targetDay: number) => {
@@ -122,7 +127,7 @@ export default function InventoryPage() {
   const allTags = useMemo(() => getAllTags(inventory), [inventory]);
   const filteredItems = useMemo(() => {
     const items = filterInventory(inventory, filters);
-    const stockOrder = { in_stock: 0, low_stock: 0, out_of_stock: 1 } as const;
+    const stockOrder = { in_stock: 0, out_of_stock: 1 } as const;
     return [...items].sort((a, b) => {
       const diff = (stockOrder[a.stockStatus] ?? 2) - (stockOrder[b.stockStatus] ?? 2);
       if (diff !== 0) return diff;
@@ -132,6 +137,13 @@ export default function InventoryPage() {
   const selectedItems = useMemo(
     () => inventory.filter((item) => selectedIds.has(item.id)),
     [inventory, selectedIds]
+  );
+  const recipeEligibleSelectedIds = useMemo(
+    () =>
+      selectedItems
+        .filter((item) => isRecipeEligibleCategory(item.category))
+        .map((item) => item.id),
+    [selectedItems]
   );
 
   // ── Selection handlers ────────────────────────────────────────────────────
@@ -160,6 +172,10 @@ export default function InventoryPage() {
     setSelectedIds(new Set());
   }, []);
 
+  const handleBlockedSelection = useCallback((message: string) => {
+    setSelectionWarning(message);
+  }, []);
+
   // ── Filter handlers ───────────────────────────────────────────────────────
   const handleClearFilters = useCallback(() => {
     setFilters(DEFAULT_FILTERS);
@@ -169,10 +185,16 @@ export default function InventoryPage() {
   // Passes selected item IDs to /recipes via query string so the recipes page
   // can read them with useSearchParams() or equivalent.
   const handleFindRecipes = useCallback(() => {
-    if (selectedIds.size === 0) return;
-    const ids = [...selectedIds].join(",");
+    if (recipeEligibleSelectedIds.length === 0) return;
+    const ids = recipeEligibleSelectedIds.join(",");
     router.push(`/recipes?items=${ids}`);
-  }, [selectedIds, router]);
+  }, [recipeEligibleSelectedIds, router]);
+
+  useEffect(() => {
+    if (!selectionWarning) return;
+    const timeoutId = window.setTimeout(() => setSelectionWarning(null), 2800);
+    return () => window.clearTimeout(timeoutId);
+  }, [selectionWarning]);
 
   // ── Render ────────────────────────────────────────────────────────────────
   return (
@@ -218,6 +240,14 @@ export default function InventoryPage() {
               setFilters((prev) => ({ ...prev, search: val }))
             }
           />
+          {selectionWarning && (
+            <div
+              role="alert"
+              className="rounded-xl border border-pantry-coral/30 bg-pantry-coral/10 px-4 py-2 text-sm text-pantry-coral"
+            >
+              {selectionWarning}
+            </div>
+          )}
           <FilterPanel
             filters={filters}
             onChange={setFilters}
@@ -300,6 +330,7 @@ export default function InventoryPage() {
                       isSelected={selectedIds.has(item.id)}
                       onToggle={handleToggle}
                       selectionCount={selectedIds.size}
+                      onBlockedSelect={handleBlockedSelection}
                     />
                   </div>
                 ))}
@@ -318,6 +349,7 @@ export default function InventoryPage() {
                 onRemove={handleRemove}
                 onClear={handleClearSelection}
                 onFindRecipes={handleFindRecipes}
+                canFindRecipes={recipeEligibleSelectedIds.length > 0}
               />
             </div>
           </aside>
@@ -405,7 +437,7 @@ export default function InventoryPage() {
 
           <Button
             variant="primary"
-            disabled={selectedIds.size === 0}
+            disabled={recipeEligibleSelectedIds.length === 0}
             onClick={handleFindRecipes}
           >
             Find recipes
