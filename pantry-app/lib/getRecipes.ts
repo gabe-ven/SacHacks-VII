@@ -80,7 +80,7 @@ function rowToRecipe(row: LiveRecipeRow): Recipe {
     id: String(row.id),
     title: row.name,
     image: row.image_url ?? "",
-    cookTime: row.cook_time != null ? `${row.cook_time} min` : "N/A",
+    cookTime: row.cook_time != null ? String(row.cook_time) : "N/A",
     difficulty: (["Easy", "Medium", "Hard"].includes(row.difficulty ?? "")
       ? row.difficulty
       : "Medium") as Recipe["difficulty"],
