@@ -54,7 +54,7 @@ export default function SelectedItemsPanel({
           <button
             onClick={onClear}
             aria-label="Clear all selected items"
-            className="text-xs text-pantry-green hover:text-pantry-green/70 underline underline-offset-2 transition-colors focus:outline-none"
+            className="text-xs text-pantry-green hover:text-pantry-green/70 underline underline-offset-2 transition-colors focus:outline-none cursor-pointer"
           >
             Clear all
           </button>

@@ -9,12 +9,14 @@ const STOCK_OPTIONS: { value: FilterState["stockStatus"]; label: string }[] = [
   { value: "out_of_stock", label: "Out of stock" },
 ];
 
-const TAG_LABELS: Record<string, string> = {
-  vegan: "Vegan",
-  halal: "Halal",
-  "gluten-free": "Gluten-free",
-  "dairy-free": "Dairy-free",
-};
+function formatTagLabel(tag: string): string {
+  return tag
+    .replace(/[_-]+/g, " ")
+    .trim()
+    .split(/\s+/)
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(" ");
+}
 
 type Props = {
   filters: FilterState;
@@ -176,7 +178,7 @@ export default function FilterPanel({
                     onClick={() => toggleTag(tag)}
                     className={[pillBase, active ? pillOn : pillOff].join(" ")}
                   >
-                    {TAG_LABELS[tag] ?? tag}
+                    {formatTagLabel(tag)}
                   </button>
                 );
               })}
@@ -216,7 +218,7 @@ export default function FilterPanel({
             <button
               onClick={onClear}
               aria-label="Clear all filters"
-              className="text-sm text-pantry-coral hover:text-pantry-green underline underline-offset-2 transition-colors focus:outline-none"
+              className="text-sm text-pantry-coral hover:text-pantry-green underline underline-offset-2 transition-colors focus:outline-none cursor-pointer"
             >
               Clear all filters
             </button>

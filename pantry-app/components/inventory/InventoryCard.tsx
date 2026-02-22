@@ -33,6 +33,15 @@ const CATEGORY_STYLE: Record<string, { bg: string; text: string }> = {
 
 const MAX_SELECTION = 20;
 
+function formatTagLabel(tag: string): string {
+  return tag
+    .replace(/[_-]+/g, " ")
+    .trim()
+    .split(/\s+/)
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(" ");
+}
+
 type Props = {
   item: InventoryItem;
   isSelected: boolean;
@@ -177,7 +186,7 @@ export default function InventoryCard({
           <div className="flex flex-wrap items-center gap-1.5 mt-auto">
             {item.tags.map((tag) => (
               <Badge key={tag} variant={TAG_VARIANTS[tag] ?? "tan"}>
-                {tag}
+                {formatTagLabel(tag)}
               </Badge>
             ))}
           </div>
