@@ -148,7 +148,6 @@ Respond ONLY with valid JSON:
     return NextResponse.json({ error: "Failed to generate recipes" }, { status: 500 });
   }
 }
-
 async function persistToSupabase(generated: OpenAIRecipe[], selectedItems: string[]) {
   const { data: allIngredients } = await supabase.from("ingredients").select("id, name");
 
@@ -177,3 +176,4 @@ async function persistToSupabase(generated: OpenAIRecipe[], selectedItems: strin
     }
   }
 }
+

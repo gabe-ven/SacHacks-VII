@@ -63,9 +63,13 @@ export default function GeneratedRecipePage() {
     <div className="min-h-screen bg-background">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 py-10 space-y-8">
 
-        {/* Back link — same as /recipes/[id] */}
+        {/* Back link — use browser back so we return to recipes list with selection + generated */}
         <Link
           href={backHref}
+          onClick={(e) => {
+            e.preventDefault();
+            router.back();
+          }}
           className="inline-flex items-center gap-1.5 text-sm text-muted hover:text-foreground transition-colors"
         >
           <svg className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} aria-hidden="true">

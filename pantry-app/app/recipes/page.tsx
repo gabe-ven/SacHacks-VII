@@ -158,16 +158,23 @@ function RecipesContent() {
   const [aiDone, setAiDone] = useState(false);
   const aiRunning = useRef(false);
 
-  // Persist AI recipes and back URL for the generated recipe page
+  // Persist back URL whenever we have selection so "back" from any recipe returns to this list
+  useEffect(() => {
+    if (typeof window === "undefined" || !searchString) return;
+    try {
+      window.sessionStorage.setItem(AI_RECIPES_BACK_KEY, `?${searchString}`);
+    } catch { /* ignore */ }
+  }, [searchString]);
+
+  // Persist AI recipes so we can restore without re-running when returning from a recipe
   useEffect(() => {
     if (typeof window === "undefined") return;
     if (aiRecipes.length > 0) {
       try {
         window.sessionStorage.setItem(AI_RECIPES_STORAGE_KEY, JSON.stringify(aiRecipes));
-        window.sessionStorage.setItem(AI_RECIPES_BACK_KEY, searchString ? `?${searchString}` : "");
       } catch { /* ignore */ }
     }
-  }, [aiRecipes, searchString]);
+  }, [aiRecipes]);
 
   // Load DB recipes + scores, then auto-trigger AI (or restore from sessionStorage when returning back)
   useEffect(() => {
