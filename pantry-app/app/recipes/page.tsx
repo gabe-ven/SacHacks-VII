@@ -66,10 +66,10 @@ function SkeletonGrid({ count = 6, shimmer = false }: { count?: number; shimmer?
   );
 }
 
-const AI_RECIPES_STORAGE_KEY = "pantry_ai_recipes";
 const AI_RECIPES_BACK_KEY = "pantry_ai_recipes_back";
-/** Set by inventory when user clicks "Find recipes"; we generate fresh. Unset = refresh/back, so use cache if available. */
-const FROM_INVENTORY_KEY = "pantry_from_inventory";
+/** Cache keyed by URL (?items=...) so we only restore recipes for this exact ingredient list. */
+const AI_RECIPES_CACHE_KEY = "pantry_ai_recipes_cache";
+const AI_CACHE_MAX_ENTRIES = 10;
 
 // ── Browse all recipes (no selection) ────────────────────────────────────────
 function BrowseRecipes({ dbIngredientNames }: { dbIngredientNames: string[] }) {
@@ -175,15 +175,21 @@ function RecipesContent() {
     } catch { /* ignore */ }
   }, [searchString]);
 
-  // Persist AI recipes so we can restore without re-running when returning from a recipe
+  // Persist AI recipes keyed by current URL so we only restore for this exact ingredient list
   useEffect(() => {
-    if (typeof window === "undefined") return;
-    if (aiRecipes.length > 0) {
-      try {
-        window.sessionStorage.setItem(AI_RECIPES_STORAGE_KEY, JSON.stringify(aiRecipes));
-      } catch { /* ignore */ }
-    }
-  }, [aiRecipes]);
+    if (typeof window === "undefined" || !searchString || aiRecipes.length === 0) return;
+    try {
+      const key = `?${searchString}`;
+      const raw = window.sessionStorage.getItem(AI_RECIPES_CACHE_KEY);
+      const cache: Record<string, unknown> = raw ? JSON.parse(raw) : {};
+      cache[key] = aiRecipes;
+      const keys = Object.keys(cache);
+      if (keys.length > AI_CACHE_MAX_ENTRIES) {
+        keys.slice(0, keys.length - AI_CACHE_MAX_ENTRIES).forEach((k) => delete cache[k]);
+      }
+      window.sessionStorage.setItem(AI_RECIPES_CACHE_KEY, JSON.stringify(cache));
+    } catch { /* ignore */ }
+  }, [aiRecipes, searchString]);
 
   // Load DB recipes + scores, then auto-trigger AI (or restore from sessionStorage when returning back)
   useEffect(() => {
@@ -195,17 +201,13 @@ function RecipesContent() {
       let skipAI = false;
       if (typeof window !== "undefined") {
         try {
-          const fromInventory = window.sessionStorage.getItem(FROM_INVENTORY_KEY) === "1";
-          window.sessionStorage.removeItem(FROM_INVENTORY_KEY);
-          const back = window.sessionStorage.getItem(AI_RECIPES_BACK_KEY);
-          const raw = window.sessionStorage.getItem(AI_RECIPES_STORAGE_KEY);
-          if (!fromInventory && back === expectedBack && raw) {
-            const parsed = JSON.parse(raw);
-            if (Array.isArray(parsed) && parsed.length > 0) {
-              skipAI = true;
-              setAiRecipes(parsed);
-              setAiDone(true);
-            }
+          const raw = window.sessionStorage.getItem(AI_RECIPES_CACHE_KEY);
+          const cache = raw ? (JSON.parse(raw) as Record<string, unknown>) : {};
+          const cached = cache[expectedBack];
+          if (Array.isArray(cached) && cached.length > 0) {
+            skipAI = true;
+            setAiRecipes(cached as ScoredRecipe[]);
+            setAiDone(true);
           }
         } catch { /* ignore */ }
       }

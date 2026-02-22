@@ -109,7 +109,7 @@ export default async function RecipeDetailPage({
                 <>
                   {have.length > 0 && (
                     <div className="space-y-1.5">
-                      <p className="text-[10px] font-semibold uppercase tracking-wider text-pantry-green">What you have</p>
+                      <p className="text-[10px] font-semibold uppercase tracking-wider text-pantry-green">What the pantry has</p>
                       <ul className="space-y-1.5">
                         {have.map((ing, i) => (
                           <li key={`have-${i}`} className="flex items-start gap-2 text-sm leading-snug text-pantry-green font-medium">

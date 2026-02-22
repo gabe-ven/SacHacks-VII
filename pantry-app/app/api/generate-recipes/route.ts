@@ -102,7 +102,7 @@ export async function POST(req: NextRequest) {
 Your job is to suggest REAL, COMPLETE, DELICIOUS recipes that feature the student's selected ingredients.
 
 Rules:
-- Generate as many distinct recipes as you can (aim for 5–6) — more variety is better.
+- Generate exactly 3 distinct recipes — no more, no fewer.
 - Each recipe MUST prominently use at least 1–2 of the student's selected ingredients.
 - Make them REAL complete recipes with proper names — not just "toast with avocado" but "Smashed Avocado Toast with Chili Flakes", etc.
 - In "haveIngredients" list the selected items used in this recipe (with quantities).
@@ -125,14 +125,14 @@ Respond ONLY with valid JSON:
         },
         {
           role: "user",
-          content: `I picked up these food items from the UC Davis Pantry:\n${foodItems.join(", ")}\n\nSuggest as many real complete recipes as you can (aim for 5–6). Use these as the main ingredients and tell me what else I need.`,
+          content: `I picked up these food items from the UC Davis Pantry:\n${foodItems.join(", ")}\n\nSuggest exactly 3 real complete recipes. Use these as the main ingredients and tell me what else I need.`,
         },
       ],
     });
 
     const raw = completion.choices[0].message.content ?? "{}";
     const parsed: OpenAIResponse = JSON.parse(raw);
-    const generated = parsed.recipes ?? [];
+    const generated = (parsed.recipes ?? []).slice(0, 3);
 
     if (generated.length === 0) {
       return NextResponse.json({ error: "No recipes returned" }, { status: 500 });

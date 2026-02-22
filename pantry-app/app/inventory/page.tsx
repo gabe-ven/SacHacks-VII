@@ -201,9 +201,6 @@ export default function InventoryPage() {
       .filter((item) => recipeEligibleSelectedIds.includes(item.id))
       .map((item) => encodeURIComponent(item.name))
       .join(",");
-    try {
-      sessionStorage.setItem("pantry_from_inventory", "1");
-    } catch { /* ignore */ }
     router.push(`/recipes?items=${names}`);
   }, [recipeEligibleSelectedIds, selectedItems, router]);
 

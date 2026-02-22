@@ -7,7 +7,7 @@ import RecipeSteps from "@/components/recipes/RecipeSteps";
 import RecipeImage from "@/components/recipes/RecipeImage";
 import type { Recipe } from "@/types/recipe";
 
-const STORAGE_KEY = "pantry_ai_recipes";
+const CACHE_KEY = "pantry_ai_recipes_cache";
 const BACK_KEY = "pantry_ai_recipes_back";
 
 export default function GeneratedRecipePage() {
@@ -20,15 +20,17 @@ export default function GeneratedRecipePage() {
 
   useEffect(() => {
     try {
-      const raw = typeof window !== "undefined" ? window.sessionStorage.getItem(STORAGE_KEY) : null;
-      const back = typeof window !== "undefined" ? window.sessionStorage.getItem(BACK_KEY) : null;
+      if (typeof window === "undefined") return;
+      const back = window.sessionStorage.getItem(BACK_KEY);
       if (back) setBackHref(back.startsWith("?") ? `/recipes${back}` : `/recipes?${back}`);
 
-      if (!raw) {
+      const raw = window.sessionStorage.getItem(CACHE_KEY);
+      const cache = raw ? (JSON.parse(raw) as Record<string, Recipe[]>) : {};
+      const list = back ? (cache[back] ?? null) : null;
+      if (!list?.length) {
         router.replace("/recipes");
         return;
       }
-      const list: Recipe[] = JSON.parse(raw);
       const found = list.find((r) => r.id === id);
       if (!found) {
         router.replace("/recipes");
