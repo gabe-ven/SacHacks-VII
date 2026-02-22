@@ -26,6 +26,7 @@ import Card from "@/components/ui/Card";
 const STORAGE_KEY = "pantry_selected_items_v1";
 const MAX_SELECTION = 20;
 const SKELETON_COUNT = 12;
+const ITEMS_PER_PAGE = 24;
 
 const DEFAULT_FILTERS: FilterState = {
   search: "",
@@ -61,6 +62,8 @@ export default function InventoryPage() {
   // ── Mobile UI toggles ─────────────────────────────────────────────────────
   const [showMobileSelected, setShowMobileSelected] = useState(false);
   const [selectionWarning, setSelectionWarning] = useState<string | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const isWeekendView = dayOfWeek === 0 || dayOfWeek === 6;
 
   // ── Load inventory for selected day ───────────────────────────────────────
   const loadInventory = useCallback(async (targetDay: number) => {
@@ -127,13 +130,18 @@ export default function InventoryPage() {
   const allTags = useMemo(() => getAllTags(inventory), [inventory]);
   const filteredItems = useMemo(() => {
     const items = filterInventory(inventory, filters);
-    const stockOrder = { in_stock: 0, out_of_stock: 1 } as const;
+    const stockOrder: Record<string, number> = { in_stock: 0, low_stock: 1, out_of_stock: 2 };
     return [...items].sort((a, b) => {
       const diff = (stockOrder[a.stockStatus] ?? 2) - (stockOrder[b.stockStatus] ?? 2);
       if (diff !== 0) return diff;
       return a.name.localeCompare(b.name);
     });
   }, [inventory, filters]);
+  const totalPages = Math.max(1, Math.ceil(filteredItems.length / ITEMS_PER_PAGE));
+  const paginatedItems = useMemo(() => {
+    const start = (currentPage - 1) * ITEMS_PER_PAGE;
+    return filteredItems.slice(start, start + ITEMS_PER_PAGE);
+  }, [currentPage, filteredItems]);
   const selectedItems = useMemo(
     () => inventory.filter((item) => selectedIds.has(item.id)),
     [inventory, selectedIds]
@@ -182,13 +190,15 @@ export default function InventoryPage() {
   }, []);
 
   // ── Navigation ────────────────────────────────────────────────────────────
-  // Passes selected item IDs to /recipes via query string so the recipes page
-  // can read them with useSearchParams() or equivalent.
+  // Passes selected item names to /recipes via query string for ingredient matching.
   const handleFindRecipes = useCallback(() => {
     if (recipeEligibleSelectedIds.length === 0) return;
-    const ids = recipeEligibleSelectedIds.join(",");
-    router.push(`/recipes?items=${ids}`);
-  }, [recipeEligibleSelectedIds, router]);
+    const names = selectedItems
+      .filter((item) => recipeEligibleSelectedIds.includes(item.id))
+      .map((item) => encodeURIComponent(item.name))
+      .join(",");
+    router.push(`/recipes?items=${names}`);
+  }, [recipeEligibleSelectedIds, selectedItems, router]);
 
   useEffect(() => {
     if (!selectionWarning) return;
@@ -196,9 +206,19 @@ export default function InventoryPage() {
     return () => window.clearTimeout(timeoutId);
   }, [selectionWarning]);
 
+  // Reset pagination when filter/day context changes.
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [dayOfWeek, filters]);
+
+  // Keep current page in bounds as data changes.
+  useEffect(() => {
+    setCurrentPage((prev) => Math.min(prev, totalPages));
+  }, [totalPages]);
+
   // ── Render ────────────────────────────────────────────────────────────────
   return (
-    <div className="min-h-screen bg-white pb-24 lg:pb-0">
+    <div className="min-h-screen bg-background pb-24 lg:pb-0">
       <div className="max-w-screen-xl mx-auto px-4 sm:px-6 py-12">
 
         {/* ── Page header ── */}
@@ -215,7 +235,7 @@ export default function InventoryPage() {
           </span>
           <h1
             className="relative z-10 text-5xl sm:text-6xl text-white"
-            style={{ fontFamily: "Dancing Script, cursive" }}
+            style={{ fontFamily: "var(--font-display)" }}
           >
             Browse the Pantry
           </h1>
@@ -231,7 +251,6 @@ export default function InventoryPage() {
             onChange={(nextDay) => setDayOfWeek(wrapDay(nextDay))}
           />
         </div>
-
         {/* ── Search + filter bar — full width above the grid ── */}
         <div className="space-y-3 mb-6">
           <SearchBar
@@ -262,6 +281,11 @@ export default function InventoryPage() {
 
           {/* ── Center: main content area ── */}
           <div className="flex-1 min-w-0 space-y-4">
+            {isWeekendView && 
+              <div className="rounded-xl border border-pantry-amber/40 bg-pantry-amber/15 px-4 py-2 text-sm font-medium text-pantry-green text-center font-bold">
+                Stock may vary during weekend.
+              </div>
+            }
 
             {/* ── Content states ── */}
 
@@ -308,7 +332,7 @@ export default function InventoryPage() {
                 {isFiltersActive(filters) && (
                   <button
                     onClick={handleClearFilters}
-                    className="mt-1 text-sm text-pantry-coral hover:text-pantry-green underline underline-offset-2 transition-colors focus:outline-none"
+                    className="mt-1 text-sm text-pantry-coral hover:text-pantry-green underline underline-offset-2 transition-colors focus:outline-none cursor-pointer"
                   >
                     Clear all filters
                   </button>
@@ -318,22 +342,62 @@ export default function InventoryPage() {
 
             {/* Item grid */}
             {!error && !loading && filteredItems.length > 0 && (
-              <div
-                className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 auto-rows-[8rem]"
-                role="list"
-                aria-label={`${filteredItems.length} pantry items`}
-              >
-                {filteredItems.map((item) => (
-                  <div key={item.id} role="listitem" className="h-full">
-                    <InventoryCard
-                      item={item}
-                      isSelected={selectedIds.has(item.id)}
-                      onToggle={handleToggle}
-                      selectionCount={selectedIds.size}
-                      onBlockedSelect={handleBlockedSelection}
-                    />
+              <div className="space-y-4">
+                <div
+                  className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 auto-rows-[8rem]"
+                  role="list"
+                  aria-label={`${filteredItems.length} pantry items, page ${currentPage} of ${totalPages}`}
+                >
+                  {paginatedItems.map((item) => (
+                    <div key={item.id} role="listitem" className="h-full">
+                      <InventoryCard
+                        item={item}
+                        isSelected={selectedIds.has(item.id)}
+                        onToggle={handleToggle}
+                        selectionCount={selectedIds.size}
+                        onBlockedSelect={handleBlockedSelection}
+                      />
+                    </div>
+                  ))}
+                </div>
+
+                {totalPages > 1 && (
+                  <div className="flex items-center justify-center gap-2" aria-label="Inventory pagination">
+                    <button
+                      onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                      disabled={currentPage === 1}
+                      aria-label="Previous page"
+                      className={[
+                        "w-9 h-9 flex items-center justify-center rounded-full border transition-colors focus:outline-none cursor-pointer",
+                        currentPage === 1
+                          ? "border-[#1a1a1a]/10 text-[#1a1a1a]/30 cursor-not-allowed"
+                          : "border-pantry-tan text-pantry-green hover:bg-pantry-tan/20",
+                      ].join(" ")}
+                    >
+                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5} aria-hidden="true">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+                      </svg>
+                    </button>
+                    <span className="text-sm text-foreground/60 min-w-24 text-center">
+                      Page {currentPage} of {totalPages}
+                    </span>
+                    <button
+                      onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                      disabled={currentPage === totalPages}
+                      aria-label="Next page"
+                      className={[
+                        "w-9 h-9 flex items-center justify-center rounded-full border transition-colors focus:outline-none cursor-pointer",
+                        currentPage === totalPages
+                          ? "border-[#1a1a1a]/10 text-[#1a1a1a]/30 cursor-not-allowed"
+                          : "border-pantry-tan text-pantry-green hover:bg-pantry-tan/20",
+                      ].join(" ")}
+                    >
+                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5} aria-hidden="true">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                      </svg>
+                    </button>
                   </div>
-                ))}
+                )}
               </div>
             )}
           </div>
@@ -343,7 +407,7 @@ export default function InventoryPage() {
             className="hidden lg:flex lg:flex-col w-64 shrink-0 sticky top-6"
             aria-label="Selected items"
           >
-            <div className="p-5 flex flex-col rounded-2xl bg-white border border-pantry-amber/40">
+            <div className="p-5 flex flex-col rounded-2xl bg-surface-card border border-border">
               <SelectedItemsPanel
                 selectedItems={selectedItems}
                 onRemove={handleRemove}

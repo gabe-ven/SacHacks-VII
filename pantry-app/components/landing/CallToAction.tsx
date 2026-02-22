@@ -7,7 +7,7 @@ export default function CallToAction() {
   return (
     <section className="px-6 py-20 bg-surface">
       <PopIn className="flex flex-col items-center text-center gap-5 max-w-lg mx-auto">
-        <h2 className="text-5xl sm:text-6xl text-foreground" style={{ fontFamily: "Dancing Script, cursive" }}>
+        <h2 className="text-5xl sm:text-6xl text-foreground" style={{ fontFamily: "var(--font-display)" }}>
           What&apos;s in your bag today?
         </h2>
         <p className="text-muted text-sm leading-relaxed max-w-xs">

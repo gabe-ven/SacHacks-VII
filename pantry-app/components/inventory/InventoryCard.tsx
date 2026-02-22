@@ -33,6 +33,15 @@ const CATEGORY_STYLE: Record<string, { bg: string; text: string }> = {
 
 const MAX_SELECTION = 20;
 
+function formatTagLabel(tag: string): string {
+  return tag
+    .replace(/[_-]+/g, " ")
+    .trim()
+    .split(/\s+/)
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(" ");
+}
+
 type Props = {
   item: InventoryItem;
   isSelected: boolean;
@@ -49,6 +58,7 @@ export default function InventoryCard({
   onBlockedSelect,
 }: Props) {
   const isOut = item.stockStatus === "out_of_stock";
+  const isLow = item.stockStatus === "low_stock";
   const isPersonalCare = item.category.trim().toLowerCase() === "personal care";
   const atMax = selectionCount >= MAX_SELECTION && !isSelected;
   const canToggle = !isOut && !atMax && !isPersonalCare;
@@ -95,17 +105,17 @@ export default function InventoryCard({
       onClick={handleCardClick}
       onKeyDown={handleKeyDown}
       className={[
-        "relative flex rounded-xl overflow-hidden h-full select-none transition-all duration-200 border border-[#1a1a1a]/8 ring-1",
+        "relative flex rounded-xl overflow-hidden h-full select-none transition-all duration-200 border border-border",
         isOut
-          ? "ring-[#1a1a1a]/8 opacity-40 grayscale cursor-not-allowed"
+          ? "opacity-40 grayscale cursor-not-allowed"
           : isPersonalCare
-          ? "ring-[#1a1a1a]/8 cursor-not-allowed opacity-60"
+          ? "cursor-not-allowed opacity-60"
           : isSelected
           ? "ring-2 ring-pantry-green shadow-md cursor-pointer"
           : canToggle
-          ? "ring-[#1a1a1a]/10 hover:ring-pantry-green/40 hover:shadow-lg cursor-pointer"
-          : "ring-[#1a1a1a]/8 cursor-not-allowed opacity-60",
-        !isOut && !isSelected ? "focus:outline-none focus-visible:ring-2 focus-visible:ring-pantry-green" : "focus:outline-none",
+          ? "bg-surface-card hover:border-pantry-green/30 hover:shadow-lg cursor-pointer"
+          : "bg-surface cursor-not-allowed opacity-60",
+        !isOut ? "focus:outline-none focus-visible:ring-2 focus-visible:ring-pantry-green" : "focus:outline-none",
       ].join(" ")}
     >
       {/* Left color block with rotated category label */}
@@ -134,13 +144,13 @@ export default function InventoryCard({
       </div>
 
       {/* Right: content */}
-      <div className="flex flex-col justify-between gap-3 p-4 bg-white flex-1 min-w-0">
+      <div className="flex flex-col justify-between gap-3 p-4 bg-surface-card flex-1 min-w-0">
 
         {/* Name + checkmark */}
         <div className="flex items-start justify-between gap-2">
           <h3 className={[
             "text-[1.05rem] font-bold leading-snug tracking-tight",
-            isOut ? "text-[#1a1a1a]/25" : "text-[#1a1a1a]",
+            isOut ? "text-muted" : "text-foreground",
           ].join(" ")}>
             {item.name}
           </h3>
@@ -158,17 +168,15 @@ export default function InventoryCard({
 
         {/* Stock indicator */}
         <div className="flex items-center gap-1.5">
-          <span
-            className={[
-              "w-1.5 h-1.5 rounded-full shrink-0",
-              isOut ? "bg-[#1a1a1a]/20" : "bg-pantry-green",
-            ].join(" ")}
-          />
+          <span className={[
+            "w-1.5 h-1.5 rounded-full shrink-0",
+            isOut ? "bg-muted" : isLow ? "bg-pantry-amber" : "bg-pantry-green",
+          ].join(" ")} />
           <span className={[
             "text-[10px] font-semibold uppercase tracking-wide",
-            isOut ? "text-[#1a1a1a]/25" : "text-pantry-green",
+            isOut ? "text-muted" : isLow ? "text-pantry-amber" : "text-pantry-green",
           ].join(" ")}>
-            {isOut ? "Out of stock" : "In stock"}
+            {isOut ? "Out of stock" : isLow ? "Low stock" : "In stock"}
           </span>
         </div>
 
@@ -177,14 +185,14 @@ export default function InventoryCard({
           <div className="flex flex-wrap items-center gap-1.5 mt-auto">
             {item.tags.map((tag) => (
               <Badge key={tag} variant={TAG_VARIANTS[tag] ?? "tan"}>
-                {tag}
+                {formatTagLabel(tag)}
               </Badge>
             ))}
           </div>
         )}
 
         {atMax && !isOut && (
-          <p className="text-[10px] text-[#1a1a1a]/30" role="note">Max {MAX_SELECTION} selected</p>
+          <p className="text-[10px] text-muted" role="note">Max {MAX_SELECTION} selected</p>
         )}
         {isPersonalCare && (
           <p className="text-[10px] text-pantry-coral/80" role="note">Not eligible for recipes</p>
