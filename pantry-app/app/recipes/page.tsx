@@ -84,8 +84,7 @@ function RecipesContent() {
 
   const hasSelection = itemIds.length > 0;
   const matched = displayed.filter((r) => r.matchScore > 0);
-  const unmatched = displayed.filter((r) => r.matchScore === 0);
-  const secondary = hasSelection ? unmatched : displayed;
+  const secondary = hasSelection ? [] : displayed;
 
   return (
     <div className="min-h-screen bg-pantry-cream">
@@ -203,9 +202,9 @@ function RecipesContent() {
               <div className="rounded-2xl border border-pantry-amber/40 bg-pantry-yellow/20 p-5 flex items-start gap-4">
                 <span className="shrink-0 w-8 h-8 rounded-full bg-pantry-amber/30 flex items-center justify-center text-pantry-amber-dark font-bold text-sm">!</span>
                 <div>
-                  <p className="font-semibold text-pantry-green-dark text-sm">No direct matches</p>
+                  <p className="font-semibold text-pantry-green-dark text-sm">No matching recipes</p>
                   <p className="text-sm text-foreground/55 mt-0.5">
-                    None of the recipes exactly match your picks — but all {unmatched.length} recipes are yours to explore below.
+                    None of our recipes use the ingredients you selected. Try going back and picking different items.
                   </p>
                 </div>
               </div>
