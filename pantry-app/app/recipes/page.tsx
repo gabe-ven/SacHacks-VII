@@ -2,7 +2,7 @@
 
 import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 import { getInventory } from "@/lib/getInventory";
 import { getRecipes, scoreRecipe } from "@/lib/getRecipes";
@@ -129,6 +129,7 @@ function BrowseRecipes() {
 
 // ── Main content ─────────────────────────────────────────────────────────────
 function RecipesContent() {
+  const router = useRouter();
   const searchParams = useSearchParams();
   const searchString = searchParams.toString();
 
@@ -306,9 +307,22 @@ function RecipesContent() {
         {hasSelection && (
           <>
             {/* Ingredient chips */}
-            <div className="rounded-2xl border border-border bg-surface-card p-4 sm:p-5 space-y-2">
-              <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted">Your selected ingredients</p>
-              <div className="flex flex-wrap gap-2 mt-2">
+            <div className="rounded-2xl border border-border bg-surface-card p-4 sm:p-5 space-y-3">
+              <div className="flex items-center justify-between gap-2 flex-wrap">
+                <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted">Your selected ingredients</p>
+                <button
+                  type="button"
+                  onClick={() => router.push("/recipes")}
+                  aria-label="Clear selection"
+                  className="inline-flex items-center gap-1.5 rounded-full border border-border bg-surface-card px-2.5 py-1 text-[10px] font-semibold text-muted transition-colors cursor-pointer hover:border-red-200 hover:bg-red-50 hover:!text-[#b91c1c] focus:outline-none focus-visible:ring-2 focus-visible:ring-red-400/40 focus-visible:ring-offset-2"
+                >
+                  <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5} aria-hidden>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                  Clear
+                </button>
+              </div>
+              <div className="flex flex-wrap gap-2">
                 {dbLoading
                   ? Array.from({ length: Math.min(itemIds.length, 8) }).map((_, i) => (
                     <div key={i} className="h-7 w-20 rounded-full bg-pantry-green/15 animate-pulse" />
