@@ -1,6 +1,6 @@
 "use client";
 
-import { DAY_LABELS, wrapDay } from "@/lib/days";
+import { DAY_LABELS, getDateForDayOfWeek, wrapDay } from "@/lib/days";
 
 type Props = {
   dayOfWeek: number;
@@ -10,6 +10,10 @@ type Props = {
 
 export default function DayCarousel({ dayOfWeek, onChange, compact = false }: Props) {
   const normalizedDay = wrapDay(dayOfWeek);
+  const dateLabel = new Intl.DateTimeFormat("en-US", {
+    month: "short",
+    day: "numeric",
+  }).format(getDateForDayOfWeek(normalizedDay));
 
   return (
     <div
@@ -30,12 +34,12 @@ export default function DayCarousel({ dayOfWeek, onChange, compact = false }: Pr
 
       <p
         className={[
-          "min-w-[8.5rem] text-center font-semibold text-[#1a1a1a]",
+          "min-w-[12rem] text-center font-semibold text-[#1a1a1a]",
           compact ? "text-sm" : "text-base",
         ].join(" ")}
         aria-live="polite"
       >
-        {DAY_LABELS[normalizedDay]}
+        {DAY_LABELS[normalizedDay]} · {dateLabel}
       </p>
 
       <button

@@ -28,3 +28,11 @@ export function toDayParam(dayOfWeek: number): (typeof DAY_PARAMS)[number] {
 export function getLocalDayOfWeek(): number {
   return new Date().getDay();
 }
+
+export function getDateForDayOfWeek(dayOfWeek: number, referenceDate = new Date()): Date {
+  const normalizedDay = wrapDay(dayOfWeek);
+  const date = new Date(referenceDate);
+  const delta = normalizedDay - date.getDay();
+  date.setDate(date.getDate() + delta);
+  return date;
+}
