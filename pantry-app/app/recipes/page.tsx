@@ -47,11 +47,14 @@ function RecipesContent() {
       try {
         const [allItems, allRecipes] = await Promise.all([getInventory(), getRecipes()]);
         if (cancelled) return;
-        const selected = itemIds.length > 0
-          ? allItems.filter((item) => itemIds.includes(item.id))
+          const selected = itemIds.length > 0
+          ? allItems.filter(
+              (item) => itemIds.includes(item.id) || itemIds.includes(item.name)
+            )
           : [];
         setSelectedItems(selected);
-        const names = selected.map((i) => i.name);
+        // If IDs are names (not UUIDs), use itemIds directly as ingredient names
+        const names = selected.length > 0 ? selected.map((i) => i.name) : itemIds;
         setRecipes(allRecipes.map((r) => ({ ...r, matchScore: scoreRecipe(r, names) })));
       } finally {
         if (!cancelled) setLoading(false);
