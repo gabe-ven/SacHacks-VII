@@ -136,7 +136,7 @@ export default function Hero() {
                 transition={{ ...springBouncy, delay: 0.75 + i * 0.08 }}
                 className="flex flex-col gap-0.5"
               >
-                <span className="text-xl sm:text-2xl font-black text-pantry-green">
+                <span className="text-xl sm:text-2xl font-black text-pantry-green whitespace-nowrap">
                   <CountUp from={from} to={to} suffix={suffix} prefix={prefix} delay={0.8 + i * 0.08} />
                 </span>
                 <span className="text-[10px] text-muted uppercase tracking-wider">{label}</span>
