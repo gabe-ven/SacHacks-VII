@@ -1,7 +1,7 @@
 export default function SkeletonCard() {
   return (
     <div
-      className="rounded-2xl border border-pantry-tan bg-white/60 p-5 space-y-3 animate-pulse"
+      className="rounded-2xl border border-border bg-surface-card p-5 space-y-3 animate-pulse"
       aria-hidden="true"
     >
       {/* Name */}

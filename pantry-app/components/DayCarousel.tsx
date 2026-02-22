@@ -27,14 +27,14 @@ export default function DayCarousel({ dayOfWeek, onChange, compact = false }: Pr
         type="button"
         aria-label="Previous day"
         onClick={() => onChange(wrapDay(normalizedDay - 1))}
-        className="w-9 h-9 rounded-full border border-[#1a1a1a]/12 text-[#1a1a1a]/70 hover:border-pantry-green/50 hover:text-pantry-green transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-pantry-green cursor-pointer"
+        className="w-9 h-9 rounded-full border border-border text-foreground/70 hover:border-pantry-green/50 hover:text-pantry-green transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-pantry-green cursor-pointer"
       >
         <span aria-hidden="true">←</span>
       </button>
 
       <p
         className={[
-          "min-w-[12rem] text-center font-semibold text-[#1a1a1a]",
+          "min-w-[12rem] text-center font-semibold text-foreground",
           compact ? "text-sm" : "text-base",
         ].join(" ")}
         aria-live="polite"
@@ -46,7 +46,7 @@ export default function DayCarousel({ dayOfWeek, onChange, compact = false }: Pr
         type="button"
         aria-label="Next day"
         onClick={() => onChange(wrapDay(normalizedDay + 1))}
-        className="w-9 h-9 rounded-full border border-[#1a1a1a]/12 text-[#1a1a1a]/70 hover:border-pantry-green/50 hover:text-pantry-green transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-pantry-green cursor-pointer"
+        className="w-9 h-9 rounded-full border border-border text-foreground/70 hover:border-pantry-green/50 hover:text-pantry-green transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-pantry-green cursor-pointer"
       >
         <span aria-hidden="true">→</span>
       </button>

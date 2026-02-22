@@ -8,7 +8,7 @@ const VARIANTS: Record<Variant, string> = {
     "bg-pantry-green text-white hover:bg-pantry-coral",
   // Outlined pill — matches landing page secondary button
   secondary:
-    "border border-[#1a1a1a]/12 text-[#1a1a1a]/60 bg-transparent hover:border-pantry-green/50 hover:text-pantry-green",
+    "border border-border text-foreground/60 bg-transparent hover:border-pantry-green/50 hover:text-pantry-green",
   // Text-only — for inline actions
   ghost:
     "text-pantry-coral hover:text-pantry-green bg-transparent",

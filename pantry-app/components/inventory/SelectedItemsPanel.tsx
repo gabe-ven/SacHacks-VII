@@ -37,7 +37,7 @@ export default function SelectedItemsPanel({
       <div className="flex items-center justify-between">
         <h2 className="font-semibold text-pantry-green text-sm">
           Selected{" "}
-          <span className="text-[#1a1a1a]/40 font-normal">
+          <span className="text-foreground/40 font-normal">
             ({count}/{MAX_SELECTION})
           </span>
         </h2>
