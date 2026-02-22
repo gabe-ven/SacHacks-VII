@@ -16,26 +16,21 @@ export type GeneratedRecipe = {
   steps: string[];
 };
 
-// ── Storage keys (shared with detail page) ────────────────────────────────
 export const RECIPES_STORAGE_KEY = "pantry_generated_recipes";
 const RECIPES_ITEMS_KEY = "pantry_generated_items";
 
-// ── Helpers ───────────────────────────────────────────────────────────────
+// ── Constants ─────────────────────────────────────────────────────────────
+
+const CARD_ACCENT: string[] = [
+  "#5E7F64", "#EEB467", "#E37861", "#DDBE86", "#92A9C0",
+  "#5E7F64", "#EEB467", "#E37861", "#DDBE86", "#92A9C0",
+];
 
 const DIFFICULTY_COLOR: Record<string, string> = {
   Easy:   "text-pantry-green bg-pantry-green/10 border-pantry-green/20",
   Medium: "text-pantry-amber bg-pantry-amber/10 border-pantry-amber/20",
   Hard:   "text-pantry-coral bg-pantry-coral/10 border-pantry-coral/20",
 };
-
-const CARD_ACCENT: string[] = [
-  "#5E7F64", // green
-  "#EEB467", // amber
-  "#E37861", // coral
-  "#DDBE86", // tan
-  "#92A9C0", // blue-grey
-  "#5E7F64",
-];
 
 // ── Skeleton ──────────────────────────────────────────────────────────────
 
@@ -54,13 +49,13 @@ function RecipeSkeleton({ i }: { i: number }) {
         <div className="space-y-2 pt-2">
           <div className="h-3 w-1/4 bg-border rounded" />
           <div className="flex gap-2 flex-wrap">
-            {[1,2,3].map(j => <div key={j} className="h-6 w-24 bg-border rounded-full" />)}
+            {[1, 2, 3].map((j) => <div key={j} className="h-6 w-24 bg-border rounded-full" />)}
           </div>
         </div>
         <div className="space-y-2">
           <div className="h-3 w-1/4 bg-border rounded" />
           <div className="flex gap-2 flex-wrap">
-            {[1,2].map(j => <div key={j} className="h-6 w-20 bg-border rounded-full" />)}
+            {[1, 2].map((j) => <div key={j} className="h-6 w-20 bg-border rounded-full" />)}
           </div>
         </div>
       </div>
@@ -92,17 +87,13 @@ function RecipeCard({
       <button
         onClick={onClick}
         className="group w-full text-left bg-surface-card border border-border rounded-3xl overflow-hidden shadow-sm hover:shadow-xl hover:border-transparent transition-all duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-pantry-green"
-        style={{ ["--accent" as string]: accent }}
       >
-        {/* Thick accent top bar */}
-        <div className="h-2 w-full transition-all duration-300" style={{ backgroundColor: accent }} />
-
+        <div className="h-2 w-full" style={{ backgroundColor: accent }} />
         <div className="p-7">
-          {/* Title row */}
           <div className="flex items-start justify-between gap-4 mb-4">
             <h3
-              className="text-2xl font-black leading-tight tracking-tight text-foreground group-hover:text-[var(--accent)] transition-colors duration-300"
-              style={{ fontFamily: "Dancing Script, cursive" }}
+              className="text-2xl font-black leading-tight tracking-tight group-hover:opacity-80 transition-opacity"
+              style={{ fontFamily: "Dancing Script, cursive", color: accent }}
             >
               {recipe.name}
             </h3>
@@ -111,7 +102,6 @@ function RecipeCard({
             </span>
           </div>
 
-          {/* Meta */}
           <div className="flex items-center gap-4 text-xs text-muted mb-6">
             <span className="flex items-center gap-1.5">
               <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -125,7 +115,6 @@ function RecipeCard({
             <span>{recipe.steps.length} steps</span>
           </div>
 
-          {/* You have */}
           {recipe.haveIngredients.length > 0 && (
             <div className="mb-4">
               <p className="text-[10px] font-bold uppercase tracking-widest text-pantry-green mb-2">
@@ -133,10 +122,7 @@ function RecipeCard({
               </p>
               <div className="flex flex-wrap gap-2">
                 {recipe.haveIngredients.map((ing) => (
-                  <span
-                    key={ing}
-                    className="text-xs font-medium px-3 py-1 rounded-full bg-pantry-green/10 border border-pantry-green/20 text-pantry-green"
-                  >
+                  <span key={ing} className="text-xs font-medium px-3 py-1 rounded-full bg-pantry-green/10 border border-pantry-green/20 text-pantry-green">
                     {ing}
                   </span>
                 ))}
@@ -144,7 +130,6 @@ function RecipeCard({
             </div>
           )}
 
-          {/* Also need */}
           {recipe.needIngredients.length > 0 && (
             <div className="mb-6">
               <p className="text-[10px] font-bold uppercase tracking-widest text-muted mb-2">
@@ -152,10 +137,7 @@ function RecipeCard({
               </p>
               <div className="flex flex-wrap gap-2">
                 {recipe.needIngredients.map((ing) => (
-                  <span
-                    key={ing}
-                    className="text-xs font-medium px-3 py-1 rounded-full bg-surface border border-border text-muted"
-                  >
+                  <span key={ing} className="text-xs font-medium px-3 py-1 rounded-full bg-surface border border-border text-muted">
                     {ing}
                   </span>
                 ))}
@@ -163,12 +145,11 @@ function RecipeCard({
             </div>
           )}
 
-          {/* Progress bar + CTA */}
           <div className="flex items-center justify-between gap-4 pt-4 border-t border-border">
             <div className="flex-1">
               <div className="flex items-center justify-between mb-1">
                 <span className="text-[10px] text-muted">Ingredients you have</span>
-                <span className="text-[10px] font-bold text-pantry-green">{pct}%</span>
+                <span className="text-[10px] font-bold" style={{ color: accent }}>{pct}%</span>
               </div>
               <div className="h-1 w-full bg-border rounded-full overflow-hidden">
                 <motion.div
@@ -214,7 +195,6 @@ export default function RecipesPage() {
       return;
     }
 
-    // If we already generated recipes for this exact set of items, reuse them
     const cachedItems = sessionStorage.getItem(RECIPES_ITEMS_KEY);
     const cachedRecipes = sessionStorage.getItem(RECIPES_STORAGE_KEY);
     if (cachedItems === raw && cachedRecipes) {
@@ -248,15 +228,37 @@ export default function RecipesPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [raw]);
 
-  const handleCardClick = (recipe: GeneratedRecipe) => {
-    router.push(`/recipes/${recipe.id}`);
-  };
+  // No items — show prompt to go pick ingredients
+  if (!raw) {
+    return (
+      <div className="min-h-screen bg-background flex flex-col items-center justify-center px-4 text-center gap-5">
+        <div className="w-14 h-14 rounded-full bg-pantry-green/10 flex items-center justify-center">
+          <svg className="w-7 h-7 text-pantry-green" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M12 8.25v-1.5m0 1.5c-1.355 0-2.697.056-4.024.166C6.845 8.51 6 9.473 6 10.608v2.513m6-4.871c1.355 0 2.697.056 4.024.166C17.155 8.51 18 9.473 18 10.608v2.513M15 8.25v-1.5A2.25 2.25 0 0012.75 4.5h-1.5A2.25 2.25 0 009 6.75v1.5m6 0H9m6.75 6.75H8.25" />
+          </svg>
+        </div>
+        <div>
+          <h1 className="text-3xl font-black text-foreground tracking-tight">
+            Find your <span className="text-pantry-green">recipes</span>
+          </h1>
+          <p className="text-sm text-muted mt-2 max-w-xs">
+            Head to the inventory, pick the items you grabbed from the Pantry, and we'll generate recipes just for you.
+          </p>
+        </div>
+        <button
+          onClick={() => router.push("/inventory")}
+          className="mt-2 px-6 py-3 bg-pantry-green text-white text-sm font-semibold rounded-full hover:bg-pantry-coral transition-colors"
+        >
+          Browse inventory →
+        </button>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background">
       <div className="max-w-2xl mx-auto px-4 py-12">
 
-        {/* Back */}
         <motion.button
           initial={{ opacity: 0, x: -10 }}
           animate={{ opacity: 1, x: 0 }}
@@ -269,18 +271,11 @@ export default function RecipesPage() {
           Back to inventory
         </motion.button>
 
-        {/* Heading */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.45 }}
-          className="mb-3"
-        >
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.45 }} className="mb-3">
           <h1 className="text-4xl sm:text-5xl font-black tracking-tight text-foreground leading-tight">
             {loading
               ? <>Cooking up<br /><span className="text-pantry-green">your recipes…</span></>
-              : error
-              ? "Something went wrong"
+              : error ? "Something went wrong"
               : recipes.length > 0
               ? <><span className="text-pantry-green">{recipes.length} recipes</span><br />for your haul</>
               : "No recipes found"}
@@ -289,20 +284,13 @@ export default function RecipesPage() {
             {loading
               ? `Generating ideas from ${selectedNames.length} item${selectedNames.length !== 1 ? "s" : ""}…`
               : error ? error
-              : recipes.length > 0
-              ? "Green = you have it · Grey = easy to grab"
+              : recipes.length > 0 ? "Green = you have it · Grey = easy to grab"
               : "Try selecting more items from the inventory"}
           </p>
         </motion.div>
 
-        {/* Selected chips */}
         {selectedNames.length > 0 && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.2 }}
-            className="flex flex-wrap gap-2 mb-10"
-          >
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }} className="flex flex-wrap gap-2 mb-10">
             {selectedNames.map((name) => (
               <span key={name} className="text-xs font-medium px-3 py-1 rounded-full bg-pantry-green/10 border border-pantry-green/20 text-pantry-green">
                 {name}
@@ -311,46 +299,22 @@ export default function RecipesPage() {
           </motion.div>
         )}
 
-        {/* Skeletons */}
         {loading && (
           <div className="flex flex-col gap-5">
             {[0, 1, 2, 3, 4].map((i) => <RecipeSkeleton key={i} i={i} />)}
           </div>
         )}
 
-        {/* Error */}
         {!loading && error && (
-          <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}
-            className="flex flex-col items-center py-16 text-center"
-          >
-            <div className="w-12 h-12 rounded-full bg-pantry-coral/10 flex items-center justify-center mb-4">
-              <svg className="w-6 h-6 text-pantry-coral" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
-              </svg>
-            </div>
+          <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} className="flex flex-col items-center py-16 text-center">
             <p className="text-sm font-semibold text-foreground mb-1">Couldn't generate recipes</p>
             <p className="text-xs text-muted max-w-xs">{error}</p>
-            <button onClick={() => router.push("/inventory")}
-              className="mt-5 px-5 py-2 bg-pantry-green text-white text-sm font-semibold rounded-full hover:bg-pantry-coral transition-colors">
+            <button onClick={() => router.push("/inventory")} className="mt-5 px-5 py-2 bg-pantry-green text-white text-sm font-semibold rounded-full hover:bg-pantry-coral transition-colors">
               Back to inventory →
             </button>
           </motion.div>
         )}
 
-        {/* Empty */}
-        {!loading && !error && selectedNames.length === 0 && (
-          <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}
-            className="flex flex-col items-center py-16 text-center"
-          >
-            <p className="text-sm text-muted">Select ingredients from the inventory first.</p>
-            <button onClick={() => router.push("/inventory")}
-              className="mt-4 px-5 py-2 bg-pantry-green text-white text-sm font-semibold rounded-full hover:bg-pantry-coral transition-colors">
-              Go to inventory →
-            </button>
-          </motion.div>
-        )}
-
-        {/* Recipe cards */}
         {!loading && !error && recipes.length > 0 && (
           <div className="flex flex-col gap-5">
             {recipes.map((recipe, i) => (
@@ -358,7 +322,7 @@ export default function RecipesPage() {
                 key={recipe.id}
                 recipe={recipe}
                 index={i}
-                onClick={() => handleCardClick(recipe)}
+                onClick={() => router.push(`/recipes/${recipe.id}`)}
               />
             ))}
           </div>
