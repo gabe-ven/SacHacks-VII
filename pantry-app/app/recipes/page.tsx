@@ -4,7 +4,7 @@ import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 
-import { getInventory } from "@/lib/getInventory";
+import { getIngredientNames, getInventory } from "@/lib/getInventory";
 import { getRecipes, scoreRecipe } from "@/lib/getRecipes";
 import type { Recipe } from "@/types/recipe";
 import RecipeCard from "@/components/recipes/RecipeCard";
@@ -70,7 +70,7 @@ const AI_RECIPES_STORAGE_KEY = "pantry_ai_recipes";
 const AI_RECIPES_BACK_KEY = "pantry_ai_recipes_back";
 
 // ── Browse all recipes (no selection) ────────────────────────────────────────
-function BrowseRecipes() {
+function BrowseRecipes({ dbIngredientNames }: { dbIngredientNames: string[] }) {
   const [recipes, setRecipes] = useState<ScoredRecipe[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
@@ -106,6 +106,7 @@ function BrowseRecipes() {
         onSortChange={setSortKey}
         difficulty={difficulty}
         onDifficultyChange={setDifficulty}
+        ingredientSuggestions={dbIngredientNames}
       />
       {loading && <SkeletonGrid count={9} shimmer />}
       {!loading && displayed.length === 0 && (
@@ -144,12 +145,18 @@ function RecipesContent() {
   const hasSelection = itemIds.length > 0;
 
   // ── DB recipes state ──────────────────────────────────────────────────────
+  const [dbIngredientNames, setDbIngredientNames] = useState<string[]>([]);
   const [ingredientNames, setIngredientNames] = useState<string[]>([]);
   const [dbRecipes, setDbRecipes] = useState<ScoredRecipe[]>([]);
   const [dbLoading, setDbLoading] = useState(false);
   const [search, setSearch] = useState("");
   const [sortKey, setSortKey] = useState<SortKey>("match");
   const [difficulty, setDifficulty] = useState("All");
+
+  // Load all ingredient names from DB once (for search autocomplete)
+  useEffect(() => {
+    getIngredientNames().then(setDbIngredientNames);
+  }, []);
 
   // ── AI recipes state ──────────────────────────────────────────────────────
   const [aiRecipes, setAiRecipes] = useState<ScoredRecipe[]>([]);
@@ -349,6 +356,7 @@ function RecipesContent() {
               onSortChange={setSortKey}
               difficulty={difficulty}
               onDifficultyChange={setDifficulty}
+              ingredientSuggestions={dbIngredientNames}
             />
 
             {/* DB loading */}
@@ -454,7 +462,7 @@ function RecipesContent() {
         )}
 
         {/* ── Browse mode ── */}
-        {!hasSelection && <BrowseRecipes />}
+        {!hasSelection && <BrowseRecipes dbIngredientNames={dbIngredientNames} />}
       </div>
     </div>
   );
