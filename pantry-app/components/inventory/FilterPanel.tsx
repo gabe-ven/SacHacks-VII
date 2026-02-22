@@ -199,7 +199,7 @@ export default function FilterPanel({
                 </svg>
               </button>
               {categoryExpanded && (
-                <div className="flex items-center gap-2" role="group" aria-label="Category filter">
+                <div className="flex items-center gap-2 animate-filter-pill-in" role="group" aria-label="Category filter">
                   {allCategories.map((cat) => {
                     const active = filters.categories.includes(cat);
                     return (
@@ -244,7 +244,7 @@ export default function FilterPanel({
                   </span>
                 )}
                 <svg
-                  className={`w-3.5 h-3.5 shrink-0 transition-transform ${dietaryExpanded ? "-rotate-90" : ""}`}
+                  className={`w-3.5 h-3.5 shrink-0 transition-transform ${dietaryExpanded ? "rotate-90" : "-rotate-90"}`}
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -255,7 +255,7 @@ export default function FilterPanel({
                 </svg>
               </button>
               {dietaryExpanded && (
-                <div className="flex items-center gap-2" role="group" aria-label="Dietary filter">
+                <div className="flex items-center gap-2 animate-filter-pill-in" role="group" aria-label="Dietary filter">
                   {allTags.map((tag) => {
                     const active = filters.tags.includes(tag);
                     return (
