@@ -1,119 +1,150 @@
+/**
+ * getRecipes.ts
+ *
+ * Fetches recipes from the live Supabase tables:
+ *
+ *   recipes            – id (int), name (text), instructions (text)
+ *   recipe_ingredient  – id, recipe_id (int), ingredient_id (uuid)
+ *   ingredients        – id (uuid), name (text), …
+ *
+ * Instructions are stored as a single text blob in the format:
+ *   "First get: <ingredient lines>\nThen <instruction lines>"
+ *
+ * Falls back to the hardcoded pantryRecipes data on any error.
+ */
+
 import { supabase } from "@/lib/supabase";
+import { pantryRecipes } from "@/lib/pantryRecipes";
 import type { Recipe } from "@/types/recipe";
 
-// ── Helpers ──────────────────────────────────────────────────────────────────
+// ── Row shapes ──────────────────────────────────────────────────────────────
 
-/**
- * The instructions field is formatted as:
- *   "First get: ingredient1\ningredient2\n...\nThen step1\nstep2\n..."
- *
- * This splits out just the steps after "Then ".
- */
-function parseSteps(instructions: string): string[] {
-  const thenIdx = instructions.indexOf("Then ");
-  if (thenIdx === -1) return [instructions.trim()].filter(Boolean);
-  return instructions
-    .slice(thenIdx + 5)
-    .split("\n")
-    .map((s) => s.trim())
-    .filter(Boolean);
+interface LiveRecipeRow {
+  id: number;
+  name: string;
+  instructions: string;
+  recipe_ingredient: Array<{
+    ingredient: { id: string; name: string } | null;
+  }>;
 }
 
+// ── Helpers ─────────────────────────────────────────────────────────────────
+
 /**
- * Extracts the raw ingredient lines from the "First get:" section.
+ * Parses the "First get: …\nThen …" instruction blob into
+ * a list of ingredient lines and a list of instruction steps.
  */
-function parseIngredientLines(instructions: string): string[] {
-  const getIdx = instructions.indexOf("First get:");
-  const thenIdx = instructions.indexOf("Then ");
-  if (getIdx === -1) return [];
-  const end = thenIdx === -1 ? instructions.length : thenIdx;
-  return instructions
-    .slice(getIdx + 10, end)
-    .split("\n")
-    .map((s) => s.trim())
-    .filter(Boolean);
-}
-
-// ── Public API ────────────────────────────────────────────────────────────────
-
-export async function getRecipes(): Promise<Recipe[]> {
-  const [{ data: recipes, error: rErr }, { data: riRows, error: riErr }] =
-    await Promise.all([
-      supabase.from("recipes").select("id, name, instructions").order("name"),
-      supabase
-        .from("recipe_ingredient")
-        .select("recipe_id, ingredient:ingredients(id, name)"),
-    ]);
-
-  if (rErr) throw new Error(rErr.message);
-  if (riErr) throw new Error(riErr.message);
-
-  // Build recipe_id → ingredient names map
-  const pantryMap = new Map<number, string[]>();
-  for (const row of riRows ?? []) {
-    const recipeId = row.recipe_id as number;
-    const ingName = (row.ingredient as { name: string } | null)?.name;
-    if (!ingName) continue;
-    if (!pantryMap.has(recipeId)) pantryMap.set(recipeId, []);
-    pantryMap.get(recipeId)!.push(ingName);
+function parseInstructions(raw: string): {
+  ingredients: string[];
+  steps: string[];
+} {
+  const thenIdx = raw.indexOf("Then ");
+  if (thenIdx === -1) {
+    return {
+      ingredients: [],
+      steps: raw
+        .split("\n")
+        .map((s) => s.trim())
+        .filter(Boolean),
+    };
   }
 
-  return (recipes ?? []).map((r) => {
-    const id = r.id as number;
-    const instructions = r.instructions as string;
-    return {
-      id: String(id),
-      title: r.name as string,
-      image: "",
-      cookTime: "",
-      difficulty: "Easy" as const,
-      ingredients: parseIngredientLines(instructions),
-      pantryIngredients: pantryMap.get(id) ?? [],
-      instructions: parseSteps(instructions),
-      substitutions: [],
-    };
-  });
+  const ingredientBlock = raw.slice(0, thenIdx);
+  const stepsBlock = raw.slice(thenIdx + 5);
+
+  const ingredients = ingredientBlock
+    .replace(/^First get:\s*/i, "")
+    .split("\n")
+    .map((s) => s.trim())
+    .filter(Boolean);
+
+  const steps = stepsBlock
+    .split("\n")
+    .map((s) => s.trim())
+    .filter(Boolean);
+
+  return { ingredients, steps };
 }
 
-export async function getRecipeById(id: string): Promise<Recipe | undefined> {
-  const [{ data: recipe, error: rErr }, { data: riRows, error: riErr }] =
-    await Promise.all([
-      supabase
-        .from("recipes")
-        .select("id, name, instructions")
-        .eq("id", Number(id))
-        .maybeSingle(),
-      supabase
-        .from("recipe_ingredient")
-        .select("ingredient:ingredients(id, name)")
-        .eq("recipe_id", Number(id)),
-    ]);
+function rowToRecipe(row: LiveRecipeRow): Recipe {
+  const { ingredients, steps } = parseInstructions(row.instructions ?? "");
 
-  if (rErr) throw new Error(rErr.message);
-  if (riErr) throw new Error(riErr.message);
-  if (!recipe) return undefined;
-
-  const instructions = recipe.instructions as string;
-  const pantryIngredients = (riRows ?? [])
-    .map((row) => (row.ingredient as { name: string } | null)?.name)
+  const pantryIngredients = (row.recipe_ingredient ?? [])
+    .map((ri) => ri.ingredient?.name)
     .filter((n): n is string => Boolean(n));
 
   return {
-    id: String(recipe.id),
-    title: recipe.name as string,
+    id: String(row.id),
+    title: row.name,
     image: "",
-    cookTime: "",
-    difficulty: "Easy" as const,
-    ingredients: parseIngredientLines(instructions),
+    cookTime: "N/A",
+    difficulty: "Medium",
+    ingredients,
     pantryIngredients,
-    instructions: parseSteps(instructions),
+    instructions: steps,
     substitutions: [],
   };
 }
 
+// ── Public API ───────────────────────────────────────────────────────────────
+
+/** Returns all recipes, falling back to local data on error. */
+export async function getRecipes(): Promise<Recipe[]> {
+  try {
+    const { data, error } = await supabase
+      .from("recipes")
+      .select(
+        "id, name, instructions, recipe_ingredient(ingredient:ingredients(id, name))"
+      )
+      .order("name", { ascending: true });
+
+    if (error) {
+      console.warn("[getRecipes] Supabase error, using local fallback:", error.message);
+      return pantryRecipes;
+    }
+
+    if (!data || data.length === 0) {
+      console.warn("[getRecipes] No rows returned, using local fallback.");
+      return pantryRecipes;
+    }
+
+    return (data as unknown as LiveRecipeRow[]).map(rowToRecipe);
+  } catch (err) {
+    console.error("[getRecipes] Unexpected error:", err);
+    return pantryRecipes;
+  }
+}
+
+/** Returns a single recipe by ID (integer string or slug), falling back to local data. */
+export async function getRecipeById(id: string): Promise<Recipe | undefined> {
+  try {
+    const numericId = parseInt(id, 10);
+
+    if (isNaN(numericId)) {
+      return pantryRecipes.find((r) => r.id === id);
+    }
+
+    const { data, error } = await supabase
+      .from("recipes")
+      .select(
+        "id, name, instructions, recipe_ingredient(ingredient:ingredients(id, name))"
+      )
+      .eq("id", numericId)
+      .maybeSingle();
+
+    if (error || !data) {
+      return pantryRecipes.find((r) => r.id === id);
+    }
+
+    return rowToRecipe(data as unknown as LiveRecipeRow);
+  } catch {
+    return pantryRecipes.find((r) => r.id === id);
+  }
+}
+
 /**
- * Scores a recipe 0–100 based on how many of its pantry ingredients
- * the user has selected. Uses fuzzy matching to handle partial names.
+ * Scores how well a recipe matches a set of user-selected ingredient names.
+ * Returns a value 0–100 (percentage of the recipe's pantry ingredients covered).
  */
 export function scoreRecipe(recipe: Recipe, userIngredients: string[]): number {
   if (userIngredients.length === 0 || recipe.pantryIngredients.length === 0)
@@ -121,7 +152,8 @@ export function scoreRecipe(recipe: Recipe, userIngredients: string[]): number {
   const normalized = userIngredients.map((i) => i.toLowerCase());
   const matches = recipe.pantryIngredients.filter((pi) =>
     normalized.some(
-      (ui) => pi.toLowerCase().includes(ui) || ui.includes(pi.toLowerCase())
+      (ui) =>
+        pi.toLowerCase().includes(ui) || ui.includes(pi.toLowerCase())
     )
   );
   return Math.round((matches.length / recipe.pantryIngredients.length) * 100);

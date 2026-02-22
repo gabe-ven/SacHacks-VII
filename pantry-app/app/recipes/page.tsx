@@ -1,333 +1,252 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useMemo, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import { motion } from "framer-motion";
 
-// ── Types ─────────────────────────────────────────────────────────────────
+import { getInventory } from "@/lib/getInventory";
+import { getRecipes, scoreRecipe } from "@/lib/getRecipes";
+import type { InventoryItem } from "@/types/inventory";
+import type { Recipe } from "@/types/recipe";
+import RecipeCard from "@/components/recipes/RecipeCard";
+import RecipeFilters, { type SortKey } from "@/components/recipes/RecipeFilters";
 
-export type GeneratedRecipe = {
-  id: number;
-  name: string;
-  cookTime: string;
-  difficulty: "Easy" | "Medium" | "Hard";
-  haveIngredients: string[];
-  needIngredients: string[];
-  steps: string[];
-};
+// ── Types ────────────────────────────────────────────────────────────────────
+type ScoredRecipe = Recipe & { matchScore: number };
 
-export const RECIPES_STORAGE_KEY = "pantry_generated_recipes";
-const RECIPES_ITEMS_KEY = "pantry_generated_items";
-
-// ── Constants ─────────────────────────────────────────────────────────────
-
-const CARD_ACCENT: string[] = [
-  "#5E7F64", "#EEB467", "#E37861", "#DDBE86", "#92A9C0",
-  "#5E7F64", "#EEB467", "#E37861", "#DDBE86", "#92A9C0",
-];
-
-const DIFFICULTY_COLOR: Record<string, string> = {
-  Easy:   "text-pantry-green bg-pantry-green/10 border-pantry-green/20",
-  Medium: "text-pantry-amber bg-pantry-amber/10 border-pantry-amber/20",
-  Hard:   "text-pantry-coral bg-pantry-coral/10 border-pantry-coral/20",
-};
-
-// ── Skeleton ──────────────────────────────────────────────────────────────
-
-function RecipeSkeleton({ i }: { i: number }) {
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: i * 0.1 }}
-      className="bg-surface-card border border-border rounded-3xl overflow-hidden animate-pulse"
-    >
-      <div className="h-2 w-full" style={{ backgroundColor: CARD_ACCENT[i % CARD_ACCENT.length] + "66" }} />
-      <div className="p-7 space-y-4">
-        <div className="h-6 w-2/3 bg-border rounded-lg" />
-        <div className="h-3 w-1/3 bg-border rounded" />
-        <div className="space-y-2 pt-2">
-          <div className="h-3 w-1/4 bg-border rounded" />
-          <div className="flex gap-2 flex-wrap">
-            {[1, 2, 3].map((j) => <div key={j} className="h-6 w-24 bg-border rounded-full" />)}
-          </div>
-        </div>
-        <div className="space-y-2">
-          <div className="h-3 w-1/4 bg-border rounded" />
-          <div className="flex gap-2 flex-wrap">
-            {[1, 2].map((j) => <div key={j} className="h-6 w-20 bg-border rounded-full" />)}
-          </div>
-        </div>
-      </div>
-    </motion.div>
-  );
+function cookTimeMinutes(t: string): number {
+  const m = t.match(/(\d+)/);
+  return m ? parseInt(m[1], 10) : 999;
 }
 
-// ── Recipe card ───────────────────────────────────────────────────────────
-
-function RecipeCard({
-  recipe,
-  index,
-  onClick,
-}: {
-  recipe: GeneratedRecipe;
-  index: number;
-  onClick: () => void;
-}) {
-  const accent = CARD_ACCENT[index % CARD_ACCENT.length];
-  const total = recipe.haveIngredients.length + recipe.needIngredients.length;
-  const pct = total > 0 ? Math.round((recipe.haveIngredients.length / total) * 100) : 0;
-
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 32 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ type: "spring", stiffness: 260, damping: 22, delay: index * 0.07 }}
-    >
-      <button
-        onClick={onClick}
-        className="group w-full text-left bg-surface-card border border-border rounded-3xl overflow-hidden shadow-sm hover:shadow-xl hover:border-transparent transition-all duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-pantry-green"
-      >
-        <div className="h-2 w-full" style={{ backgroundColor: accent }} />
-        <div className="p-7">
-          <div className="flex items-start justify-between gap-4 mb-4">
-            <h3
-              className="text-2xl font-black leading-tight tracking-tight group-hover:opacity-80 transition-opacity"
-              style={{ fontFamily: "Dancing Script, cursive", color: accent }}
-            >
-              {recipe.name}
-            </h3>
-            <span className={`shrink-0 text-[10px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-full border mt-1 ${DIFFICULTY_COLOR[recipe.difficulty] ?? DIFFICULTY_COLOR.Easy}`}>
-              {recipe.difficulty}
-            </span>
-          </div>
-
-          <div className="flex items-center gap-4 text-xs text-muted mb-6">
-            <span className="flex items-center gap-1.5">
-              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <circle cx="12" cy="12" r="10" /><path d="M12 6v6l4 2" />
-              </svg>
-              {recipe.cookTime}
-            </span>
-            <span>·</span>
-            <span>{total} ingredients</span>
-            <span>·</span>
-            <span>{recipe.steps.length} steps</span>
-          </div>
-
-          {recipe.haveIngredients.length > 0 && (
-            <div className="mb-4">
-              <p className="text-[10px] font-bold uppercase tracking-widest text-pantry-green mb-2">
-                ✓ You have ({recipe.haveIngredients.length})
-              </p>
-              <div className="flex flex-wrap gap-2">
-                {recipe.haveIngredients.map((ing) => (
-                  <span key={ing} className="text-xs font-medium px-3 py-1 rounded-full bg-pantry-green/10 border border-pantry-green/20 text-pantry-green">
-                    {ing}
-                  </span>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {recipe.needIngredients.length > 0 && (
-            <div className="mb-6">
-              <p className="text-[10px] font-bold uppercase tracking-widest text-muted mb-2">
-                + Also need ({recipe.needIngredients.length})
-              </p>
-              <div className="flex flex-wrap gap-2">
-                {recipe.needIngredients.map((ing) => (
-                  <span key={ing} className="text-xs font-medium px-3 py-1 rounded-full bg-surface border border-border text-muted">
-                    {ing}
-                  </span>
-                ))}
-              </div>
-            </div>
-          )}
-
-          <div className="flex items-center justify-between gap-4 pt-4 border-t border-border">
-            <div className="flex-1">
-              <div className="flex items-center justify-between mb-1">
-                <span className="text-[10px] text-muted">Ingredients you have</span>
-                <span className="text-[10px] font-bold" style={{ color: accent }}>{pct}%</span>
-              </div>
-              <div className="h-1 w-full bg-border rounded-full overflow-hidden">
-                <motion.div
-                  className="h-full rounded-full"
-                  style={{ backgroundColor: accent }}
-                  initial={{ width: 0 }}
-                  animate={{ width: `${pct}%` }}
-                  transition={{ duration: 0.8, ease: "easeOut", delay: 0.4 + index * 0.07 }}
-                />
-              </div>
-            </div>
-            <span
-              className="shrink-0 text-xs font-bold px-4 py-2 rounded-full text-white transition-all duration-200 group-hover:scale-105"
-              style={{ backgroundColor: accent }}
-            >
-              See recipe →
-            </span>
-          </div>
-        </div>
-      </button>
-    </motion.div>
-  );
-}
-
-// ── Page ──────────────────────────────────────────────────────────────────
-
-export default function RecipesPage() {
+// ── Main content ─────────────────────────────────────────────────────────────
+function RecipesContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
 
-  const [recipes, setRecipes] = useState<GeneratedRecipe[]>([]);
+  const itemIds = useMemo(
+    () =>
+      (searchParams.get("items") ?? "")
+        .split(",")
+        .map((s) => s.trim())
+        .filter(Boolean),
+    [searchParams]
+  );
+
+  const [selectedItems, setSelectedItems] = useState<InventoryItem[]>([]);
+  const [recipes, setRecipes] = useState<ScoredRecipe[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [search, setSearch] = useState("");
+  const [sortKey, setSortKey] = useState<SortKey>("match");
+  const [difficulty, setDifficulty] = useState("All");
 
-  const raw = searchParams.get("items") ?? "";
-  const selectedNames = raw
-    ? raw.split(",").map((s) => decodeURIComponent(s).trim()).filter(Boolean)
-    : [];
-
+  // Fetch inventory + recipes in parallel, then score
   useEffect(() => {
-    if (selectedNames.length === 0) {
-      setLoading(false);
-      return;
-    }
-
-    const cachedItems = sessionStorage.getItem(RECIPES_ITEMS_KEY);
-    const cachedRecipes = sessionStorage.getItem(RECIPES_STORAGE_KEY);
-    if (cachedItems === raw && cachedRecipes) {
-      setRecipes(JSON.parse(cachedRecipes));
-      setLoading(false);
-      return;
-    }
-
-    async function generate() {
+    let cancelled = false;
+    async function load() {
       setLoading(true);
-      setError(null);
       try {
-        const res = await fetch("/api/generate-recipes", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ items: selectedNames }),
-        });
-        const json = await res.json();
-        if (!res.ok) throw new Error(json.error ?? "Unknown error");
-        const list: GeneratedRecipe[] = json.recipes ?? [];
-        setRecipes(list);
-        sessionStorage.setItem(RECIPES_STORAGE_KEY, JSON.stringify(list));
-        sessionStorage.setItem(RECIPES_ITEMS_KEY, raw);
-      } catch (e) {
-        setError(e instanceof Error ? e.message : "Something went wrong");
+        const [allItems, allRecipes] = await Promise.all([getInventory(), getRecipes()]);
+        if (cancelled) return;
+        const selected = itemIds.length > 0
+          ? allItems.filter((item) => itemIds.includes(item.id))
+          : [];
+        setSelectedItems(selected);
+        const names = selected.map((i) => i.name);
+        setRecipes(allRecipes.map((r) => ({ ...r, matchScore: scoreRecipe(r, names) })));
       } finally {
-        setLoading(false);
+        if (!cancelled) setLoading(false);
       }
     }
-    generate();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [raw]);
+    load();
+    return () => { cancelled = true; };
+  }, [itemIds]);
 
-  // No items — show prompt to go pick ingredients
-  if (!raw) {
-    return (
-      <div className="min-h-screen bg-background flex flex-col items-center justify-center px-4 text-center gap-5">
-        <div className="w-14 h-14 rounded-full bg-pantry-green/10 flex items-center justify-center">
-          <svg className="w-7 h-7 text-pantry-green" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M12 8.25v-1.5m0 1.5c-1.355 0-2.697.056-4.024.166C6.845 8.51 6 9.473 6 10.608v2.513m6-4.871c1.355 0 2.697.056 4.024.166C17.155 8.51 18 9.473 18 10.608v2.513M15 8.25v-1.5A2.25 2.25 0 0012.75 4.5h-1.5A2.25 2.25 0 009 6.75v1.5m6 0H9m6.75 6.75H8.25" />
-          </svg>
-        </div>
-        <div>
-          <h1 className="text-3xl font-black text-foreground tracking-tight">
-            Find your <span className="text-pantry-green">recipes</span>
-          </h1>
-          <p className="text-sm text-muted mt-2 max-w-xs">
-            Head to the inventory, pick the items you grabbed from the Pantry, and we'll generate recipes just for you.
-          </p>
-        </div>
-        <button
-          onClick={() => router.push("/inventory")}
-          className="mt-2 px-6 py-3 bg-pantry-green text-white text-sm font-semibold rounded-full hover:bg-pantry-coral transition-colors"
-        >
-          Browse inventory →
-        </button>
-      </div>
-    );
-  }
+  // Filter + sort
+  const displayed = useMemo(() => {
+    let list = recipes;
+    if (search.trim()) {
+      const q = search.toLowerCase();
+      list = list.filter(
+        (r) =>
+          r.title.toLowerCase().includes(q) ||
+          r.ingredients.some((i) => i.toLowerCase().includes(q))
+      );
+    }
+    if (difficulty !== "All") list = list.filter((r) => r.difficulty === difficulty);
+    return [...list].sort((a, b) => {
+      if (sortKey === "match")
+        return b.matchScore !== a.matchScore ? b.matchScore - a.matchScore : a.title.localeCompare(b.title);
+      if (sortKey === "time")
+        return cookTimeMinutes(a.cookTime) - cookTimeMinutes(b.cookTime);
+      return a.title.localeCompare(b.title);
+    });
+  }, [recipes, search, sortKey, difficulty]);
+
+  const hasSelection = itemIds.length > 0;
+  const matched = displayed.filter((r) => r.matchScore > 0);
+  const unmatched = displayed.filter((r) => r.matchScore === 0);
+  const secondary = hasSelection ? unmatched : displayed;
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="max-w-2xl mx-auto px-4 py-12">
+    <div className="min-h-screen bg-pantry-cream">
+      <div className="max-w-screen-xl mx-auto px-4 sm:px-6 py-10 space-y-8">
 
-        <motion.button
-          initial={{ opacity: 0, x: -10 }}
-          animate={{ opacity: 1, x: 0 }}
-          onClick={() => router.push("/inventory")}
-          className="flex items-center gap-1.5 text-sm text-muted hover:text-foreground transition-colors mb-10 group"
-        >
-          <svg className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
-          </svg>
-          Back to inventory
-        </motion.button>
+        {/* Hero banner */}
+        <div className="relative overflow-hidden rounded-3xl bg-pantry-green px-8 py-12 flex flex-col gap-3">
+          <div
+            aria-hidden="true"
+            className="absolute inset-0 opacity-[0.05] pointer-events-none"
+            style={{
+              backgroundImage: "linear-gradient(#fff 1px,transparent 1px),linear-gradient(90deg,#fff 1px,transparent 1px)",
+              backgroundSize: "48px 48px",
+            }}
+          />
+          <div aria-hidden="true" className="absolute -top-10 -right-10 w-48 h-48 rounded-full bg-pantry-amber/10 blur-2xl pointer-events-none" />
 
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.45 }} className="mb-3">
-          <h1 className="text-4xl sm:text-5xl font-black tracking-tight text-foreground leading-tight">
-            {loading
-              ? <>Cooking up<br /><span className="text-pantry-green">your recipes…</span></>
-              : error ? "Something went wrong"
-              : recipes.length > 0
-              ? <><span className="text-pantry-green">{recipes.length} recipes</span><br />for your haul</>
-              : "No recipes found"}
+          <span className="relative z-10 text-pantry-amber text-[10px] font-bold uppercase tracking-[0.25em]">
+            The Pantry at ASUCD · UC Davis
+          </span>
+          <h1
+            className="relative z-10 text-5xl sm:text-6xl text-white leading-tight"
+            style={{ fontFamily: "Dancing Script, cursive" }}
+          >
+            Recipe Suggestions
           </h1>
-          <p className="text-sm text-muted mt-2">
-            {loading
-              ? `Generating ideas from ${selectedNames.length} item${selectedNames.length !== 1 ? "s" : ""}…`
-              : error ? error
-              : recipes.length > 0 ? "Green = you have it · Grey = easy to grab"
-              : "Try selecting more items from the inventory"}
+          <p className="relative z-10 text-pantry-cream/65 max-w-lg text-sm leading-relaxed">
+            {hasSelection
+              ? `Showing recipes matched to your ${itemIds.length} selected ingredient${itemIds.length !== 1 ? "s" : ""}. Every student deserves a good meal — here are yours.`
+              : "Browse all pantry recipes below, or head back to select your ingredients for personalised suggestions."}
           </p>
-        </motion.div>
 
-        {selectedNames.length > 0 && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }} className="flex flex-wrap gap-2 mb-10">
-            {selectedNames.map((name) => (
-              <span key={name} className="text-xs font-medium px-3 py-1 rounded-full bg-pantry-green/10 border border-pantry-green/20 text-pantry-green">
-                {name}
-              </span>
-            ))}
-          </motion.div>
+          <button
+            onClick={() => router.push("/inventory")}
+            className="relative z-10 mt-2 w-fit inline-flex items-center gap-1.5 text-pantry-cream/60 hover:text-pantry-amber text-sm transition-colors focus:outline-none"
+          >
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} aria-hidden="true">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+            </svg>
+            Back to pantry
+          </button>
+        </div>
+
+        {/* Selected ingredient chips */}
+        {hasSelection && (
+          <div className="space-y-2">
+            <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-pantry-brown/60">
+              Your selected ingredients
+            </p>
+            <div className="flex flex-wrap gap-2">
+              {loading
+                ? Array.from({ length: Math.min(itemIds.length, 8) }).map((_, i) => (
+                  <div key={i} className="h-7 w-20 rounded-full bg-pantry-green/15 animate-pulse" />
+                ))
+                : selectedItems.length > 0
+                  ? selectedItems.map((item) => (
+                    <span key={item.id} className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-pantry-green text-pantry-cream border border-pantry-green-dark/20">
+                      {item.name}
+                    </span>
+                  ))
+                  : (
+                    <p className="text-sm text-pantry-brown/50 italic">
+                      Could not resolve ingredient names — match scores may not appear.
+                    </p>
+                  )}
+            </div>
+          </div>
         )}
 
+        {/* Filters */}
+        <RecipeFilters
+          search={search}
+          onSearchChange={setSearch}
+          sortKey={sortKey}
+          onSortChange={setSortKey}
+          difficulty={difficulty}
+          onDifficultyChange={setDifficulty}
+        />
+
+        {/* Loading skeletons */}
         {loading && (
-          <div className="flex flex-col gap-5">
-            {[0, 1, 2, 3, 4].map((i) => <RecipeSkeleton key={i} i={i} />)}
-          </div>
-        )}
-
-        {!loading && error && (
-          <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} className="flex flex-col items-center py-16 text-center">
-            <p className="text-sm font-semibold text-foreground mb-1">Couldn't generate recipes</p>
-            <p className="text-xs text-muted max-w-xs">{error}</p>
-            <button onClick={() => router.push("/inventory")} className="mt-5 px-5 py-2 bg-pantry-green text-white text-sm font-semibold rounded-full hover:bg-pantry-coral transition-colors">
-              Back to inventory →
-            </button>
-          </motion.div>
-        )}
-
-        {!loading && !error && recipes.length > 0 && (
-          <div className="flex flex-col gap-5">
-            {recipes.map((recipe, i) => (
-              <RecipeCard
-                key={recipe.id}
-                recipe={recipe}
-                index={i}
-                onClick={() => router.push(`/recipes/${recipe.id}`)}
-              />
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {Array.from({ length: 9 }).map((_, i) => (
+              <div key={i} className="rounded-2xl border border-pantry-tan/50 overflow-hidden animate-pulse bg-pantry-cream">
+                <div className="h-36 bg-pantry-tan/25" />
+                <div className="p-4 space-y-3">
+                  <div className="h-3.5 rounded-full bg-pantry-tan/40 w-3/4" />
+                  <div className="h-3 rounded-full bg-pantry-tan/30 w-1/2" />
+                </div>
+              </div>
             ))}
           </div>
+        )}
+
+        {/* Results */}
+        {!loading && (
+          <>
+            {displayed.length === 0 && (
+              <div className="rounded-2xl border border-pantry-tan/50 bg-white/60 p-12 text-center space-y-2">
+                <p className="font-semibold text-pantry-green text-lg">No recipes found</p>
+                <p className="text-sm text-foreground/50">Try a different search term or remove the difficulty filter.</p>
+              </div>
+            )}
+
+            {hasSelection && matched.length > 0 && (
+              <section className="space-y-4">
+                <SectionHeading title="Best matches" count={matched.length} accent="text-pantry-green bg-pantry-green/12" />
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {matched.map((r) => <RecipeCard key={r.id} recipe={r} matchScore={r.matchScore} />)}
+                </div>
+              </section>
+            )}
+
+            {hasSelection && matched.length === 0 && displayed.length > 0 && (
+              <div className="rounded-2xl border border-pantry-amber/40 bg-pantry-yellow/20 p-5 flex items-start gap-4">
+                <span className="shrink-0 w-8 h-8 rounded-full bg-pantry-amber/30 flex items-center justify-center text-pantry-amber-dark font-bold text-sm">!</span>
+                <div>
+                  <p className="font-semibold text-pantry-green-dark text-sm">No direct matches</p>
+                  <p className="text-sm text-foreground/55 mt-0.5">
+                    None of the recipes exactly match your picks — but all {unmatched.length} recipes are yours to explore below.
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {secondary.length > 0 && (
+              <section className="space-y-4">
+                <SectionHeading
+                  title={hasSelection && matched.length > 0 ? "All other recipes" : "All recipes"}
+                  count={secondary.length}
+                  accent="text-pantry-brown bg-pantry-tan/40"
+                />
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {secondary.map((r) => <RecipeCard key={r.id} recipe={r} />)}
+                </div>
+              </section>
+            )}
+          </>
         )}
       </div>
     </div>
+  );
+}
+
+function SectionHeading({ title, count, accent }: { title: string; count: number; accent: string }) {
+  return (
+    <div className="flex items-center gap-3">
+      <h2 className="font-semibold text-foreground text-base">{title}</h2>
+      <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${accent}`}>{count}</span>
+    </div>
+  );
+}
+
+export default function RecipesPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-pantry-cream flex items-center justify-center">
+        <p className="text-sm text-pantry-brown/50">Loading recipes…</p>
+      </div>
+    }>
+      <RecipesContent />
+    </Suspense>
   );
 }
