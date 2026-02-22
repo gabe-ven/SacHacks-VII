@@ -71,14 +71,14 @@ export default function InventoryCard({ item, isSelected, onToggle, selectionCou
       onClick={handleCardClick}
       onKeyDown={handleKeyDown}
       className={[
-        "relative flex rounded-xl overflow-hidden h-full select-none transition-all duration-200 border border-[#1a1a1a]/8",
+        "relative flex rounded-xl overflow-hidden h-full select-none transition-all duration-200 border border-border",
         isOut
           ? "opacity-40 grayscale cursor-not-allowed"
           : isSelected
           ? "ring-2 ring-pantry-green ring-offset-1 shadow-md -translate-y-0.5 cursor-pointer"
           : canToggle
-          ? "bg-white border-[#1a1a1a]/6 hover:border-pantry-green/30 hover:shadow-lg cursor-pointer"
-          : "bg-[#f9f9f7] border-[#1a1a1a]/6 cursor-not-allowed opacity-60",
+          ? "bg-surface-card hover:border-pantry-green/30 hover:shadow-lg cursor-pointer"
+          : "bg-surface border-border cursor-not-allowed opacity-60",
         !isOut ? "focus:outline-none focus-visible:ring-2 focus-visible:ring-pantry-green" : "",
       ].join(" ")}
     >
@@ -102,7 +102,7 @@ export default function InventoryCard({ item, isSelected, onToggle, selectionCou
       </div>
 
       {/* Right: content */}
-      <div className="flex flex-col justify-between gap-3 p-4 bg-white flex-1 min-w-0">
+      <div className="flex flex-col justify-between gap-3 p-4 bg-surface-card flex-1 min-w-0">
 
         {/* Stock indicator */}
         <div className="flex items-center gap-1.5">
@@ -123,7 +123,7 @@ export default function InventoryCard({ item, isSelected, onToggle, selectionCou
         {/* Item name */}
         <h3 className={[
           "text-[1.05rem] font-bold leading-snug tracking-tight",
-          isOut ? "text-[#1a1a1a]/25" : "text-[#1a1a1a]",
+          isOut ? "text-muted" : "text-foreground",
         ].join(" ")}>
           {item.name}
         </h3>
@@ -131,7 +131,7 @@ export default function InventoryCard({ item, isSelected, onToggle, selectionCou
         {/* Tags + checkmark */}
         <div className="flex items-center justify-between gap-1 min-h-[16px]">
           {(item.tags?.length ?? 0) > 0 ? (
-            <p className="text-[10px] text-[#1a1a1a]/30 truncate">
+            <p className="text-[10px] text-muted truncate">
               {item.tags!.join(" · ")}
             </p>
           ) : (
@@ -151,7 +151,7 @@ export default function InventoryCard({ item, isSelected, onToggle, selectionCou
         </div>
 
         {atMax && !isOut && (
-          <p className="text-[10px] text-[#1a1a1a]/30" role="note">Max {MAX_SELECTION} selected</p>
+          <p className="text-[10px] text-muted" role="note">Max {MAX_SELECTION} selected</p>
         )}
       </div>
 

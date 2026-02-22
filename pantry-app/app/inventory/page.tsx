@@ -148,7 +148,7 @@ export default function InventoryPage() {
 
   // ── Render ────────────────────────────────────────────────────────────────
   return (
-    <div className="min-h-screen bg-white pb-24 lg:pb-0">
+    <div className="min-h-screen bg-background pb-24 lg:pb-0">
       <div className="max-w-screen-xl mx-auto px-4 sm:px-6 py-12">
 
         {/* ── Page header ── */}
@@ -276,7 +276,7 @@ export default function InventoryPage() {
             className="hidden lg:flex lg:flex-col w-64 shrink-0 sticky top-6"
             aria-label="Selected items"
           >
-            <div className="p-5 flex flex-col rounded-2xl bg-white border border-pantry-amber/40">
+            <div className="p-5 flex flex-col rounded-2xl bg-surface-card border border-border">
               <SelectedItemsPanel
                 selectedItems={selectedItems}
                 onRemove={handleRemove}
