@@ -336,9 +336,9 @@ function RecipesContent() {
         {hasSelection && (
           <>
             {/* Ingredient chips */}
-            <div className="space-y-2">
+            <div className="rounded-2xl border border-border bg-surface-card p-4 sm:p-5 space-y-2">
               <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted">Your selected ingredients</p>
-              <div className="flex flex-wrap gap-2">
+              <div className="flex flex-wrap gap-2 mt-2">
                 {dbLoading
                   ? Array.from({ length: Math.min(itemIds.length, 8) }).map((_, i) => (
                     <div key={i} className="h-7 w-20 rounded-full bg-pantry-green/15 animate-pulse" />

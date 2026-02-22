@@ -30,7 +30,7 @@ export default function RecipeFilters({
       {/* Search — pill styling to match inventory page */}
       <div className="relative flex-1">
         <svg
-          className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted pointer-events-none"
+          className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-pantry-green/50 pointer-events-none"
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"
@@ -45,7 +45,7 @@ export default function RecipeFilters({
           onChange={(e) => onSearchChange(e.target.value)}
           placeholder="Search recipes or ingredients…"
           aria-label="Search recipes"
-          className="w-full pl-10 pr-4 py-2.5 rounded-full border border-border bg-surface-card text-sm text-foreground placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-pantry-green/30 focus:border-pantry-green/50 transition"
+          className="w-full pl-10 pr-4 py-2.5 !rounded-full border-2 border-gray-300 bg-gray-100 text-sm text-foreground placeholder:text-muted focus:outline-none focus-visible:border-pantry-green transition"
         />
       </div>
 
@@ -67,18 +67,18 @@ export default function RecipeFilters({
       </div>
 
       {/* Sort */}
-      <div className="relative shrink-0">
+      <div className="relative shrink-0 group">
         <select
           value={sortKey}
           onChange={(e) => onSortChange(e.target.value as SortKey)}
-          className="appearance-none pl-4 pr-9 py-2.5 rounded-full border border-border bg-surface-card text-sm text-muted font-medium focus:outline-none transition cursor-pointer"
+          className="appearance-none pl-4 pr-9 py-2.5 rounded-full border border-border bg-surface-card text-sm text-muted font-medium focus:outline-none transition-colors cursor-pointer hover:border-pantry-green/40 hover:text-pantry-green"
         >
           {(Object.keys(SORT_LABELS) as SortKey[]).map((k) => (
             <option key={k} value={k}>{SORT_LABELS[k]}</option>
           ))}
         </select>
         <svg
-          className="absolute right-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted pointer-events-none"
+          className="absolute right-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted group-hover:text-pantry-green pointer-events-none transition-colors"
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"
