@@ -1,17 +1,27 @@
 "use client";
 
+import Image from "next/image";
 import type { InventoryItem } from "@/types/inventory";
 import Button from "@/components/ui/Button";
-import StockBadge from "./StockBadge";
+import { useTheme } from "@/context/ThemeContext";
 
 const MAX_SELECTION = 20;
 
-const CATEGORY_META: Record<string, { color: string }> = {
-  "Produce":             { color: "#5E7F64" },
-  "Dairy":               { color: "#6C90B2" },
-  "Canned/Jarred Foods": { color: "#E3694F" },
-  "Dry/Baking Goods":    { color: "#CCAA6C" },
-  "Personal Care":       { color: "#A592C0" },
+// Match InventoryCard: category bar + label
+const CATEGORY_STYLE: Record<string, { bg: string; text: string; label: string }> = {
+  "Produce":               { bg: "#5E7F64", text: "#fff",    label: "Produce"  },
+  "Dairy":                 { bg: "#6C90B2", text: "#fff",    label: "Dairy"    },
+  "Canned/Jarred Foods":   { bg: "#E3694F", text: "#fff",    label: "Canned"   },
+  "Dry/Baking Goods":      { bg: "#CCAA6C", text: "#312F2D", label: "Bakery"   },
+  "Personal Care":         { bg: "#A592C0", text: "#fff",    label: "Personal" },
+};
+
+const CATEGORY_IMAGE: Record<string, string> = {
+  "Produce": "/image1.jpeg",
+  "Dairy": "/image2.jpg",
+  "Canned/Jarred Foods": "/image3.jpeg",
+  "Dry/Baking Goods": "/image2.jpg",
+  "Personal Care": "/image3.jpeg",
 };
 
 type Props = {
@@ -22,6 +32,11 @@ type Props = {
   canFindRecipes: boolean;
 };
 
+function getItemImage(item: InventoryItem): string {
+  const fallback = CATEGORY_IMAGE[item.category] ?? "/pantry.png";
+  return item.imageUrl?.trim() ? item.imageUrl : fallback;
+}
+
 export default function SelectedItemsPanel({
   selectedItems,
   onRemove,
@@ -29,6 +44,7 @@ export default function SelectedItemsPanel({
   onFindRecipes,
   canFindRecipes,
 }: Props) {
+  const { theme } = useTheme();
   const count = selectedItems.length;
 
   return (
@@ -65,39 +81,74 @@ export default function SelectedItemsPanel({
         </div>
       ) : (
         <ul
-          className="space-y-1.5 overflow-y-auto pr-0.5"
-          style={{ maxHeight: "min(360px, 40vh)" }}
+          className="selected-items-scroll space-y-3 overflow-y-auto"
+          style={{ maxHeight: "min(420px, 50vh)" }}
           aria-label="Selected items list"
         >
-          {selectedItems.map((item) => (
-            <li
-              key={item.id}
-              className="flex items-center gap-2 bg-surface rounded-lg border border-border overflow-hidden"
-            >
-              {/* Category color strip */}
-              <div
-                className="w-1 self-stretch shrink-0"
-                style={{ backgroundColor: (CATEGORY_META[item.category] ?? { color: "#DDBE86" }).color }}
-                aria-hidden="true"
-              />
-
-              {/* Name */}
-              <p className="flex-1 min-w-0 py-2 text-xs font-semibold text-foreground leading-snug truncate">
-                {item.name}
-              </p>
-
-              {/* Remove button */}
-              <button
-                onClick={() => onRemove(item.id)}
-                aria-label={`Remove ${item.name}`}
-                className="shrink-0 mr-1.5 w-5 h-5 flex items-center justify-center rounded-full text-muted hover:text-pantry-coral hover:bg-pantry-coral/10 transition-colors focus:outline-none cursor-pointer"
+          {selectedItems.map((item) => {
+            const cardImage = getItemImage(item);
+            const style = CATEGORY_STYLE[item.category] ?? { bg: "#DDBE86", text: "#312F2D", label: item.category };
+            return (
+              <li
+                key={item.id}
+                className="flex rounded-2xl overflow-hidden border border-border bg-surface-card shadow-sm"
               >
-                <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5} aria-hidden="true">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            </li>
-          ))}
+                {/* Left accent bar (same as InventoryCard) */}
+                <div
+                  className="w-6 shrink-0 flex items-center justify-center"
+                  style={{ backgroundColor: style.bg }}
+                  aria-hidden="true"
+                >
+                  <span
+                    style={{
+                      writingMode: "vertical-rl",
+                      transform: "rotate(180deg)",
+                      color: style.text,
+                      opacity: 0.85,
+                      fontSize: "6px",
+                      fontWeight: 800,
+                      letterSpacing: "0.12em",
+                      textTransform: "uppercase",
+                      whiteSpace: "nowrap",
+                      overflow: "hidden",
+                      maxHeight: "56px",
+                    }}
+                  >
+                    {style.label}
+                  </span>
+                </div>
+
+                {/* Card body: image + name */}
+                <div className="flex flex-1 min-w-0 p-2 items-center gap-2">
+                  <div className="relative h-14 w-14 shrink-0 rounded-lg bg-transparent flex items-center justify-center overflow-hidden">
+                    <Image
+                      src={cardImage}
+                      alt=""
+                      width={56}
+                      height={56}
+                      unoptimized
+                      className={[
+                        "w-full h-full object-contain",
+                        theme === "dark" ? "mix-blend-normal" : "mix-blend-multiply",
+                      ].join(" ")}
+                    />
+                  </div>
+                  <p className="flex-1 min-w-0 text-xs font-semibold leading-tight text-foreground line-clamp-2">
+                    {item.name}
+                  </p>
+                  <button
+                    onClick={() => onRemove(item.id)}
+                    aria-label={`Remove ${item.name}`}
+                    className="shrink-0 w-6 h-6 flex items-center justify-center rounded-full text-muted hover:text-pantry-coral hover:bg-pantry-coral/10 transition-colors focus:outline-none cursor-pointer"
+                  >
+                    <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5} aria-hidden="true">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                </div>
+              </li>
+            );
+          })}
         </ul>
       )}
 
