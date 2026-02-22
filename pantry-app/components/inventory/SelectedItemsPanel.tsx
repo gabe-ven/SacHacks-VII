@@ -159,8 +159,8 @@ export default function SelectedItemsPanel({
         </p>
       )}
 
-      {/* Find Recipes CTA — match list content width (scrollbar gutter reserved on list) */}
-      <div className="w-full min-w-0 pt-1 space-y-1.5 pr-[0.5rem]">
+      {/* Find Recipes CTA — same width as list content (scrollbar gutter + spacing) */}
+      <div className="w-full min-w-0 pt-1 space-y-1.5 pr-[calc(6px+0.5rem)]">
         <Button
           variant="primary"
           fullWidth
