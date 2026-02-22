@@ -7,20 +7,24 @@ import StockBadge from "./StockBadge";
 const MAX_SELECTION = 20;
 
 const CATEGORY_META: Record<string, { color: string }> = {
-  Produce:        { color: "#5E7F64" },
-  Dairy:          { color: "#DDBE86" },
-  Milk:           { color: "#DDBE86" },
-  Snacks:         { color: "#EEB467" },
-  "Canned Goods": { color: "#E37861" },
-  Canned:         { color: "#E37861" },
-  Grains:         { color: "#DDBE86" },
-  Necessities:    { color: "#5E7F64" },
-  Beverages:      { color: "#EEB467" },
-  Protein:        { color: "#E37861" },
-  Bakery:         { color: "#EEB467" },
-  Frozen:         { color: "#92A9C0" },
-  Pantry:         { color: "#DDBE86" },
-  Hygiene:        { color: "#92A9C0" },
+  Produce:               { color: "#5E7F64" },
+  Dairy:                 { color: "#DDBE86" },
+  Milk:                  { color: "#DDBE86" },
+  Snacks:                { color: "#EEB467" },
+  "Canned Goods":        { color: "#E37861" },
+  "Canned/Jarred Foods": { color: "#E37861" },
+  Canned:                { color: "#E37861" },
+  Grains:                { color: "#DDBE86" },
+  "Dry/Baking Goods":    { color: "#DDBE86" },
+  Necessities:           { color: "#5E7F64" },
+  Beverages:             { color: "#EEB467" },
+  Protein:               { color: "#E37861" },
+  "Protein/Meat":        { color: "#E37861" },
+  Bakery:                { color: "#EEB467" },
+  Frozen:                { color: "#92A9C0" },
+  Pantry:                { color: "#DDBE86" },
+  Hygiene:               { color: "#92A9C0" },
+  "Personal Care":       { color: "#B0A8B9" },
 };
 
 type Props = {

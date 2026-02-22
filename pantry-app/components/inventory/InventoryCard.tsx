@@ -2,7 +2,6 @@
 
 import type { KeyboardEvent } from "react";
 import type { InventoryItem } from "@/types/inventory";
-import Badge from "@/components/ui/Badge";
 
 type TagVariant = "green" | "tan" | "amber" | "coral";
 
@@ -16,19 +15,33 @@ const TAG_VARIANTS: Record<string, TagVariant> = {
   dairy_free: "coral",
 };
 
-const CATEGORY_STYLE: Record<string, { bg: string; text: string }> = {
-  Produce:        { bg: "#5E7F64", text: "#fff" },
-  Dairy:          { bg: "#DDBE86", text: "#312F2D" },
-  Milk:           { bg: "#DDBE86", text: "#312F2D" },
-  Snacks:         { bg: "#EEB467", text: "#312F2D" },
-  "Canned Goods": { bg: "#E37861", text: "#fff" },
-  Canned:         { bg: "#E37861", text: "#fff" },
-  Grains:         { bg: "#DDBE86", text: "#312F2D" },
-  Necessities:    { bg: "#5E7F64", text: "#fff" },
-  Beverages:      { bg: "#EEB467", text: "#312F2D" },
-  Protein:        { bg: "#E37861", text: "#fff" },
-  Bakery:         { bg: "#EEB467", text: "#312F2D" },
-  Frozen:         { bg: "#92A9C0", text: "#fff" },
+const TAG_COLORS: Record<TagVariant, string> = {
+  green: "bg-pantry-green/10 text-pantry-green border-pantry-green/20",
+  tan:   "bg-pantry-tan/20 text-pantry-tan border-pantry-tan/30",
+  amber: "bg-pantry-amber/10 text-pantry-amber border-pantry-amber/20",
+  coral: "bg-pantry-coral/10 text-pantry-coral border-pantry-coral/20",
+};
+
+// Shared category → color + short label (keep in sync with SelectedItemsPanel)
+export const CATEGORY_STYLE: Record<string, { bg: string; text: string; label: string }> = {
+  Produce:               { bg: "#5E7F64", text: "#fff",    label: "Produce"   },
+  Dairy:                 { bg: "#DDBE86", text: "#312F2D", label: "Dairy"     },
+  Milk:                  { bg: "#DDBE86", text: "#312F2D", label: "Dairy"     },
+  Snacks:                { bg: "#EEB467", text: "#312F2D", label: "Snacks"    },
+  "Canned Goods":        { bg: "#E37861", text: "#fff",    label: "Canned"    },
+  "Canned/Jarred Foods": { bg: "#E37861", text: "#fff",    label: "Canned"    },
+  Canned:                { bg: "#E37861", text: "#fff",    label: "Canned"    },
+  Grains:                { bg: "#DDBE86", text: "#312F2D", label: "Grains"    },
+  "Dry/Baking Goods":    { bg: "#DDBE86", text: "#312F2D", label: "Bakery"    },
+  Necessities:           { bg: "#5E7F64", text: "#fff",    label: "Essential" },
+  Beverages:             { bg: "#EEB467", text: "#312F2D", label: "Drinks"    },
+  Protein:               { bg: "#E37861", text: "#fff",    label: "Protein"   },
+  "Protein/Meat":        { bg: "#E37861", text: "#fff",    label: "Protein"   },
+  Bakery:                { bg: "#EEB467", text: "#312F2D", label: "Bakery"    },
+  Frozen:                { bg: "#92A9C0", text: "#fff",    label: "Frozen"    },
+  "Personal Care":       { bg: "#B0A8B9", text: "#fff",    label: "Personal"  },
+  Pantry:                { bg: "#DDBE86", text: "#312F2D", label: "Pantry"    },
+  Hygiene:               { bg: "#92A9C0", text: "#fff",    label: "Hygiene"   },
 };
 
 const MAX_SELECTION = 20;
@@ -38,7 +51,7 @@ function formatTagLabel(tag: string): string {
     .replace(/[_-]+/g, " ")
     .trim()
     .split(/\s+/)
-    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
     .join(" ");
 }
 
@@ -62,36 +75,23 @@ export default function InventoryCard({
   const isPersonalCare = item.category.trim().toLowerCase() === "personal care";
   const atMax = selectionCount >= MAX_SELECTION && !isSelected;
   const canToggle = !isOut && !atMax && !isPersonalCare;
-  const style = CATEGORY_STYLE[item.category] ?? { bg: "#DDBE86", text: "#312F2D" };
+  const style = CATEGORY_STYLE[item.category] ?? { bg: "#DDBE86", text: "#312F2D", label: item.category };
 
   const ariaLabel = isPersonalCare
-    ? `${item.name} is personal care and cannot be selected for recipes`
+    ? `${item.name} — personal care, not eligible for recipes`
     : isOut
-    ? `${item.name} is out of stock`
-    : `Select ${item.name} (In stock)`;
-
-  function showBlockedMessage() {
-    if (isPersonalCare) {
-      onBlockedSelect?.("Personal care items are not eligible for recipes.");
-    }
-  }
+    ? `${item.name} — out of stock`
+    : `Select ${item.name}`;
 
   function handleCardClick() {
-    if (canToggle) {
-      onToggle(item.id);
-      return;
-    }
-    showBlockedMessage();
+    if (canToggle) { onToggle(item.id); return; }
+    if (isPersonalCare) onBlockedSelect?.("Personal care items are not eligible for recipes.");
   }
 
   function handleKeyDown(e: KeyboardEvent<HTMLElement>) {
     if (e.key === "Enter" || e.key === " ") {
       e.preventDefault();
-      if (canToggle) {
-        onToggle(item.id);
-        return;
-      }
-      showBlockedMessage();
+      handleCardClick();
     }
   }
 
@@ -105,98 +105,109 @@ export default function InventoryCard({
       onClick={handleCardClick}
       onKeyDown={handleKeyDown}
       className={[
-        "relative flex rounded-xl overflow-hidden h-full select-none transition-all duration-200 border border-border",
+        "relative flex rounded-2xl overflow-hidden select-none transition-all duration-200 h-[96px]",
+        "border",
         isOut
-          ? "opacity-40 grayscale cursor-not-allowed"
+          ? "opacity-40 grayscale cursor-not-allowed border-border"
           : isPersonalCare
-          ? "cursor-not-allowed opacity-60"
+          ? "cursor-not-allowed opacity-60 border-border"
           : isSelected
-          ? "ring-2 ring-pantry-green shadow-md cursor-pointer"
+          ? "border-pantry-green ring-2 ring-pantry-green/25 shadow-md cursor-pointer"
           : canToggle
-          ? "bg-surface-card hover:border-pantry-green/30 hover:shadow-lg cursor-pointer"
-          : "bg-surface cursor-not-allowed opacity-60",
+          ? "border-border hover:border-pantry-green/40 hover:shadow-md cursor-pointer"
+          : "border-border cursor-not-allowed opacity-60",
         !isOut ? "focus:outline-none focus-visible:ring-2 focus-visible:ring-pantry-green" : "focus:outline-none",
       ].join(" ")}
     >
-      {/* Left color block with rotated category label */}
+      {/* Left accent bar */}
       <div
-        className="w-10 shrink-0 flex items-center justify-center overflow-hidden"
+        className="w-9 shrink-0 flex items-center justify-center"
         style={{ backgroundColor: style.bg }}
         aria-hidden="true"
       >
         <span
-          className="font-black uppercase"
           style={{
             writingMode: "vertical-rl",
             transform: "rotate(180deg)",
             color: style.text,
-            opacity: 0.7,
-            fontSize: "9px",
-            letterSpacing: "0.2em",
+            opacity: 0.85,
+            fontSize: "8px",
+            fontWeight: 800,
+            letterSpacing: "0.18em",
+            textTransform: "uppercase",
             whiteSpace: "nowrap",
             overflow: "hidden",
-            textOverflow: "ellipsis",
-            maxHeight: "100%",
+            maxHeight: "80px",
           }}
         >
-          {item.category}
+          {style.label}
         </span>
       </div>
 
-      {/* Right: content */}
-      <div className="flex flex-col justify-between gap-3 p-4 bg-surface-card flex-1 min-w-0">
-
-        {/* Name + checkmark */}
+      {/* Card body */}
+      <div
+        className={[
+          "flex flex-col justify-between p-3.5 flex-1 min-w-0 transition-colors duration-200 overflow-hidden",
+          isSelected ? "bg-pantry-green/5" : "bg-surface-card",
+        ].join(" ")}
+      >
+        {/* Top row: name + stock status */}
         <div className="flex items-start justify-between gap-2">
           <h3 className={[
-            "text-[1.05rem] font-bold leading-snug tracking-tight",
+            "text-sm font-semibold leading-snug tracking-tight flex-1 min-w-0 line-clamp-2",
             isOut ? "text-muted" : "text-foreground",
           ].join(" ")}>
             {item.name}
           </h3>
+
+          {/* Stock in top-right */}
+          <span className={[
+            "shrink-0 inline-flex items-center gap-1 text-[9px] font-bold uppercase tracking-widest mt-0.5",
+            isOut ? "text-muted" : isLow ? "text-pantry-amber" : "text-pantry-green",
+          ].join(" ")}>
+            <span className={[
+              "w-1.5 h-1.5 rounded-full",
+              isOut ? "bg-muted" : isLow ? "bg-pantry-amber" : "bg-pantry-green",
+            ].join(" ")} />
+            {isOut ? "Out" : isLow ? "Low" : "In stock"}
+          </span>
+        </div>
+
+        {/* Bottom row: tags OR notes */}
+        <div className="flex items-center gap-1 overflow-hidden">
+          {atMax && !isOut ? (
+            <span className="text-[9px] text-muted">Max {MAX_SELECTION} reached</span>
+          ) : isPersonalCare ? (
+            <span className="text-[9px] text-muted">Not for recipes</span>
+          ) : item.tags.length > 0 ? (
+            item.tags.slice(0, 3).map((tag) => {
+              const variant = TAG_VARIANTS[tag] ?? "tan";
+              return (
+                <span
+                  key={tag}
+                  className={[
+                    "text-[9px] font-semibold uppercase tracking-wide px-1.5 py-0.5 rounded-full border shrink-0",
+                    TAG_COLORS[variant],
+                  ].join(" ")}
+                >
+                  {formatTagLabel(tag)}
+                </span>
+              );
+            })
+          ) : null}
+
+          {/* Selected checkmark (bottom-right) */}
           {isSelected && (
             <span
               aria-hidden="true"
-              className="shrink-0 w-4 h-4 rounded-full bg-pantry-green flex items-center justify-center mt-0.5"
+              className="ml-auto shrink-0 w-5 h-5 rounded-full bg-pantry-green flex items-center justify-center"
             >
-              <svg className="w-2.5 h-2.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3.5}>
+              <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
               </svg>
             </span>
           )}
         </div>
-
-        {/* Stock indicator */}
-        <div className="flex items-center gap-1.5">
-          <span className={[
-            "w-1.5 h-1.5 rounded-full shrink-0",
-            isOut ? "bg-muted" : isLow ? "bg-pantry-amber" : "bg-pantry-green",
-          ].join(" ")} />
-          <span className={[
-            "text-[10px] font-semibold uppercase tracking-wide",
-            isOut ? "text-muted" : isLow ? "text-pantry-amber" : "text-pantry-green",
-          ].join(" ")}>
-            {isOut ? "Out of stock" : isLow ? "Low stock" : "In stock"}
-          </span>
-        </div>
-
-        {/* Dietary tags */}
-        {item.tags.length > 0 && (
-          <div className="flex flex-wrap items-center gap-1.5 mt-auto">
-            {item.tags.map((tag) => (
-              <Badge key={tag} variant={TAG_VARIANTS[tag] ?? "tan"}>
-                {formatTagLabel(tag)}
-              </Badge>
-            ))}
-          </div>
-        )}
-
-        {atMax && !isOut && (
-          <p className="text-[10px] text-muted" role="note">Max {MAX_SELECTION} selected</p>
-        )}
-        {isPersonalCare && (
-          <p className="text-[10px] text-pantry-coral/80" role="note">Not eligible for recipes</p>
-        )}
       </div>
 
       <input
