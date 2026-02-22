@@ -22,26 +22,13 @@ const TAG_COLORS: Record<TagVariant, string> = {
   coral: "bg-pantry-coral/10 text-pantry-coral border-pantry-coral/20",
 };
 
-// Shared category → color + short label (keep in sync with SelectedItemsPanel)
+// Category → color + short label (matches exact Supabase category names)
 export const CATEGORY_STYLE: Record<string, { bg: string; text: string; label: string }> = {
-  Produce:               { bg: "#5E7F64", text: "#fff",    label: "Produce"   },
-  Dairy:                 { bg: "#DDBE86", text: "#312F2D", label: "Dairy"     },
-  Milk:                  { bg: "#DDBE86", text: "#312F2D", label: "Dairy"     },
-  Snacks:                { bg: "#EEB467", text: "#312F2D", label: "Snacks"    },
-  "Canned Goods":        { bg: "#E37861", text: "#fff",    label: "Canned"    },
-  "Canned/Jarred Foods": { bg: "#E37861", text: "#fff",    label: "Canned"    },
-  Canned:                { bg: "#E37861", text: "#fff",    label: "Canned"    },
-  Grains:                { bg: "#DDBE86", text: "#312F2D", label: "Grains"    },
-  "Dry/Baking Goods":    { bg: "#DDBE86", text: "#312F2D", label: "Bakery"    },
-  Necessities:           { bg: "#5E7F64", text: "#fff",    label: "Essential" },
-  Beverages:             { bg: "#EEB467", text: "#312F2D", label: "Drinks"    },
-  Protein:               { bg: "#E37861", text: "#fff",    label: "Protein"   },
-  "Protein/Meat":        { bg: "#E37861", text: "#fff",    label: "Protein"   },
-  Bakery:                { bg: "#EEB467", text: "#312F2D", label: "Bakery"    },
-  Frozen:                { bg: "#92A9C0", text: "#fff",    label: "Frozen"    },
-  "Personal Care":       { bg: "#B0A8B9", text: "#fff",    label: "Personal"  },
-  Pantry:                { bg: "#DDBE86", text: "#312F2D", label: "Pantry"    },
-  Hygiene:               { bg: "#92A9C0", text: "#fff",    label: "Hygiene"   },
+  "Produce":               { bg: "#5E7F64", text: "#fff",    label: "Produce"  },
+  "Dairy":                 { bg: "#6C90B2", text: "#fff",    label: "Dairy"    },
+  "Canned/Jarred Foods":   { bg: "#E3694F", text: "#fff",    label: "Canned"   },
+  "Dry/Baking Goods":      { bg: "#CCAA6C", text: "#312F2D", label: "Bakery"   },
+  "Personal Care":         { bg: "#A592C0", text: "#fff",    label: "Personal" },
 };
 
 const MAX_SELECTION = 20;
