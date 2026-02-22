@@ -1,26 +1,111 @@
+@import url("https://fonts.googleapis.com/css2?family=Rubik:ital,wght@0,300..900;1,300..900&family=Dancing+Script:wght@700&display=swap");
 @import "tailwindcss";
 
+/* ── Brand color palette (The Pantry at ASUCD, 2025 guidelines) ─────────────
+   Source rows from the official guidelines:
+   Row 1 — coral / purple
+   Row 2 — amber / blue
+   Row 3 — tan / teal
+   Row 4 — yellow / green
+   Row 5 — cream / neutral dark
+   ──────────────────────────────────────────────────────────────────────────── */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background:           #F4E8D0;   /* pantry cream — page background        */
+  --foreground:           #312F2D;   /* warm near-black                        */
+
+  /* Coral / red family */
+  --pantry-coral:         #E37861;   /* primary accent, CTAs                  */
+  --pantry-coral-mid:     #E3694F;
+  --pantry-coral-dark:    #D65539;
+
+  /* Purple family */
+  --pantry-purple:        #765E9A;   /* secondary accent                       */
+  --pantry-lavender:      #A592C0;   /* soft purple highlight                  */
+  --pantry-purple-dark:   #5F4387;
+
+  /* Amber / orange family */
+  --pantry-amber:         #EEB467;   /* warm highlight, badges                 */
+  --pantry-amber-mid:     #F0A43F;
+  --pantry-amber-dark:    #DD912D;
+
+  /* Blue family */
+  --pantry-blue:          #6C90B2;
+  --pantry-blue-light:    #92A9C0;
+  --pantry-blue-dark:     #47739C;
+
+  /* Tan / neutral warm */
+  --pantry-tan:           #DDBE86;   /* borders, muted backgrounds             */
+  --pantry-tan-mid:       #CCAA6C;
+
+  /* Teal family */
+  --pantry-teal:          #4C8C9E;
+  --pantry-teal-light:    #6CA3B2;
+
+  /* Yellow */
+  --pantry-yellow:        #F2D87B;
+  --pantry-yellow-mid:    #F0C93F;
+
+  /* Green family */
+  --pantry-green:         #5E7F64;   /* primary green, brand hero color        */
+  --pantry-green-mid:     #638047;
+  --pantry-green-dark:    #436A4A;
+
+  /* Cream / neutral light */
+  --pantry-cream:         #F4E8D0;
+  --pantry-cream-mid:     #DED2B9;
+
+  /* Brown / neutral dark */
+  --pantry-brown:         #9E8251;
+  --pantry-brown-dark:    #7C6131;
+  --pantry-charcoal:      #5D5C5A;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+  --color-background:         var(--background);
+  --color-foreground:         var(--foreground);
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --color-pantry-coral:       var(--pantry-coral);
+  --color-pantry-coral-mid:   var(--pantry-coral-mid);
+  --color-pantry-coral-dark:  var(--pantry-coral-dark);
+
+  --color-pantry-purple:      var(--pantry-purple);
+  --color-pantry-lavender:    var(--pantry-lavender);
+  --color-pantry-purple-dark: var(--pantry-purple-dark);
+
+  --color-pantry-amber:       var(--pantry-amber);
+  --color-pantry-amber-mid:   var(--pantry-amber-mid);
+  --color-pantry-amber-dark:  var(--pantry-amber-dark);
+
+  --color-pantry-blue:        var(--pantry-blue);
+  --color-pantry-blue-light:  var(--pantry-blue-light);
+  --color-pantry-blue-dark:   var(--pantry-blue-dark);
+
+  --color-pantry-tan:         var(--pantry-tan);
+  --color-pantry-tan-mid:     var(--pantry-tan-mid);
+
+  --color-pantry-teal:        var(--pantry-teal);
+  --color-pantry-teal-light:  var(--pantry-teal-light);
+
+  --color-pantry-yellow:      var(--pantry-yellow);
+  --color-pantry-yellow-mid:  var(--pantry-yellow-mid);
+
+  --color-pantry-green:       var(--pantry-green);
+  --color-pantry-green-mid:   var(--pantry-green-mid);
+  --color-pantry-green-dark:  var(--pantry-green-dark);
+
+  --color-pantry-cream:       var(--pantry-cream);
+  --color-pantry-cream-mid:   var(--pantry-cream-mid);
+
+  --color-pantry-brown:       var(--pantry-brown);
+  --color-pantry-brown-dark:  var(--pantry-brown-dark);
+  --color-pantry-charcoal:    var(--pantry-charcoal);
+
+  --font-sans:    "Rubik", sans-serif;
+  --font-display: "Dancing Script", cursive;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: "Rubik", sans-serif;
 }
