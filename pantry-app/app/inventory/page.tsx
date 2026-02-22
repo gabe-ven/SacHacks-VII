@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { Suspense, useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
 import { getDailyInventory } from "@/lib/getDailyInventory";
@@ -40,8 +40,8 @@ function isRecipeEligibleCategory(category: string): boolean {
   return category.trim().toLowerCase() !== "personal care";
 }
 
-// ── Page component ─────────────────────────────────────────────────────────
-export default function InventoryPage() {
+// ── Page component (wrapped in Suspense for useSearchParams) ─────────────────
+function InventoryContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -524,5 +524,17 @@ export default function InventoryPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function InventoryPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <p className="text-sm text-muted">Loading…</p>
+      </div>
+    }>
+      <InventoryContent />
+    </Suspense>
   );
 }
