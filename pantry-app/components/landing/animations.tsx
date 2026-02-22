@@ -122,3 +122,26 @@ export function StaggerItem({ children, className = "" }: { children: React.Reac
     </motion.div>
   );
 }
+
+/* ── recipe card scroll animations (trigger per card as you scroll) ────────── */
+const recipeCardEase = [0.25, 0.46, 0.45, 0.94] as const;
+
+export function RecipeCardGrid({ children, className = "" }: { children: React.ReactNode; className?: string }) {
+  return <div className={className}>{children}</div>;
+}
+
+export function RecipeCardItem({ children, className = "" }: { children: React.ReactNode; className?: string }) {
+  const ref = useRef(null);
+  const inView = useInView(ref, { once: true, amount: 0.15, margin: "0px 0px -40px 0px" });
+  return (
+    <motion.div
+      ref={ref}
+      initial={{ opacity: 0, y: 32, scale: 0.98 }}
+      animate={inView ? { opacity: 1, y: 0, scale: 1 } : { opacity: 0, y: 32, scale: 0.98 }}
+      transition={{ duration: 0.52, ease: recipeCardEase }}
+      className={className}
+    >
+      {children}
+    </motion.div>
+  );
+}
