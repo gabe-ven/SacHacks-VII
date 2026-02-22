@@ -200,10 +200,12 @@ export default function InventoryPage() {
   // Passes selected item names to /recipes via query string for ingredient matching.
   const handleFindRecipes = useCallback(() => {
     if (recipeEligibleSelectedIds.length === 0) return;
-    const names = selectedItems
-      .filter((item) => recipeEligibleSelectedIds.includes(item.id))
-      .map((item) => encodeURIComponent(item.name))
-      .join(",");
+    const eligible = selectedItems.filter((item) => recipeEligibleSelectedIds.includes(item.id));
+    const names = eligible.map((item) => encodeURIComponent(item.name)).join(",");
+    // Save name→category map so the recipe loading animation can use inventory colors
+    const meta: Record<string, string> = {};
+    eligible.forEach((item) => { meta[item.name] = item.category; });
+    sessionStorage.setItem("pantry_selected_categories", JSON.stringify(meta));
     router.push(`/recipes?items=${names}`);
   }, [recipeEligibleSelectedIds, selectedItems, router]);
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef, useMemo } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 
@@ -32,33 +32,102 @@ const DIFFICULTY_COLOR: Record<string, string> = {
   Hard:   "text-pantry-coral bg-pantry-coral/10 border-pantry-coral/20",
 };
 
-// ── Skeleton ──────────────────────────────────────────────────────────────
+// ── Mixing animation ──────────────────────────────────────────────────────
 
-function RecipeSkeleton({ i }: { i: number }) {
+const CAT_COLORS: Record<string, string> = {
+  "Produce":             "#5E7F64",
+  "Dairy":               "#6C90B2",
+  "Canned/Jarred Foods": "#E3694F",
+  "Dry/Baking Goods":    "#CCAA6C",
+  "Personal Care":       "#A592C0",
+};
+const FALLBACK_COLORS = ["#5E7F64", "#EEB467", "#E37861", "#DDBE86", "#92A9C0"];
+
+function BowlAnimation({ items }: { items: string[] }) {
+  const chipRefs = useRef<(HTMLSpanElement | null)[]>([]);
+  const rafRef   = useRef<number>(0);
+  const [categoryMap, setCategoryMap] = useState<Record<string, string>>({});
+
+  useEffect(() => {
+    try {
+      const raw = sessionStorage.getItem("pantry_selected_categories");
+      if (raw) setCategoryMap(JSON.parse(raw));
+    } catch { /* ignore */ }
+  }, []);
+
+  // Each item follows two independent sine waves (Lissajous motion).
+  // Different x/y frequencies create complex, organic, never-boring paths.
+  const params = useMemo(() => items.map((_, i) => {
+    const n = Math.max(items.length, 1);
+    const phase = (i / n) * Math.PI * 2;
+    return {
+      freqX:  0.20 + i * 0.033,          // x oscillation speed (Hz)
+      freqY:  0.15 + i * 0.041,          // y oscillation speed (Hz) — different → complex path
+      ampX:   100 + (i % 4) * 26,        // x amplitude (px from center)
+      ampY:   52  + (i % 3) * 18,        // y amplitude (px from center)
+      phaseX: phase,                      // spread items around evenly at t=0
+      phaseY: phase + Math.PI * 0.6,     // offset y phase for rounder paths
+      tiltF:  0.07 + i * 0.019,          // gentle self-rotation frequency
+    };
+  }), [items]);
+
+  useEffect(() => {
+    const start = performance.now();
+
+    function tick(now: number) {
+      const t = (now - start) / 1000;
+
+      params.forEach((p, i) => {
+        const el = chipRefs.current[i];
+        if (!el) return;
+
+        const x = p.ampX * Math.sin(p.freqX * t * Math.PI * 2 + p.phaseX);
+        const y = p.ampY * Math.sin(p.freqY * t * Math.PI * 2 + p.phaseY);
+
+        // Depth: items higher up (negative y) feel further away
+        const normY = (y + p.ampY) / (2 * p.ampY);   // 0 = top, 1 = bottom
+        const scale   = 0.78 + normY * 0.32;          // 0.78–1.10
+        const opacity = 0.35 + normY * 0.65;          // 0.35–1.0
+        const tilt    = 13  * Math.sin(p.tiltF * t * Math.PI * 2 + p.phaseX);
+
+        el.style.transform = `translate(calc(-50% + ${x.toFixed(1)}px), calc(-50% + ${y.toFixed(1)}px)) scale(${scale.toFixed(3)}) rotate(${tilt.toFixed(2)}deg)`;
+        el.style.opacity   = opacity.toFixed(3);
+        el.style.zIndex    = String(Math.round(normY * 20));
+      });
+
+      rafRef.current = requestAnimationFrame(tick);
+    }
+
+    rafRef.current = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(rafRef.current);
+  }, [params]);
+
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: i * 0.1 }}
-      className="bg-surface-card border border-border rounded-3xl overflow-hidden animate-pulse"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.7 }}
+      className="relative w-full overflow-hidden select-none"
+      style={{ height: 320 }}
     >
-      <div className="h-2 w-full" style={{ backgroundColor: CARD_ACCENT[i % CARD_ACCENT.length] + "66" }} />
-      <div className="p-7 space-y-4">
-        <div className="h-6 w-2/3 bg-border rounded-lg" />
-        <div className="h-3 w-1/3 bg-border rounded" />
-        <div className="space-y-2 pt-2">
-          <div className="h-3 w-1/4 bg-border rounded" />
-          <div className="flex gap-2 flex-wrap">
-            {[1, 2, 3].map((j) => <div key={j} className="h-6 w-24 bg-border rounded-full" />)}
-          </div>
-        </div>
-        <div className="space-y-2">
-          <div className="h-3 w-1/4 bg-border rounded" />
-          <div className="flex gap-2 flex-wrap">
-            {[1, 2].map((j) => <div key={j} className="h-6 w-20 bg-border rounded-full" />)}
-          </div>
-        </div>
-      </div>
+      {items.map((name, i) => {
+        const cat   = categoryMap[name];
+        const color = (cat && CAT_COLORS[cat]) ?? FALLBACK_COLORS[i % FALLBACK_COLORS.length];
+        return (
+          <span
+            key={name}
+            ref={(el) => { chipRefs.current[i] = el; }}
+            className="absolute left-1/2 top-1/2 whitespace-nowrap font-semibold text-lg px-5 py-2.5 rounded-full border pointer-events-none"
+            style={{
+              color,
+              backgroundColor: color + "1c",
+              borderColor:     color + "45",
+            }}
+          >
+            {name}
+          </span>
+        );
+      })}
     </motion.div>
   );
 }
@@ -288,7 +357,7 @@ export default function RecipesPage() {
           </p>
         </motion.div>
 
-        {selectedNames.length > 0 && (
+        {!loading && selectedNames.length > 0 && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }} className="flex flex-wrap gap-1.5 mt-4 mb-10">
             {selectedNames.map((name) => (
               <span key={name} className="text-xs font-medium px-3 py-1 rounded-full bg-surface-card border border-border text-muted">
@@ -298,11 +367,7 @@ export default function RecipesPage() {
           </motion.div>
         )}
 
-        {loading && (
-          <div className="flex flex-col gap-5">
-            {[0, 1, 2, 3, 4].map((i) => <RecipeSkeleton key={i} i={i} />)}
-          </div>
-        )}
+        {loading && <BowlAnimation items={selectedNames} />}
 
         {!loading && error && (
           <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} className="flex flex-col items-center py-16 text-center">
