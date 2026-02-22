@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import Image from "next/image";
 
 export default function Navbar() {
@@ -18,10 +19,22 @@ export default function Navbar() {
         />
       </Link>
       <div className="flex gap-6 text-pantry-cream text-sm font-medium">
-        <Link href="/" className="hover:text-pantry-amber transition-colors">Home</Link>
-        <Link href="/ingredients" className="hover:text-pantry-amber transition-colors">Ingredients</Link>
-        <Link href="/recipes" className="hover:text-pantry-amber transition-colors">Recipes</Link>
-        <Link href="/inventory" className="hover:text-pantry-amber transition-colors">Pantry Inventory</Link>
+        {[
+          { href: "/", label: "Home" },
+          { href: "/inventory", label: "Pantry" },
+          { href: "/recipes", label: "Recipes" },
+        ].map(({ href, label }) => {
+          const active = href === "/" ? pathname === "/" : pathname.startsWith(href);
+          return (
+            <Link
+              key={href}
+              href={href}
+              className={`transition-colors ${active ? "text-pantry-amber font-semibold" : "hover:text-pantry-amber"}`}
+            >
+              {label}
+            </Link>
+          );
+        })}
       </div>
     </nav>
   );
