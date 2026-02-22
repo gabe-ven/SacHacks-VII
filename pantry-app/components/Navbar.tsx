@@ -27,7 +27,7 @@ export default function Navbar() {
         <button
           onClick={toggle}
           aria-label={`Switch to ${theme === "light" ? "dark" : "light"} mode`}
-          className="w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-pantry-cream transition-all duration-200"
+          className="w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-pantry-cream transition-all duration-200 cursor-pointer"
         >
           {theme === "light" ? (
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
