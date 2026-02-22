@@ -1,10 +1,10 @@
 import { supabase } from "@/lib/supabase";
-import type { InventoryItem, StockStatus } from "@/types/inventory";
+import type { InventoryItem } from "@/types/inventory";
 
 export async function getInventory(): Promise<InventoryItem[]> {
   const { data, error } = await supabase
     .from("ingredients")
-    .select("id, name, category, in_stock, item_tags")
+    .select("id, name, category, item_tags")
     .order("name", { ascending: true });
 
   if (error) throw new Error(error.message);
@@ -13,7 +13,7 @@ export async function getInventory(): Promise<InventoryItem[]> {
     id: row.id as string,
     name: row.name as string,
     category: row.category as string,
-    stockStatus: ((row.in_stock as boolean) ? "in_stock" : "out_of_stock") as StockStatus,
+    stockStatus: "in_stock" as const,
     tags: (row.item_tags as string[] | null) ?? [],
   }));
 }
