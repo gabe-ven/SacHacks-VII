@@ -40,13 +40,27 @@ export default function RecipeFilters({
           <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z" />
         </svg>
         <input
-          type="search"
+          type="text"
+          role="search"
           value={search}
           onChange={(e) => onSearchChange(e.target.value)}
           placeholder="Search recipes or ingredients…"
           aria-label="Search recipes"
           className="w-full pl-10 pr-10 py-2.5 !rounded-full border-2 text-sm text-foreground placeholder:text-muted focus:outline-none focus-visible:border-pantry-green focus-visible:ring-2 focus-visible:ring-pantry-green/30 focus-visible:ring-offset-0 [background:var(--search-bg)] [border-color:var(--search-border)]"
         />
+        {search && (
+          <button
+            type="button"
+            onClick={() => onSearchChange("")}
+            aria-label="Clear search"
+            className="absolute inset-y-0 right-3 flex items-center cursor-pointer transition-colors focus:outline-none hover:opacity-80"
+            style={{ color: "var(--pantry-green)" }}
+          >
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        )}
       </div>
 
       {/* Difficulty pills — same hover as inventory FilterPanel categories */}

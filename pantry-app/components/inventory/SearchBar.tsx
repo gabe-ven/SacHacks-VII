@@ -34,7 +34,8 @@ export default function SearchBar({
         </svg>
       </div>
       <Input
-        type="search"
+        type="text"
+        role="search"
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
@@ -43,9 +44,11 @@ export default function SearchBar({
       />
       {value && (
         <button
+          type="button"
           onClick={() => onChange("")}
           aria-label="Clear search"
-          className="absolute inset-y-0 right-4 flex items-center text-foreground/30 hover:text-pantry-green transition-colors focus:outline-none"
+          className="absolute inset-y-0 right-4 flex items-center cursor-pointer transition-colors focus:outline-none hover:opacity-80"
+          style={{ color: "var(--pantry-green)" }}
         >
           <svg
             className="h-4 w-4"
