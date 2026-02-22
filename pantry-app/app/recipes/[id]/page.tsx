@@ -20,7 +20,7 @@ export default async function RecipeDetailPage({
         : "bg-pantry-coral/12 text-pantry-coral-dark border-pantry-coral/20";
 
   return (
-    <div className="min-h-screen bg-pantry-cream">
+    <div className="min-h-screen bg-background">
       <div className="max-w-3xl mx-auto px-4 sm:px-6 py-10 space-y-8">
 
         {/* Back link */}
@@ -121,7 +121,7 @@ export default async function RecipeDetailPage({
 
           {/* Right: ingredients sidebar */}
           <aside>
-            <div className="rounded-2xl border border-pantry-tan bg-white/70 p-5 space-y-3 sticky top-6">
+            <div className="rounded-2xl border border-border bg-surface-card p-5 space-y-3 sticky top-6">
               <div className="flex items-baseline gap-2">
                 <h2 className="text-sm font-semibold text-foreground">Ingredients</h2>
                 <span className="text-xs text-pantry-brown/50">{recipe.ingredients.length} items</span>
