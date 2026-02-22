@@ -7,20 +7,11 @@ import StockBadge from "./StockBadge";
 const MAX_SELECTION = 20;
 
 const CATEGORY_META: Record<string, { color: string }> = {
-  Produce:        { color: "#5E7F64" },
-  Dairy:          { color: "#DDBE86" },
-  Milk:           { color: "#DDBE86" },
-  Snacks:         { color: "#EEB467" },
-  "Canned Goods": { color: "#E37861" },
-  Canned:         { color: "#E37861" },
-  Grains:         { color: "#DDBE86" },
-  Necessities:    { color: "#5E7F64" },
-  Beverages:      { color: "#EEB467" },
-  Protein:        { color: "#E37861" },
-  Bakery:         { color: "#EEB467" },
-  Frozen:         { color: "#92A9C0" },
-  Pantry:         { color: "#DDBE86" },
-  Hygiene:        { color: "#92A9C0" },
+  "Produce":             { color: "#5E7F64" },
+  "Dairy":               { color: "#6C90B2" },
+  "Canned/Jarred Foods": { color: "#E3694F" },
+  "Dry/Baking Goods":    { color: "#CCAA6C" },
+  "Personal Care":       { color: "#A592C0" },
 };
 
 type Props = {
@@ -73,11 +64,15 @@ export default function SelectedItemsPanel({
           <p className="text-xs text-muted mt-1">Tap items to add them</p>
         </div>
       ) : (
-        <ul className="space-y-2" aria-label="Selected items list">
+        <ul
+          className="space-y-1.5 overflow-y-auto pr-0.5"
+          style={{ maxHeight: "min(360px, 40vh)" }}
+          aria-label="Selected items list"
+        >
           {selectedItems.map((item) => (
             <li
               key={item.id}
-              className="flex items-center gap-2.5 bg-surface rounded-xl border border-border overflow-hidden shadow-sm"
+              className="flex items-center gap-2 bg-surface rounded-lg border border-border overflow-hidden"
             >
               {/* Category color strip */}
               <div
@@ -86,19 +81,18 @@ export default function SelectedItemsPanel({
                 aria-hidden="true"
               />
 
-              {/* Name + category */}
-              <div className="flex-1 min-w-0 py-2.5">
-                <p className="text-sm font-semibold text-foreground leading-snug truncate">{item.name}</p>
-                <p className="text-[10px] font-medium uppercase tracking-wide text-muted mt-0.5">{item.category}</p>
-              </div>
+              {/* Name */}
+              <p className="flex-1 min-w-0 py-2 text-xs font-semibold text-foreground leading-snug truncate">
+                {item.name}
+              </p>
 
               {/* Remove button */}
               <button
                 onClick={() => onRemove(item.id)}
                 aria-label={`Remove ${item.name}`}
-                className="shrink-0 mr-2 w-6 h-6 flex items-center justify-center rounded-full text-muted hover:text-pantry-coral hover:bg-pantry-coral/10 transition-colors focus:outline-none cursor-pointer"
+                className="shrink-0 mr-1.5 w-5 h-5 flex items-center justify-center rounded-full text-muted hover:text-pantry-coral hover:bg-pantry-coral/10 transition-colors focus:outline-none cursor-pointer"
               >
-                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5} aria-hidden="true">
+                <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5} aria-hidden="true">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
                 </svg>
               </button>

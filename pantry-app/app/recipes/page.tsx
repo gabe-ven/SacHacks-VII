@@ -186,7 +186,7 @@ export default function RecipesPage() {
 
   const raw = searchParams.get("items") ?? "";
   const selectedNames = raw
-    ? raw.split(",").map((s) => decodeURIComponent(s).trim()).filter(Boolean)
+    ? [...new Set(raw.split(",").map((s) => decodeURIComponent(s).trim()).filter(Boolean))]
     : [];
 
   useEffect(() => {
