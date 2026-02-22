@@ -48,9 +48,9 @@ export default function SelectedItemsPanel({
   const count = selectedItems.length;
 
   return (
-    <div className="flex flex-col gap-3" aria-label="Selected items panel">
+    <div className="flex flex-col gap-3 w-full min-w-0" aria-label="Selected items panel">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between w-full">
         <h2 className="font-semibold text-pantry-green text-sm">
           Selected{" "}
           <span className="text-foreground/40 font-normal">
@@ -81,7 +81,7 @@ export default function SelectedItemsPanel({
         </div>
       ) : (
         <ul
-          className="selected-items-scroll space-y-3 overflow-y-auto"
+          className="selected-items-scroll w-full min-w-0 space-y-3 overflow-y-auto"
           style={{ maxHeight: "min(420px, 50vh)" }}
           aria-label="Selected items list"
         >
@@ -91,7 +91,7 @@ export default function SelectedItemsPanel({
             return (
               <li
                 key={item.id}
-                className="flex rounded-2xl overflow-hidden border border-border bg-surface-card shadow-sm"
+                className="flex w-full min-w-0 rounded-2xl overflow-hidden border border-border bg-surface-card shadow-sm"
               >
                 {/* Left accent bar (same as InventoryCard) */}
                 <div
@@ -159,8 +159,8 @@ export default function SelectedItemsPanel({
         </p>
       )}
 
-      {/* Find Recipes CTA */}
-      <div className="pt-1 space-y-1.5">
+      {/* Find Recipes CTA — match list content width (scrollbar gutter reserved on list) */}
+      <div className="w-full min-w-0 pt-1 space-y-1.5 pr-[0.5rem]">
         <Button
           variant="primary"
           fullWidth
