@@ -26,9 +26,9 @@ export default async function RecipeDetailPage({
         {/* Back link */}
         <Link
           href="/recipes"
-          className="inline-flex items-center gap-1.5 text-sm text-pantry-brown/60 hover:text-pantry-green transition-colors"
+          className="inline-flex items-center gap-2 rounded-full border border-border bg-surface-card px-4 py-2.5 text-sm font-semibold text-foreground/70 hover:border-pantry-green/40 hover:text-pantry-green transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-pantry-green/40 focus-visible:border-pantry-green/50"
         >
-          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} aria-hidden="true">
+          <svg className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} aria-hidden="true">
             <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
           </svg>
           Back to recipes
