@@ -296,23 +296,26 @@ export default function FilterPanel({
 
       </div>
 
-      {/* Results count + clear */}
-      <div className="flex items-center gap-3">
+      {/* Results count + clear — always reserve space to avoid layout shift */}
+      <div className="flex items-center gap-3 min-h-[1.5rem] mt-2">
         <p className="text-sm text-foreground/60">
           {resultCount} result{resultCount !== 1 ? "s" : ""}
         </p>
-        {hasActiveFilters && (
-          <>
-            <span className="text-foreground/30 text-sm" aria-hidden="true">·</span>
-            <button
-              onClick={onClear}
-              aria-label="Clear all filters"
-              className="text-sm text-pantry-coral hover:text-pantry-green underline underline-offset-2 transition-colors focus:outline-none cursor-pointer"
-            >
-              Clear all filters
-            </button>
-          </>
-        )}
+        <span
+          className={`text-foreground/30 text-sm ${hasActiveFilters ? "" : "invisible"}`}
+          aria-hidden="true"
+        >
+          ·
+        </span>
+        <button
+          onClick={onClear}
+          aria-label="Clear all filters"
+          aria-hidden={!hasActiveFilters}
+          tabIndex={hasActiveFilters ? 0 : -1}
+          className={`text-sm text-pantry-coral hover:text-pantry-green underline underline-offset-2 transition-colors focus:outline-none cursor-pointer shrink-0 ${hasActiveFilters ? "" : "invisible pointer-events-none"}`}
+        >
+          Clear all filters
+        </button>
       </div>
     </div>
   );
