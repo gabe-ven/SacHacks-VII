@@ -17,3 +17,14 @@ export async function getInventory(): Promise<InventoryItem[]> {
     tags: (row.item_tags as string[] | null) ?? [],
   }));
 }
+
+/** Returns all ingredient names from the ingredients table (for search autocomplete). */
+export async function getIngredientNames(): Promise<string[]> {
+  const { data, error } = await supabase
+    .from("ingredients")
+    .select("name")
+    .order("name", { ascending: true });
+
+  if (error) return [];
+  return (data ?? []).map((row) => (row.name as string).trim()).filter(Boolean);
+}

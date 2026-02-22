@@ -57,8 +57,6 @@ export default function InventoryPage() {
 
   // ── Selection state ───────────────────────────────────────────────────────
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
-  // Track whether localStorage has been read so we don't overwrite it on first render
-  const [hydrated, setHydrated] = useState(false);
 
   // ── Mobile UI toggles ─────────────────────────────────────────────────────
   const [showMobileSelected, setShowMobileSelected] = useState(false);
@@ -104,7 +102,7 @@ export default function InventoryPage() {
     loadInventory(dayOfWeek);
   }, [dayInitialized, dayOfWeek, loadInventory]);
 
-  // ── Hydrate selection from localStorage ───────────────────────────────────
+  // ── Restore selection from localStorage on mount (so reload keeps it) ───────
   useEffect(() => {
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
@@ -117,14 +115,19 @@ export default function InventoryPage() {
     } catch {
       // Silently ignore malformed localStorage data
     }
-    setHydrated(true);
   }, []);
 
-  // ── Persist selection to localStorage ────────────────────────────────────
+  // ── Persist selection to localStorage ─────────────────────────────────────
   useEffect(() => {
-    if (!hydrated) return;
     localStorage.setItem(STORAGE_KEY, JSON.stringify([...selectedIds]));
-  }, [selectedIds, hydrated]);
+  }, [selectedIds]);
+
+  // ── Clear selection when navigating away (so coming back shows empty list) ─
+  useEffect(() => {
+    return () => {
+      localStorage.removeItem(STORAGE_KEY);
+    };
+  }, []);
 
   // ── Derived values (memoised) ─────────────────────────────────────────────
   const allCategories = useMemo(() => getAllCategories(inventory), [inventory]);

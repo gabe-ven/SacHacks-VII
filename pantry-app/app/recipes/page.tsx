@@ -4,7 +4,7 @@ import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 
-import { getInventory } from "@/lib/getInventory";
+import { getIngredientNames, getInventory } from "@/lib/getInventory";
 import { getRecipes, scoreRecipe } from "@/lib/getRecipes";
 import type { Recipe } from "@/types/recipe";
 import RecipeCard from "@/components/recipes/RecipeCard";
@@ -70,7 +70,7 @@ const AI_RECIPES_STORAGE_KEY = "pantry_ai_recipes";
 const AI_RECIPES_BACK_KEY = "pantry_ai_recipes_back";
 
 // ── Browse all recipes (no selection) ────────────────────────────────────────
-function BrowseRecipes() {
+function BrowseRecipes({ dbIngredientNames }: { dbIngredientNames: string[] }) {
   const [recipes, setRecipes] = useState<ScoredRecipe[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
@@ -106,6 +106,7 @@ function BrowseRecipes() {
         onSortChange={setSortKey}
         difficulty={difficulty}
         onDifficultyChange={setDifficulty}
+        ingredientSuggestions={dbIngredientNames}
       />
       {loading && <SkeletonGrid count={9} shimmer />}
       {!loading && displayed.length === 0 && (
@@ -144,12 +145,18 @@ function RecipesContent() {
   const hasSelection = itemIds.length > 0;
 
   // ── DB recipes state ──────────────────────────────────────────────────────
+  const [dbIngredientNames, setDbIngredientNames] = useState<string[]>([]);
   const [ingredientNames, setIngredientNames] = useState<string[]>([]);
   const [dbRecipes, setDbRecipes] = useState<ScoredRecipe[]>([]);
   const [dbLoading, setDbLoading] = useState(false);
   const [search, setSearch] = useState("");
   const [sortKey, setSortKey] = useState<SortKey>("match");
   const [difficulty, setDifficulty] = useState("All");
+
+  // Load all ingredient names from DB once (for search autocomplete)
+  useEffect(() => {
+    getIngredientNames().then(setDbIngredientNames);
+  }, []);
 
   // ── AI recipes state ──────────────────────────────────────────────────────
   const [aiRecipes, setAiRecipes] = useState<ScoredRecipe[]>([]);
@@ -323,11 +330,8 @@ function RecipesContent() {
                   type="button"
                   onClick={() => router.push("/recipes")}
                   aria-label="Clear selection"
-                  className="inline-flex items-center gap-1.5 rounded-full border border-border bg-surface-card px-2.5 py-1 text-[10px] font-semibold text-muted transition-colors cursor-pointer hover:border-pantry-coral/50 hover:bg-pantry-coral/10 hover:!text-pantry-coral focus:outline-none focus-visible:ring-2 focus-visible:ring-pantry-coral focus-visible:ring-offset-2"
+                  className="text-[10px] font-semibold text-muted underline underline-offset-2 transition-colors cursor-pointer hover:!text-[#dc2626] focus:outline-none focus-visible:ring-2 focus-visible:ring-pantry-coral focus-visible:ring-offset-2 rounded"
                 >
-                  <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5} aria-hidden>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                  </svg>
                   Clear
                 </button>
               </div>
@@ -352,6 +356,7 @@ function RecipesContent() {
               onSortChange={setSortKey}
               difficulty={difficulty}
               onDifficultyChange={setDifficulty}
+              ingredientSuggestions={dbIngredientNames}
             />
 
             {/* DB loading */}
@@ -457,7 +462,7 @@ function RecipesContent() {
         )}
 
         {/* ── Browse mode ── */}
-        {!hasSelection && <BrowseRecipes />}
+        {!hasSelection && <BrowseRecipes dbIngredientNames={dbIngredientNames} />}
       </div>
     </div>
   );
