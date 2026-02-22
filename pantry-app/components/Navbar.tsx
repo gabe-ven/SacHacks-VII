@@ -35,7 +35,8 @@ export default function Navbar() {
           <button
             onClick={toggle}
             aria-label={`Switch to ${theme === "light" ? "dark" : "light"} mode`}
-            className="p-2 text-pantry-cream/80 hover:text-pantry-amber transition-colors cursor-pointer"
+            className="p-2 transition-colors cursor-pointer hover:opacity-90"
+            style={{ color: "var(--pantry-cream)" }}
           >
             {theme === "light" ? (
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
