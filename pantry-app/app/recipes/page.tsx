@@ -40,8 +40,9 @@ function aiToRecipe(r: AIRawRecipe): ScoredRecipe {
 }
 
 function cookTimeMinutes(t: string): number {
+  if (!t || t === "N/A") return Infinity;
   const m = t.match(/(\d+)/);
-  return m ? parseInt(m[1], 10) : 999;
+  return m ? parseInt(m[1], 10) : Infinity;
 }
 
 // ── Skeleton cards ────────────────────────────────────────────────────────────
