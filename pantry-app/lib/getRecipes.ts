@@ -23,6 +23,9 @@ interface LiveRecipeRow {
   id: number;
   name: string;
   instructions: string;
+  image_url: string | null;
+  cook_time: number | null;
+  difficulty: string | null;
   recipe_ingredient: Array<{
     ingredient: { id: string; name: string } | null;
   }>;
@@ -76,9 +79,11 @@ function rowToRecipe(row: LiveRecipeRow): Recipe {
   return {
     id: String(row.id),
     title: row.name,
-    image: "",
-    cookTime: "N/A",
-    difficulty: "Medium",
+    image: row.image_url ?? "",
+    cookTime: row.cook_time != null ? `${row.cook_time} min` : "N/A",
+    difficulty: (["Easy", "Medium", "Hard"].includes(row.difficulty ?? "")
+      ? row.difficulty
+      : "Medium") as Recipe["difficulty"],
     ingredients,
     pantryIngredients,
     instructions: steps,
@@ -94,7 +99,7 @@ export async function getRecipes(): Promise<Recipe[]> {
     const { data, error } = await supabase
       .from("recipes")
       .select(
-        "id, name, instructions, recipe_ingredient(ingredient:ingredients(id, name))"
+        "id, name, instructions, image_url, cook_time, difficulty, recipe_ingredient(ingredient:ingredients(id, name))"
       )
       .order("name", { ascending: true });
 
@@ -127,7 +132,7 @@ export async function getRecipeById(id: string): Promise<Recipe | undefined> {
     const { data, error } = await supabase
       .from("recipes")
       .select(
-        "id, name, instructions, recipe_ingredient(ingredient:ingredients(id, name))"
+        "id, name, instructions, image_url, cook_time, difficulty, recipe_ingredient(ingredient:ingredients(id, name))"
       )
       .eq("id", numericId)
       .maybeSingle();

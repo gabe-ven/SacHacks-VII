@@ -44,7 +44,7 @@ export default function RecipeFilters({
           value={search}
           onChange={(e) => onSearchChange(e.target.value)}
           placeholder="Search recipes or ingredients…"
-          className="w-full pl-10 pr-4 py-2.5 rounded-full border border-pantry-tan bg-pantry-cream text-sm text-foreground placeholder:text-pantry-brown/40 focus:outline-none focus:ring-2 focus:ring-pantry-green/30 focus:border-pantry-green/50 transition"
+          className="w-full pl-10 pr-4 py-2.5 rounded-full border border-border bg-surface-card text-sm text-foreground placeholder:text-pantry-brown/40 focus:outline-none focus:ring-2 focus:ring-pantry-green/30 focus:border-pantry-green/50 transition"
         />
       </div>
 
@@ -57,7 +57,7 @@ export default function RecipeFilters({
             className={`px-3.5 py-2 rounded-full text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-pantry-green/30 ${
               difficulty === d
                 ? "bg-pantry-green text-pantry-cream"
-                : "border border-pantry-tan text-foreground/60 bg-pantry-cream hover:border-pantry-green/40 hover:text-pantry-green"
+                : "border border-border text-foreground/60 bg-surface-card hover:border-pantry-green/40 hover:text-pantry-green"
             }`}
           >
             {d}
@@ -70,7 +70,7 @@ export default function RecipeFilters({
         <select
           value={sortKey}
           onChange={(e) => onSortChange(e.target.value as SortKey)}
-          className="appearance-none pl-4 pr-9 py-2.5 rounded-full border border-pantry-tan bg-pantry-cream text-sm text-foreground/70 font-medium focus:outline-none focus:ring-2 focus:ring-pantry-green/30 transition cursor-pointer"
+          className="appearance-none pl-4 pr-9 py-2.5 rounded-full border border-border bg-surface-card text-sm text-foreground/70 font-medium focus:outline-none focus:ring-2 focus:ring-pantry-green/30 transition cursor-pointer"
         >
           {(Object.keys(SORT_LABELS) as SortKey[]).map((k) => (
             <option key={k} value={k}>{SORT_LABELS[k]}</option>

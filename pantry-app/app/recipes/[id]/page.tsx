@@ -56,30 +56,38 @@ export default async function RecipeDetailPage({
           </h1>
         </div>
 
-        {/* Hero image placeholder */}
-        <div className="w-full h-48 sm:h-60 rounded-3xl bg-pantry-green overflow-hidden flex items-center justify-center relative">
-          {/* Grid texture — brand motif */}
-          <div
-            aria-hidden="true"
-            className="absolute inset-0 opacity-[0.06]"
-            style={{
-              backgroundImage: "linear-gradient(#fff 1px,transparent 1px),linear-gradient(90deg,#fff 1px,transparent 1px)",
-              backgroundSize: "32px 32px",
-            }}
-          />
-          {/* Amber glow */}
-          <div aria-hidden="true" className="absolute -bottom-8 -right-8 w-40 h-40 rounded-full bg-pantry-amber/20 blur-2xl" />
-          <svg
-            className="w-14 h-14 text-pantry-cream/25 relative z-10"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            strokeWidth={1}
-            aria-hidden="true"
-          >
-            <path strokeLinecap="round" strokeLinejoin="round" d="M12 3c-1.2 5.4-5 7.8-5 12a5 5 0 0010 0c0-4.2-3.8-6.6-5-12z" />
-            <path strokeLinecap="round" strokeLinejoin="round" d="M12 3v18M9 9.5c-.5 1 .5 2 1.5 2" />
-          </svg>
+        {/* Hero image */}
+        <div className="w-full aspect-square sm:aspect-[4/3] rounded-3xl bg-pantry-green overflow-hidden flex items-center justify-center relative">
+          {recipe.image ? (
+            <img
+              src={recipe.image}
+              alt={recipe.title}
+              className="absolute inset-0 w-full h-full object-cover"
+            />
+          ) : (
+            <>
+              <div
+                aria-hidden="true"
+                className="absolute inset-0 opacity-[0.06]"
+                style={{
+                  backgroundImage: "linear-gradient(#fff 1px,transparent 1px),linear-gradient(90deg,#fff 1px,transparent 1px)",
+                  backgroundSize: "32px 32px",
+                }}
+              />
+              <div aria-hidden="true" className="absolute -bottom-8 -right-8 w-40 h-40 rounded-full bg-pantry-amber/20 blur-2xl" />
+              <svg
+                className="w-14 h-14 text-pantry-cream/25 relative z-10"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth={1}
+                aria-hidden="true"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 3c-1.2 5.4-5 7.8-5 12a5 5 0 0010 0c0-4.2-3.8-6.6-5-12z" />
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 3v18M9 9.5c-.5 1 .5 2 1.5 2" />
+              </svg>
+            </>
+          )}
         </div>
 
         {/* Two-column layout */}
