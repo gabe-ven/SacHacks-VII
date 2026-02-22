@@ -2,6 +2,7 @@
 @import "tailwindcss";
 
 :root {
+  --font-display: "Dancing Script", cursive;
   --background: #ffffff;
   --foreground: #1a1a1a;
   --surface: #f9f9f7;
