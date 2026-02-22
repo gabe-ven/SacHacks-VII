@@ -507,6 +507,7 @@ export default function InventoryPage() {
             variant="primary"
             disabled={recipeEligibleSelectedIds.length === 0}
             onClick={handleFindRecipes}
+            className="!text-white font-bold"
           >
             Find recipes
           </Button>

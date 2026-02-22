@@ -27,10 +27,10 @@ export default function RecipeFilters({
 }: Props) {
   return (
     <div className="flex flex-col sm:flex-row gap-3">
-      {/* Search */}
+      {/* Search — pill styling to match inventory page */}
       <div className="relative flex-1">
         <svg
-          className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-pantry-brown/40 pointer-events-none"
+          className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-pantry-green/50 pointer-events-none"
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"
@@ -44,7 +44,8 @@ export default function RecipeFilters({
           value={search}
           onChange={(e) => onSearchChange(e.target.value)}
           placeholder="Search recipes or ingredients…"
-          className="w-full pl-10 pr-4 py-2.5 rounded-full border border-border bg-surface-card text-sm text-foreground placeholder:text-pantry-brown/40 focus:outline-none focus:ring-2 focus:ring-pantry-green/30 focus:border-pantry-green/50 transition"
+          aria-label="Search recipes"
+          className="w-full pl-10 pr-4 py-2.5 !rounded-full border-2 border-gray-300 bg-gray-100 text-sm text-foreground placeholder:text-foreground/40 focus:outline-none focus-visible:border-pantry-green transition"
         />
       </div>
 
@@ -54,7 +55,7 @@ export default function RecipeFilters({
           <button
             key={d}
             onClick={() => onDifficultyChange(d)}
-            className={`px-3.5 py-2 rounded-full text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-pantry-green/30 ${
+            className={`px-3.5 py-2 rounded-full text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-pantry-green/30 cursor-pointer ${
               difficulty === d
                 ? "bg-pantry-green text-pantry-cream"
                 : "border border-border text-foreground/60 bg-surface-card hover:border-pantry-green/40 hover:text-pantry-green"
@@ -70,7 +71,7 @@ export default function RecipeFilters({
         <select
           value={sortKey}
           onChange={(e) => onSortChange(e.target.value as SortKey)}
-          className="appearance-none pl-4 pr-9 py-2.5 rounded-full border border-border bg-surface-card text-sm text-foreground/70 font-medium focus:outline-none focus:ring-2 focus:ring-pantry-green/30 transition cursor-pointer"
+          className="appearance-none pl-4 pr-9 py-2.5 rounded-full border border-border bg-surface-card text-sm text-foreground/70 font-medium focus:outline-none focus:ring-2 focus:ring-pantry-green/30 transition-colors cursor-pointer hover:border-pantry-green/40 hover:text-pantry-green"
         >
           {(Object.keys(SORT_LABELS) as SortKey[]).map((k) => (
             <option key={k} value={k}>{SORT_LABELS[k]}</option>

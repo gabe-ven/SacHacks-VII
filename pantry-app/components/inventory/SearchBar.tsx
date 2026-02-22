@@ -39,7 +39,7 @@ export default function SearchBar({
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
         aria-label="Search inventory items"
-        className="pl-10 pr-10 !rounded-full bg-gray-100 border-gray-300 focus-visible:border-gray-400 focus-visible:ring-gray-400/30"
+        className="pl-10 pr-10 !rounded-full !bg-gray-100 border-gray-300 focus-visible:border-gray-400 focus-visible:ring-gray-400/30"
       />
       {value && (
         <button

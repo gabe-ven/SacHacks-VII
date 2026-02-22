@@ -166,6 +166,7 @@ export default function SelectedItemsPanel({
           fullWidth
           disabled={!canFindRecipes}
           onClick={onFindRecipes}
+          className="!text-white font-bold"
         >
           {count === 0 ? "Find recipes" : `Find recipes (${count})`}
         </Button>
