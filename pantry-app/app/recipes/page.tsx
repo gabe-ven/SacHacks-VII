@@ -251,8 +251,12 @@ function RecipesContent() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ items: names }),
       });
-      if (!res.ok) throw new Error();
-      const json = await res.json();
+      const json = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        const msg = typeof json?.error === "string" ? json.error : "Couldn't build suggestions — check your connection and try again.";
+        setAiError(msg);
+        return;
+      }
       const raw: AIRawRecipe[] = json.recipes ?? [];
       setAiRecipes(raw.map(aiToRecipe));
       setAiDone(true);

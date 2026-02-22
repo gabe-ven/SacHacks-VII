@@ -2,7 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import OpenAI from "openai";
 import { createClient } from "@supabase/supabase-js";
 
-const openai = new OpenAI({ apiKey: process.env.OPEN_AI_API_KEY });
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY ?? process.env.OPEN_AI_API_KEY ?? "",
+});
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -70,6 +72,15 @@ async function generateRecipeImage(recipeName: string, ingredients: string[]): P
 
 export async function POST(req: NextRequest) {
   try {
+    const apiKey = process.env.OPENAI_API_KEY ?? process.env.OPEN_AI_API_KEY;
+    if (!apiKey?.trim()) {
+      console.error("generate-recipes: Missing OPENAI_API_KEY (or OPEN_AI_API_KEY)");
+      return NextResponse.json(
+        { error: "Server misconfigured: OpenAI API key not set. Set OPENAI_API_KEY in .env.local." },
+        { status: 503 }
+      );
+    }
+
     const { items }: { items: string[] } = await req.json();
 
     if (!items || items.length === 0) {
