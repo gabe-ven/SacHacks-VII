@@ -28,6 +28,7 @@ type Props = {
   onRemove: (id: string) => void;
   onClear: () => void;
   onFindRecipes: () => void;
+  canFindRecipes: boolean;
 };
 
 export default function SelectedItemsPanel({
@@ -35,6 +36,7 @@ export default function SelectedItemsPanel({
   onRemove,
   onClear,
   onFindRecipes,
+  canFindRecipes,
 }: Props) {
   const count = selectedItems.length;
 
@@ -113,7 +115,7 @@ export default function SelectedItemsPanel({
         <Button
           variant="primary"
           fullWidth
-          disabled={count === 0}
+          disabled={!canFindRecipes}
           onClick={onFindRecipes}
         >
           {count === 0 ? "Find recipes" : `Find recipes (${count})`}
@@ -121,6 +123,11 @@ export default function SelectedItemsPanel({
         {count === 0 && (
           <p className="text-xs text-foreground/50 text-center">
             Select at least 1 item
+          </p>
+        )}
+        {count > 0 && !canFindRecipes && (
+          <p className="text-xs text-foreground/50 text-center">
+            Personal care items are excluded from recipes
           </p>
         )}
       </div>

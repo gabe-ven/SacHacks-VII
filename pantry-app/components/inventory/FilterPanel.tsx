@@ -6,7 +6,6 @@ import type { FilterState } from "@/types/inventory";
 const STOCK_OPTIONS: { value: FilterState["stockStatus"]; label: string }[] = [
   { value: "all", label: "All" },
   { value: "in_stock", label: "In stock" },
-  { value: "low_stock", label: "Low stock" },
   { value: "out_of_stock", label: "Out of stock" },
 ];
 

@@ -38,29 +38,50 @@ type Props = {
   isSelected: boolean;
   onToggle: (id: string) => void;
   selectionCount: number;
+  onBlockedSelect?: (message: string) => void;
 };
 
-export default function InventoryCard({ item, isSelected, onToggle, selectionCount }: Props) {
+export default function InventoryCard({
+  item,
+  isSelected,
+  onToggle,
+  selectionCount,
+  onBlockedSelect,
+}: Props) {
   const isOut = item.stockStatus === "out_of_stock";
-  const isLow = item.stockStatus === "low_stock";
+  const isPersonalCare = item.category.trim().toLowerCase() === "personal care";
   const atMax = selectionCount >= MAX_SELECTION && !isSelected;
-  const canToggle = !isOut && !atMax;
+  const canToggle = !isOut && !atMax && !isPersonalCare;
   const style = CATEGORY_STYLE[item.category] ?? { bg: "#DDBE86", text: "#312F2D" };
 
-  const ariaLabel = isOut
+  const ariaLabel = isPersonalCare
+    ? `${item.name} is personal care and cannot be selected for recipes`
+    : isOut
     ? `${item.name} is out of stock`
-    : isLow
-    ? `Select ${item.name} (Low stock)`
     : `Select ${item.name} (In stock)`;
 
+  function showBlockedMessage() {
+    if (isPersonalCare) {
+      onBlockedSelect?.("Personal care items are not eligible for recipes.");
+    }
+  }
+
   function handleCardClick() {
-    if (canToggle) onToggle(item.id);
+    if (canToggle) {
+      onToggle(item.id);
+      return;
+    }
+    showBlockedMessage();
   }
 
   function handleKeyDown(e: KeyboardEvent<HTMLElement>) {
     if (e.key === "Enter" || e.key === " ") {
       e.preventDefault();
-      if (canToggle) onToggle(item.id);
+      if (canToggle) {
+        onToggle(item.id);
+        return;
+      }
+      showBlockedMessage();
     }
   }
 
@@ -77,6 +98,8 @@ export default function InventoryCard({ item, isSelected, onToggle, selectionCou
         "relative flex rounded-xl overflow-hidden h-full select-none transition-all duration-200 border border-[#1a1a1a]/8 ring-1",
         isOut
           ? "ring-[#1a1a1a]/8 opacity-40 grayscale cursor-not-allowed"
+          : isPersonalCare
+          ? "ring-[#1a1a1a]/8 cursor-not-allowed opacity-60"
           : isSelected
           ? "ring-2 ring-pantry-green shadow-md cursor-pointer"
           : canToggle
@@ -138,14 +161,14 @@ export default function InventoryCard({ item, isSelected, onToggle, selectionCou
           <span
             className={[
               "w-1.5 h-1.5 rounded-full shrink-0",
-              isOut ? "bg-[#1a1a1a]/20" : isLow ? "bg-pantry-amber" : "bg-pantry-green",
+              isOut ? "bg-[#1a1a1a]/20" : "bg-pantry-green",
             ].join(" ")}
           />
           <span className={[
             "text-[10px] font-semibold uppercase tracking-wide",
-            isOut ? "text-[#1a1a1a]/25" : isLow ? "text-pantry-amber" : "text-pantry-green",
+            isOut ? "text-[#1a1a1a]/25" : "text-pantry-green",
           ].join(" ")}>
-            {isOut ? "Out of stock" : isLow ? "Low stock" : "In stock"}
+            {isOut ? "Out of stock" : "In stock"}
           </span>
         </div>
 
@@ -162,6 +185,9 @@ export default function InventoryCard({ item, isSelected, onToggle, selectionCou
 
         {atMax && !isOut && (
           <p className="text-[10px] text-[#1a1a1a]/30" role="note">Max {MAX_SELECTION} selected</p>
+        )}
+        {isPersonalCare && (
+          <p className="text-[10px] text-pantry-coral/80" role="note">Not eligible for recipes</p>
         )}
       </div>
 
