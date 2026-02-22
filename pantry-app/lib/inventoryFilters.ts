@@ -1,5 +1,9 @@
 import type { InventoryItem, FilterState } from "@/types/inventory";
 
+function normalizeTag(tag: string): string {
+  return tag.trim().toLowerCase().replace(/[_-]+/g, " ");
+}
+
 /**
  * Pure filter function — all filtering logic lives here for easy unit testing.
  * Takes the full inventory list and active filters, returns only matching items.
@@ -11,10 +15,13 @@ export function filterInventory(
   const query = filters.search.toLowerCase().trim();
 
   return items.filter((item) => {
+    const normalizedItemTags = item.tags.map(normalizeTag);
+
     // Text search: match name or any dietary tag
     if (query) {
       const inName = item.name.toLowerCase().includes(query);
-      const inTags = item.tags.some((t) => t.toLowerCase().includes(query));
+      const normalizedQuery = normalizeTag(query);
+      const inTags = normalizedItemTags.some((t) => t.includes(normalizedQuery));
       if (!inName && !inTags) return false;
     }
 
@@ -33,7 +40,8 @@ export function filterInventory(
 
     // Dietary tag multi-select (item must have ALL selected tags)
     if (filters.tags.length > 0) {
-      if (!filters.tags.every((t) => item.tags.includes(t))) return false;
+      const selectedTags = filters.tags.map(normalizeTag);
+      if (!selectedTags.every((t) => normalizedItemTags.includes(t))) return false;
     }
 
     return true;
@@ -48,7 +56,7 @@ export function getAllCategories(items: InventoryItem[]): string[] {
 /** Returns sorted list of unique dietary tags present across all items. */
 export function getAllTags(items: InventoryItem[]): string[] {
   const tagSet = new Set<string>();
-  items.forEach((item) => item.tags.forEach((t) => tagSet.add(t)));
+  items.forEach((item) => item.tags.forEach((t) => tagSet.add(normalizeTag(t))));
   return [...tagSet].sort();
 }
 
