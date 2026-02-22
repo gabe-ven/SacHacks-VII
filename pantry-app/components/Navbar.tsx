@@ -17,9 +17,9 @@ export default function Navbar() {
           <Image
             src="/pantry.png"
             alt="The Pantry"
-            width={200}
-            height={60}
-            className="object-contain h-10 sm:h-12 md:h-14 w-auto max-w-[140px] sm:max-w-[180px] md:max-w-none"
+            width={220}
+            height={66}
+            className="object-contain h-11 sm:h-14 md:h-16 w-auto max-w-[160px] sm:max-w-[200px] md:max-w-none"
           />
         </Link>
 

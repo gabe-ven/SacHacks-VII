@@ -21,6 +21,7 @@ import SkeletonCard from "@/components/inventory/SkeletonCard";
 import DayCarousel from "@/components/DayCarousel";
 import Button from "@/components/ui/Button";
 import Card from "@/components/ui/Card";
+import { RecipeCardItem } from "@/components/landing/animations";
 
 // ── Constants ──────────────────────────────────────────────────────────────
 const STORAGE_KEY = "pantry_selected_items_v1";
@@ -354,13 +355,15 @@ export default function InventoryPage() {
                 >
                   {paginatedItems.map((item) => (
                     <div key={item.id} role="listitem" className="h-full">
-                      <InventoryCard
-                        item={item}
-                        isSelected={selectedIds.has(item.id)}
-                        onToggle={handleToggle}
-                        selectionCount={selectedIds.size}
-                        onBlockedSelect={handleBlockedSelection}
-                      />
+                      <RecipeCardItem className="h-full">
+                        <InventoryCard
+                          item={item}
+                          isSelected={selectedIds.has(item.id)}
+                          onToggle={handleToggle}
+                          selectionCount={selectedIds.size}
+                          onBlockedSelect={handleBlockedSelection}
+                        />
+                      </RecipeCardItem>
                     </div>
                   ))}
                 </div>
