@@ -344,7 +344,7 @@ export default function InventoryPage() {
             {!error && !loading && filteredItems.length > 0 && (
               <div className="space-y-4">
                 <div
-                  className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 auto-rows-[8rem]"
+                  className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 auto-rows-[11rem]"
                   role="list"
                   aria-label={`${filteredItems.length} pantry items, page ${currentPage} of ${totalPages}`}
                 >

@@ -6,6 +6,7 @@ export type InventoryItem = {
   category: string;
   stockStatus: StockStatus;
   tags: string[];
+  imageUrl?: string | null;
 };
 
 export type FilterState = {
