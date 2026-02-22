@@ -68,6 +68,8 @@ function SkeletonGrid({ count = 6, shimmer = false }: { count?: number; shimmer?
 
 const AI_RECIPES_STORAGE_KEY = "pantry_ai_recipes";
 const AI_RECIPES_BACK_KEY = "pantry_ai_recipes_back";
+/** Set by inventory when user clicks "Find recipes"; we generate fresh. Unset = refresh/back, so use cache if available. */
+const FROM_INVENTORY_KEY = "pantry_from_inventory";
 
 // ── Browse all recipes (no selection) ────────────────────────────────────────
 function BrowseRecipes({ dbIngredientNames }: { dbIngredientNames: string[] }) {
@@ -193,9 +195,11 @@ function RecipesContent() {
       let skipAI = false;
       if (typeof window !== "undefined") {
         try {
+          const fromInventory = window.sessionStorage.getItem(FROM_INVENTORY_KEY) === "1";
+          window.sessionStorage.removeItem(FROM_INVENTORY_KEY);
           const back = window.sessionStorage.getItem(AI_RECIPES_BACK_KEY);
           const raw = window.sessionStorage.getItem(AI_RECIPES_STORAGE_KEY);
-          if (back === expectedBack && raw) {
+          if (!fromInventory && back === expectedBack && raw) {
             const parsed = JSON.parse(raw);
             if (Array.isArray(parsed) && parsed.length > 0) {
               skipAI = true;

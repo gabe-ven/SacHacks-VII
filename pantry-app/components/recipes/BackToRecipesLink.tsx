@@ -16,8 +16,10 @@ export default function BackToRecipesLink({
 
   useEffect(() => {
     try {
-      const back = typeof window !== "undefined" ? window.sessionStorage.getItem(BACK_KEY) : null;
-      if (back) setHref(back.startsWith("?") ? `/recipes${back}` : `/recipes?${back}`);
+      if (typeof window !== "undefined") {
+        const back = window.sessionStorage.getItem(BACK_KEY);
+        if (back) setHref(back.startsWith("?") ? `/recipes${back}` : `/recipes?${back}`);
+      }
     } catch { /* ignore */ }
   }, []);
 
