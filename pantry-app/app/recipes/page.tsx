@@ -14,8 +14,9 @@ import RecipeFilters, { type SortKey } from "@/components/recipes/RecipeFilters"
 type ScoredRecipe = Recipe & { matchScore: number };
 
 function cookTimeMinutes(t: string): number {
+  if (!t || t === "N/A") return Infinity;
   const m = t.match(/(\d+)/);
-  return m ? parseInt(m[1], 10) : 999;
+  return m ? parseInt(m[1], 10) : Infinity;
 }
 
 // ── Main content ─────────────────────────────────────────────────────────────
@@ -47,7 +48,7 @@ function RecipesContent() {
       try {
         const [allItems, allRecipes] = await Promise.all([getInventory(), getRecipes()]);
         if (cancelled) return;
-          const selected = itemIds.length > 0
+        const selected = itemIds.length > 0
           ? allItems.filter(
               (item) => itemIds.includes(item.id) || itemIds.includes(item.name)
             )
@@ -90,7 +91,7 @@ function RecipesContent() {
   const secondary = hasSelection ? [] : displayed;
 
   return (
-    <div className="min-h-screen bg-pantry-cream">
+    <div className="min-h-screen bg-background">
       <div className="max-w-screen-xl mx-auto px-4 sm:px-6 py-10 space-y-8">
 
         {/* Hero banner */}
@@ -171,7 +172,7 @@ function RecipesContent() {
         {loading && (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {Array.from({ length: 9 }).map((_, i) => (
-              <div key={i} className="rounded-2xl border border-pantry-tan/50 overflow-hidden animate-pulse bg-pantry-cream">
+              <div key={i} className="rounded-2xl border border-pantry-tan/50 overflow-hidden animate-pulse bg-surface-card">
                 <div className="h-36 bg-pantry-tan/25" />
                 <div className="p-4 space-y-3">
                   <div className="h-3.5 rounded-full bg-pantry-tan/40 w-3/4" />
@@ -244,7 +245,7 @@ function SectionHeading({ title, count, accent }: { title: string; count: number
 export default function RecipesPage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen bg-pantry-cream flex items-center justify-center">
+      <div className="min-h-screen bg-background flex items-center justify-center">
         <p className="text-sm text-pantry-brown/50">Loading recipes…</p>
       </div>
     }>
