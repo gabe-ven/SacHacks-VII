@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { motion, useInView, animate } from "framer-motion";
+import { motion, useInView } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import { ease, spring, springBouncy } from "./animations";
 
@@ -72,7 +72,7 @@ export default function Hero() {
               initial={{ opacity: 0, rotateX: 20, y: 30 }}
               animate={{ opacity: 1, rotateX: 0, y: 0 }}
               transition={{ ...spring, delay: 0.15 }}
-              style={{ transformOrigin: "top left", fontFamily: "Dancing Script, cursive" }}
+              style={{ transformOrigin: "top left", fontFamily: "var(--font-display)" }}
               className="text-5xl sm:text-6xl md:text-7xl leading-[1.05] tracking-tight"
             >
               <span className="text-pantry-green">No student</span>

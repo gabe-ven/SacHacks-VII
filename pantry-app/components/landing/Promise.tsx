@@ -35,7 +35,7 @@ function Card({ num, word, desc, color, line, index }: typeof promises[0] & { in
           initial={{ opacity: 0, scale: 0.6 }}
           animate={inView ? { opacity: 1, scale: 1 } : {}}
           transition={{ ...springBouncy, delay: index * 0.12 + 0.15 }}
-          style={{ fontFamily: "Dancing Script, cursive", fontSize: "clamp(2.4rem, 4vw, 3rem)" }}
+          style={{ fontFamily: "var(--font-display)", fontSize: "clamp(2.4rem, 4vw, 3rem)" }}
         >
           {word}
         </motion.span>
@@ -51,7 +51,7 @@ export default function Promise() {
       <div className="max-w-4xl mx-auto flex flex-col items-center">
         <Reveal3D className="text-center mb-16">
           <span className="text-pantry-coral text-[11px] font-bold uppercase tracking-[0.2em]">Our Promise</span>
-          <h2 className="text-4xl sm:text-5xl text-foreground mt-3 whitespace-nowrap" style={{ fontFamily: "Dancing Script, cursive" }}>
+          <h2 className="text-4xl sm:text-5xl text-foreground mt-3 whitespace-nowrap" style={{ fontFamily: "var(--font-display)" }}>
             Built on <span className="text-pantry-green">three promises.</span>
           </h2>
         </Reveal3D>

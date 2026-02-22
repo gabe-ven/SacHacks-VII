@@ -51,7 +51,7 @@ export default function MissionQuote() {
             className="flex flex-col gap-4"
           >
             <span className="text-pantry-coral text-[11px] font-bold uppercase tracking-[0.2em]">Our Mission</span>
-            <span className="text-7xl leading-none text-pantry-amber/40" style={{ fontFamily: "Dancing Script, cursive" }}>&ldquo;</span>
+            <span className="text-7xl leading-none text-pantry-amber/40" style={{ fontFamily: "var(--font-display)" }}>&ldquo;</span>
             <p className="text-2xl sm:text-[1.65rem] font-light text-foreground leading-snug -mt-4">
               The Pantry aids UC Davis students in their pursuit of higher education by ensuring that{" "}
               <motion.em
@@ -64,7 +64,7 @@ export default function MissionQuote() {
               </motion.em>{" "}
               or lack basic necessities due to financial reasons.
             </p>
-            <span className="text-7xl leading-none text-pantry-amber/40 self-end -mt-2" style={{ fontFamily: "Dancing Script, cursive" }}>&rdquo;</span>
+            <span className="text-7xl leading-none text-pantry-amber/40 self-end -mt-2" style={{ fontFamily: "var(--font-display)" }}>&rdquo;</span>
             <span className="text-[11px] font-bold uppercase tracking-[0.2em] text-muted mt-1">
               Over 50,000 visits · 2018–2019 school year
             </span>
