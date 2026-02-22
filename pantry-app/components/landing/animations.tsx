@@ -136,9 +136,9 @@ export function RecipeCardItem({ children, className = "" }: { children: React.R
   return (
     <motion.div
       ref={ref}
-      initial={{ opacity: 0, y: 32, scale: 0.98 }}
-      animate={inView ? { opacity: 1, y: 0, scale: 1 } : { opacity: 0, y: 32, scale: 0.98 }}
-      transition={{ duration: 0.52, ease: recipeCardEase }}
+      initial={{ opacity: 0.4, y: 20, scale: 0.98 }}
+      animate={inView ? { opacity: 1, y: 0, scale: 1 } : { opacity: 0.4, y: 20, scale: 0.98 }}
+      transition={{ duration: 0.35, ease: recipeCardEase }}
       className={className}
     >
       {children}

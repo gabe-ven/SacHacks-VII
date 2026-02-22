@@ -117,7 +117,7 @@ export default async function RecipeDetailPage({
                 <>
                   {have.length > 0 && (
                     <div className="space-y-1.5">
-                      <p className="text-[10px] font-semibold uppercase tracking-wider text-pantry-green">Have</p>
+                      <p className="text-[10px] font-semibold uppercase tracking-wider text-pantry-green">What you have</p>
                       <ul className="space-y-1.5">
                         {have.map((ing, i) => (
                           <li key={`have-${i}`} className="flex items-start gap-2 text-sm leading-snug text-pantry-green font-medium">
@@ -130,7 +130,7 @@ export default async function RecipeDetailPage({
                   )}
                   {need.length > 0 && (
                     <div className="space-y-1.5 pt-1">
-                      <p className="text-[10px] font-semibold uppercase tracking-wider text-muted">Need</p>
+                      <p className="text-[10px] font-semibold uppercase tracking-wider text-muted">What you need</p>
                       <ul className="space-y-1.5">
                         {need.map((ing, i) => (
                           <li key={`need-${i}`} className="flex items-start gap-2 text-sm leading-snug text-foreground/75">
