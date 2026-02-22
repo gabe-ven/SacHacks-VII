@@ -6,8 +6,9 @@ import Footer from "@/components/Footer";
 import { ThemeProvider } from "@/context/ThemeContext";
 
 export const metadata: Metadata = {
-  title: "Pantry Recipes — UC Davis",
-  description: "Turn Pantry ingredients into simple meals.",
+  title: "The Pantry at ASUCD — Recipe Finder",
+  description:
+    "Turn your Pantry picks into real meals. Select the ingredients you grabbed today and discover recipes made for UC Davis students.",
 };
 
 const rubik = Rubik({

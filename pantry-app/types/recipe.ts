@@ -5,6 +5,8 @@ export interface Recipe {
   cookTime: string;
   difficulty: "Easy" | "Medium" | "Hard";
   ingredients: string[];
+  /** Subset of ingredients available at the ASUCD Pantry */
+  pantryIngredients: string[];
   instructions: string[];
   substitutions: string[];
 }

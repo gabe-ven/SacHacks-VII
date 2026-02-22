@@ -11,24 +11,23 @@ const supabase = createClient(
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
-export type GeneratedRecipe = {
+/** Shape returned by OpenAI — no `id` yet, that's added before sending to the client. */
+type OpenAIRecipe = {
   name: string;
   cookTime: string;
   difficulty: "Easy" | "Medium" | "Hard";
-  /** Ingredients the user already has from their selection */
   haveIngredients: string[];
-  /** Extra common ingredients needed to complete the recipe */
   needIngredients: string[];
   steps: string[];
 };
 
 type OpenAIResponse = {
-  recipes: GeneratedRecipe[];
+  recipes: OpenAIRecipe[];
 };
 
 // ── Helpers ────────────────────────────────────────────────────────────────
 
-function formatInstructions(recipe: GeneratedRecipe): string {
+function formatInstructions(recipe: OpenAIRecipe): string {
   const all = [...recipe.haveIngredients, ...recipe.needIngredients].join("\n");
   const steps = recipe.steps.join("\n");
   return `First get: ${all}\nThen ${steps}\n`;
@@ -154,7 +153,7 @@ Respond ONLY with valid JSON:
   }
 }
 
-async function persistToSupabase(generated: GeneratedRecipe[], selectedItems: string[]) {
+async function persistToSupabase(generated: OpenAIRecipe[], selectedItems: string[]) {
   const { data: allIngredients } = await supabase.from("ingredients").select("id, name");
 
   const ingredientMap = new Map<string, string>(

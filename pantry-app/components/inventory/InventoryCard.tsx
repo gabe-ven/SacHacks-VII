@@ -1,7 +1,9 @@
 "use client";
 
+import Image from "next/image";
 import type { KeyboardEvent } from "react";
 import type { InventoryItem } from "@/types/inventory";
+import { useTheme } from "@/context/ThemeContext";
 
 type TagVariant = "green" | "tan" | "amber" | "coral";
 
@@ -33,6 +35,14 @@ export const CATEGORY_STYLE: Record<string, { bg: string; text: string; label: s
 
 const MAX_SELECTION = 20;
 
+const CATEGORY_IMAGE: Record<string, string> = {
+  "Produce": "/image1.jpeg",
+  "Dairy": "/image2.jpg",
+  "Canned/Jarred Foods": "/image3.jpeg",
+  "Dry/Baking Goods": "/image2.jpg",
+  "Personal Care": "/image3.jpeg",
+};
+
 function formatTagLabel(tag: string): string {
   return tag
     .replace(/[_-]+/g, " ")
@@ -57,12 +67,15 @@ export default function InventoryCard({
   selectionCount,
   onBlockedSelect,
 }: Props) {
+  const { theme } = useTheme();
   const isOut = item.stockStatus === "out_of_stock";
   const isLow = item.stockStatus === "low_stock";
   const isPersonalCare = item.category.trim().toLowerCase() === "personal care";
   const atMax = selectionCount >= MAX_SELECTION && !isSelected;
   const canToggle = !isOut && !atMax && !isPersonalCare;
   const style = CATEGORY_STYLE[item.category] ?? { bg: "#DDBE86", text: "#312F2D", label: item.category };
+  const fallbackImage = CATEGORY_IMAGE[item.category] ?? "/pantry.png";
+  const cardImage = item.imageUrl?.trim() ? item.imageUrl : fallbackImage;
 
   const ariaLabel = isPersonalCare
     ? `${item.name} — personal care, not eligible for recipes`
@@ -138,18 +151,42 @@ export default function InventoryCard({
           isSelected ? "bg-pantry-green/5" : "bg-surface-card",
         ].join(" ")}
       >
-        {/* Top row: name + stock status */}
-        <div className="flex items-start justify-between gap-2">
-          <h3 className={[
-            "text-sm font-semibold leading-snug tracking-tight flex-1 min-w-0 line-clamp-2",
-            isOut ? "text-muted" : "text-foreground",
-          ].join(" ")}>
-            {item.name}
-          </h3>
+        {/* Image-first layout */}
+        <div className="relative h-[92px] w-full rounded-xl bg-transparent flex items-center justify-center overflow-hidden">
+          <Image
+            src={cardImage}
+            alt={`${item.category} item`}
+            width={112}
+            height={112}
+            unoptimized
+            className={[
+              "w-full h-full object-contain p-1",
+              theme === "dark" ? "mix-blend-normal" : "mix-blend-multiply",
+            ].join(" ")}
+          />
+          {isSelected && (
+            <span
+              aria-hidden="true"
+              className="absolute top-1 right-1 shrink-0 w-4.5 h-4.5 rounded-full bg-pantry-green flex items-center justify-center"
+            >
+              <svg className="w-2.5 h-2.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+              </svg>
+            </span>
+          )}
+        </div>
 
-          {/* Stock in top-right */}
+        <h3 className={[
+          "mt-1.5 text-sm font-semibold leading-tight tracking-tight line-clamp-2 text-center",
+          isOut ? "text-muted" : "text-foreground",
+        ].join(" ")}>
+          {item.name}
+        </h3>
+
+        {/* Bottom area: stock + tags OR notes */}
+        <div className="mt-auto flex flex-col items-center gap-1 overflow-hidden">
           <span className={[
-            "shrink-0 inline-flex items-center gap-1 text-[9px] font-bold uppercase tracking-widest mt-0.5",
+            "shrink-0 inline-flex items-center gap-1 text-[9px] font-bold uppercase tracking-widest",
             isOut ? "text-muted" : isLow ? "text-pantry-amber" : "text-pantry-green",
           ].join(" ")}>
             <span className={[
@@ -158,16 +195,14 @@ export default function InventoryCard({
             ].join(" ")} />
             {isOut ? "Out" : isLow ? "Low" : "In stock"}
           </span>
-        </div>
 
-        {/* Bottom row: tags OR notes */}
-        <div className="flex items-center gap-1 overflow-hidden">
           {atMax && !isOut ? (
-            <span className="text-[9px] text-muted">Max {MAX_SELECTION} reached</span>
+            <span className="text-[9px] text-muted text-center">Max {MAX_SELECTION} reached</span>
           ) : isPersonalCare ? (
-            <span className="text-[9px] text-muted">Not for recipes</span>
+            <span className="text-[9px] text-muted text-center">Not for recipes</span>
           ) : item.tags.length > 0 ? (
-            item.tags.slice(0, 3).map((tag) => {
+            <div className="flex items-center justify-center gap-1 overflow-hidden">
+              {item.tags.slice(0, 3).map((tag) => {
               const variant = TAG_VARIANTS[tag] ?? "tan";
               return (
                 <span
@@ -180,20 +215,10 @@ export default function InventoryCard({
                   {formatTagLabel(tag)}
                 </span>
               );
-            })
+            })}
+            </div>
           ) : null}
 
-          {/* Selected checkmark (bottom-right) */}
-          {isSelected && (
-            <span
-              aria-hidden="true"
-              className="ml-auto shrink-0 w-5 h-5 rounded-full bg-pantry-green flex items-center justify-center"
-            >
-              <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
-              </svg>
-            </span>
-          )}
         </div>
       </div>
 
