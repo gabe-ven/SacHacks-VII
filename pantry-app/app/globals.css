@@ -173,11 +173,11 @@ svg {
   border-radius: var(--radius-full);
 }
 
-/* Selected items panel scrollbar: pill only, no track, no buttons */
+/* Selected items panel scrollbar: pill only, no track, no buttons. Reserve gutter so cards match button width. */
 .selected-items-scroll {
+  scrollbar-gutter: stable;
   scrollbar-width: thin;
   scrollbar-color: var(--pantry-green) transparent;
-  padding-right: 0.75rem;
 }
 
 .selected-items-scroll::-webkit-scrollbar {
