@@ -2,7 +2,7 @@
 
 import { motion, useInView } from "framer-motion";
 import { useRef } from "react";
-import { Reveal3D, spring, springBouncy, ease } from "./animations";
+import { Reveal3D, spring, springBouncy } from "./animations";
 
 const steps = [
   { step: "1", title: "Visit the Pantry", body: "Walk in during open hours and swipe your student ID. No forms, no judgment.", color: "text-pantry-green", pill: "bg-pantry-green/10 text-pantry-green", shift: "ml-0 mr-auto", },
@@ -54,7 +54,7 @@ export default function HowItWorks() {
       <div className="max-w-5xl mx-auto">
         <Reveal3D className="text-center mb-12">
           <span className="text-pantry-coral text-[11px] font-bold uppercase tracking-[0.2em]">How It Works</span>
-          <h2 className="text-5xl sm:text-6xl text-foreground mt-3" style={{ fontFamily: "Dancing Script, cursive" }}>
+          <h2 className="text-5xl sm:text-6xl text-foreground mt-3" style={{ fontFamily: "var(--font-display)" }}>
             Three points.{" "}
             <span className="text-pantry-green">Infinite meals.</span>
           </h2>

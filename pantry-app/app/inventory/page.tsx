@@ -233,7 +233,7 @@ export default function InventoryPage() {
           </span>
           <h1
             className="relative z-10 text-5xl sm:text-6xl text-white"
-            style={{ fontFamily: "Dancing Script, cursive" }}
+            style={{ fontFamily: "var(--font-display)" }}
           >
             Browse the Pantry
           </h1>
