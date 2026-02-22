@@ -364,14 +364,16 @@ export default function InventoryPage() {
                 {totalPages > 1 && (
                   <div className="flex items-center justify-center gap-2" aria-label="Inventory pagination">
                     <button
+                      type="button"
                       onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
                       disabled={currentPage === 1}
                       aria-label="Previous page"
+                      aria-disabled={currentPage === 1}
                       className={[
-                        "w-9 h-9 flex items-center justify-center rounded-full border transition-colors focus:outline-none cursor-pointer",
+                        "w-9 h-9 flex items-center justify-center rounded-full border transition-colors focus:outline-none",
                         currentPage === 1
-                          ? "border-border text-muted cursor-not-allowed"
-                          : "border-pantry-tan text-pantry-green hover:bg-pantry-tan/20",
+                          ? "border-border text-muted cursor-not-allowed opacity-50 pointer-events-none"
+                          : "cursor-pointer border-pantry-tan text-pantry-green hover:bg-pantry-tan/20",
                       ].join(" ")}
                     >
                       <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5} aria-hidden="true">
@@ -382,14 +384,16 @@ export default function InventoryPage() {
                       Page {currentPage} of {totalPages}
                     </span>
                     <button
+                      type="button"
                       onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
                       disabled={currentPage === totalPages}
                       aria-label="Next page"
+                      aria-disabled={currentPage === totalPages}
                       className={[
-                        "w-9 h-9 flex items-center justify-center rounded-full border transition-colors focus:outline-none cursor-pointer",
+                        "w-9 h-9 flex items-center justify-center rounded-full border transition-colors focus:outline-none",
                         currentPage === totalPages
-                          ? "border-border text-muted cursor-not-allowed"
-                          : "border-pantry-tan text-pantry-green hover:bg-pantry-tan/20",
+                          ? "border-border text-muted cursor-not-allowed opacity-50 pointer-events-none"
+                          : "cursor-pointer border-pantry-tan text-pantry-green hover:bg-pantry-tan/20",
                       ].join(" ")}
                     >
                       <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5} aria-hidden="true">
@@ -407,7 +411,7 @@ export default function InventoryPage() {
             className="hidden lg:flex lg:flex-col w-64 shrink-0 sticky top-6"
             aria-label="Selected items"
           >
-            <div className="p-5 flex flex-col rounded-2xl bg-surface-card border border-border">
+            <div className="p-5 flex flex-col rounded-2xl bg-surface-card border-2 border-pantry-amber/50 shadow-lg">
               <SelectedItemsPanel
                 selectedItems={selectedItems}
                 onRemove={handleRemove}
