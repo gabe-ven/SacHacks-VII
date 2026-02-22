@@ -222,24 +222,28 @@ export default function InventoryPage() {
       <div className="max-w-screen-xl mx-auto px-4 sm:px-6 py-12">
 
         {/* ── Page header ── */}
-        <div className="mb-10 relative overflow-hidden rounded-3xl bg-pantry-green px-8 py-12 flex flex-col gap-3">
+        <div className="mb-10 relative overflow-hidden rounded-3xl bg-pantry-green px-8 sm:px-10 py-14 sm:py-16 flex flex-col gap-2 sm:gap-3">
+          {/* Grid texture */}
           <div
-            className="absolute inset-0 opacity-[0.04] pointer-events-none"
+            className="absolute inset-0 opacity-[0.07] pointer-events-none"
             style={{
               backgroundImage: "linear-gradient(#fff 1px, transparent 1px), linear-gradient(90deg, #fff 1px, transparent 1px)",
-              backgroundSize: "48px 48px",
+              backgroundSize: "40px 40px",
             }}
           />
-          <span className="relative z-10 text-pantry-amber text-[11px] font-bold uppercase tracking-[0.2em]">
+          {/* Soft gradient for depth */}
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/10 pointer-events-none" />
+          <div aria-hidden="true" className="absolute -top-12 -right-12 w-56 h-56 rounded-full bg-pantry-amber/15 blur-3xl pointer-events-none" />
+          <span className="relative z-10 text-pantry-amber text-[11px] font-bold uppercase tracking-[0.22em]">
             The Pantry at ASUCD · UC Davis
           </span>
           <h1
-            className="relative z-10 text-5xl sm:text-6xl text-white"
+            className="relative z-10 text-4xl sm:text-5xl md:text-6xl text-white leading-tight drop-shadow-sm"
             style={{ fontFamily: "var(--font-display)" }}
           >
             Browse the Pantry
           </h1>
-          <p className="relative z-10 text-pantry-cream/60 max-w-md text-sm leading-relaxed">
+          <p className="relative z-10 text-pantry-cream/85 max-w-lg text-sm sm:text-base leading-relaxed">
             Pick the items you grabbed this week and we&apos;ll generate a real meal from them.
           </p>
         </div>

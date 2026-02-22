@@ -277,26 +277,28 @@ function RecipesContent() {
       <div className="max-w-screen-xl mx-auto px-4 sm:px-6 py-10 space-y-8">
 
         {/* Hero */}
-        <div className="relative overflow-hidden rounded-3xl bg-pantry-green px-8 py-12 flex flex-col gap-3">
+        <div className="relative overflow-hidden rounded-3xl bg-pantry-green px-8 sm:px-10 py-14 sm:py-16 flex flex-col gap-2 sm:gap-3">
+          {/* Grid texture */}
           <div
             aria-hidden="true"
-            className="absolute inset-0 opacity-[0.05] pointer-events-none"
+            className="absolute inset-0 opacity-[0.07] pointer-events-none"
             style={{
-              backgroundImage: "linear-gradient(#fff 1px,transparent 1px),linear-gradient(90deg,#fff 1px,transparent 1px)",
-              backgroundSize: "48px 48px",
+              backgroundImage: "linear-gradient(#fff 1px, transparent 1px), linear-gradient(90deg, #fff 1px, transparent 1px)",
+              backgroundSize: "40px 40px",
             }}
           />
-          <div aria-hidden="true" className="absolute -top-10 -right-10 w-48 h-48 rounded-full bg-pantry-amber/10 blur-2xl pointer-events-none" />
-          <span className="relative z-10 text-pantry-amber text-[10px] font-bold uppercase tracking-[0.25em]">
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/10 pointer-events-none" />
+          <div aria-hidden="true" className="absolute -top-12 -right-12 w-56 h-56 rounded-full bg-pantry-amber/15 blur-3xl pointer-events-none" />
+          <span className="relative z-10 text-pantry-amber text-[11px] font-bold uppercase tracking-[0.22em]">
             The Pantry at ASUCD · UC Davis
           </span>
           <h1
-            className="relative z-10 text-5xl sm:text-6xl text-white leading-tight"
+            className="relative z-10 text-4xl sm:text-5xl md:text-6xl text-white leading-tight drop-shadow-sm"
             style={{ fontFamily: "var(--font-display)" }}
           >
             {hasSelection ? "Your Recipes" : "Recipe Suggestions"}
           </h1>
-          <p className="relative z-10 text-pantry-cream/65 max-w-lg text-sm leading-relaxed">
+          <p className="relative z-10 text-pantry-cream/85 max-w-lg text-sm sm:text-base leading-relaxed">
             {hasSelection
               ? `Recipes matched and built around your ${itemIds.length} selected ingredient${itemIds.length !== 1 ? "s" : ""}.`
               : "Browse all pantry recipes, or head back to select your ingredients for personalised suggestions."}
