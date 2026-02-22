@@ -312,7 +312,7 @@ export default function FilterPanel({
           aria-label="Clear all filters"
           aria-hidden={!hasActiveFilters}
           tabIndex={hasActiveFilters ? 0 : -1}
-          className={`text-sm text-pantry-coral hover:text-pantry-green underline underline-offset-2 transition-colors focus:outline-none cursor-pointer shrink-0 ${hasActiveFilters ? "" : "invisible pointer-events-none"}`}
+          className={`text-sm text-pantry-coral hover:!text-[#dc2626] underline underline-offset-2 transition-colors focus:outline-none cursor-pointer shrink-0 ${hasActiveFilters ? "" : "invisible pointer-events-none"}`}
         >
           Clear all filters
         </button>
