@@ -116,7 +116,7 @@ export default function InventoryCard({
           : canToggle
           ? "border-border hover:border-pantry-green/40 hover:shadow-md cursor-pointer"
           : "border-border cursor-not-allowed opacity-60",
-        !isOut ? "focus:outline-none focus-visible:ring-2 focus-visible:ring-pantry-green" : "focus:outline-none",
+        !isOut ? "focus:outline-none focus-visible:border-pantry-green" : "focus:outline-none",
       ].join(" ")}
     >
       {/* Left accent bar */}
