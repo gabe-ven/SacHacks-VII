@@ -30,7 +30,7 @@ type Props = {
 const pillBase =
   "inline-flex items-center px-3.5 py-1.5 rounded-full text-sm font-medium border transition-colors duration-150 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-pantry-green";
 const pillOff =
-  "border-pantry-tan text-foreground/70 hover:border-pantry-green hover:text-pantry-green bg-transparent";
+  "border-border text-muted hover:border-pantry-green hover:text-pantry-green bg-transparent";
 const pillOn =
   "border-transparent bg-pantry-green text-pantry-cream";
 
@@ -103,7 +103,7 @@ export default function FilterPanel({
           disabled={!canScrollLeft}
           aria-label="Scroll filters left"
           className={[
-            "shrink-0 w-7 h-7 flex items-center justify-center rounded-full border border-pantry-tan text-pantry-green transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-pantry-green",
+            "shrink-0 w-7 h-7 flex items-center justify-center rounded-full border border-border text-pantry-green transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-pantry-green",
             canScrollLeft
               ? "opacity-100 hover:bg-pantry-tan/30 cursor-pointer"
               : "opacity-40 cursor-not-allowed",
@@ -139,7 +139,7 @@ export default function FilterPanel({
 
           {/* Divider */}
           {allCategories.length > 0 && (
-            <span className="h-6 w-px bg-pantry-tan shrink-0 mx-1" aria-hidden="true" />
+            <span className="h-6 w-px bg-border shrink-0 mx-1" aria-hidden="true" />
           )}
 
           {/* Category chips */}
@@ -163,7 +163,7 @@ export default function FilterPanel({
 
           {/* Divider */}
           {allTags.length > 0 && (
-            <span className="h-6 w-px bg-pantry-tan shrink-0 mx-1" aria-hidden="true" />
+            <span className="h-6 w-px bg-border shrink-0 mx-1" aria-hidden="true" />
           )}
 
           {/* Dietary chips */}
@@ -194,7 +194,7 @@ export default function FilterPanel({
           disabled={!canScrollRight}
           aria-label="Scroll filters right"
           className={[
-            "shrink-0 w-7 h-7 flex items-center justify-center rounded-full border border-pantry-tan text-pantry-green transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-pantry-green",
+            "shrink-0 w-7 h-7 flex items-center justify-center rounded-full border border-border text-pantry-green transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-pantry-green",
             canScrollRight
               ? "opacity-100 hover:bg-pantry-tan/30 cursor-pointer"
               : "opacity-40 cursor-not-allowed",

@@ -50,7 +50,7 @@ export default function CoreValues() {
       <div className="max-w-5xl mx-auto">
         <Reveal3D className="text-center mb-16">
           <span className="text-pantry-coral text-[11px] font-bold uppercase tracking-[0.2em]">Core Values</span>
-          <h2 className="text-5xl sm:text-6xl text-foreground mt-3" style={{ fontFamily: "Dancing Script, cursive" }}>
+          <h2 className="text-5xl sm:text-6xl text-foreground mt-3" style={{ fontFamily: "var(--font-display)" }}>
             What we <span className="text-pantry-green">stand for</span>
           </h2>
         </Reveal3D>

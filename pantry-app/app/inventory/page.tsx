@@ -130,7 +130,7 @@ export default function InventoryPage() {
   const allTags = useMemo(() => getAllTags(inventory), [inventory]);
   const filteredItems = useMemo(() => {
     const items = filterInventory(inventory, filters);
-    const stockOrder = { in_stock: 0, out_of_stock: 1 } as const;
+    const stockOrder: Record<string, number> = { in_stock: 0, low_stock: 1, out_of_stock: 2 };
     return [...items].sort((a, b) => {
       const diff = (stockOrder[a.stockStatus] ?? 2) - (stockOrder[b.stockStatus] ?? 2);
       if (diff !== 0) return diff;
@@ -190,13 +190,15 @@ export default function InventoryPage() {
   }, []);
 
   // ── Navigation ────────────────────────────────────────────────────────────
-  // Passes selected item IDs to /recipes via query string so the recipes page
-  // can read them with useSearchParams() or equivalent.
+  // Passes selected item names to /recipes via query string for ingredient matching.
   const handleFindRecipes = useCallback(() => {
     if (recipeEligibleSelectedIds.length === 0) return;
-    const ids = recipeEligibleSelectedIds.join(",");
-    router.push(`/recipes?items=${ids}`);
-  }, [recipeEligibleSelectedIds, router]);
+    const names = selectedItems
+      .filter((item) => recipeEligibleSelectedIds.includes(item.id))
+      .map((item) => encodeURIComponent(item.name))
+      .join(",");
+    router.push(`/recipes?items=${names}`);
+  }, [recipeEligibleSelectedIds, selectedItems, router]);
 
   useEffect(() => {
     if (!selectionWarning) return;
@@ -216,7 +218,7 @@ export default function InventoryPage() {
 
   // ── Render ────────────────────────────────────────────────────────────────
   return (
-    <div className="min-h-screen bg-white pb-24 lg:pb-0">
+    <div className="min-h-screen bg-background pb-24 lg:pb-0">
       <div className="max-w-screen-xl mx-auto px-4 sm:px-6 py-12">
 
         {/* ── Page header ── */}
@@ -233,7 +235,7 @@ export default function InventoryPage() {
           </span>
           <h1
             className="relative z-10 text-5xl sm:text-6xl text-white"
-            style={{ fontFamily: "Dancing Script, cursive" }}
+            style={{ fontFamily: "var(--font-display)" }}
           >
             Browse the Pantry
           </h1>
@@ -405,7 +407,7 @@ export default function InventoryPage() {
             className="hidden lg:flex lg:flex-col w-64 shrink-0 sticky top-6"
             aria-label="Selected items"
           >
-            <div className="p-5 flex flex-col rounded-2xl bg-white border border-pantry-amber/40">
+            <div className="p-5 flex flex-col rounded-2xl bg-surface-card border border-border">
               <SelectedItemsPanel
                 selectedItems={selectedItems}
                 onRemove={handleRemove}

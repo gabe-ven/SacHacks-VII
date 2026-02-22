@@ -39,9 +39,9 @@ export default function Button({
       aria-disabled={disabled}
       className={[
         "inline-flex items-center justify-center gap-2",
-        "px-5 py-2 rounded-full font-semibold text-sm",
+        "px-5 py-2 leading-5 rounded-full font-semibold text-sm appearance-none",
         "transition-colors duration-150 cursor-pointer",
-        "focus:outline-none focus:ring-2 focus:ring-pantry-green focus:ring-offset-1",
+        "focus:outline-none focus-visible:ring-2 focus-visible:ring-pantry-green",
         VARIANTS[variant],
         disabled ? DISABLED : "",
         fullWidth ? "w-full" : "",

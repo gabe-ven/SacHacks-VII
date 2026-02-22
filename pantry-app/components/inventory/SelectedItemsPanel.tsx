@@ -69,30 +69,34 @@ export default function SelectedItemsPanel({
               <path strokeLinecap="round" strokeLinejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2 4h14" />
             </svg>
           </div>
-          <p className="text-sm font-medium text-[#1a1a1a]/50">Nothing here yet</p>
-          <p className="text-xs text-[#1a1a1a]/30 mt-1">Tap items to add them</p>
+          <p className="text-sm font-medium text-muted">Nothing here yet</p>
+          <p className="text-xs text-muted mt-1">Tap items to add them</p>
         </div>
       ) : (
         <ul className="space-y-2" aria-label="Selected items list">
           {selectedItems.map((item) => (
             <li
               key={item.id}
-              className="flex items-center gap-2.5 bg-white rounded-xl border border-[#1a1a1a]/6 overflow-hidden shadow-sm"
+              className="flex items-center gap-2.5 bg-surface rounded-xl border border-border overflow-hidden shadow-sm"
             >
               {/* Category color strip */}
-              <div className="w-1 self-stretch bg-pantry-amber shrink-0" aria-hidden="true" />
+              <div
+                className="w-1 self-stretch shrink-0"
+                style={{ backgroundColor: (CATEGORY_META[item.category] ?? { color: "#DDBE86" }).color }}
+                aria-hidden="true"
+              />
 
               {/* Name + category */}
               <div className="flex-1 min-w-0 py-2.5">
-                <p className="text-sm font-semibold text-[#1a1a1a] leading-snug truncate">{item.name}</p>
-                <p className="text-[10px] font-medium uppercase tracking-wide text-[#1a1a1a]/35 mt-0.5">{item.category}</p>
+                <p className="text-sm font-semibold text-foreground leading-snug truncate">{item.name}</p>
+                <p className="text-[10px] font-medium uppercase tracking-wide text-muted mt-0.5">{item.category}</p>
               </div>
 
               {/* Remove button */}
               <button
                 onClick={() => onRemove(item.id)}
                 aria-label={`Remove ${item.name}`}
-                className="shrink-0 mr-2 w-6 h-6 flex items-center justify-center rounded-full text-[#1a1a1a]/20 hover:text-pantry-coral hover:bg-pantry-coral/10 transition-colors focus:outline-none cursor-pointer"
+                className="shrink-0 mr-2 w-6 h-6 flex items-center justify-center rounded-full text-muted hover:text-pantry-coral hover:bg-pantry-coral/10 transition-colors focus:outline-none cursor-pointer"
               >
                 <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5} aria-hidden="true">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
