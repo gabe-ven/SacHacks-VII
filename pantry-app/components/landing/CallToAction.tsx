@@ -15,7 +15,7 @@ export default function CallToAction() {
         </p>
         <Link
           href="/inventory"
-          className="bg-pantry-green text-white px-10 py-3.5 rounded-full font-bold text-sm hover:bg-pantry-coral transition-colors duration-200 shadow-sm mt-2"
+          className="bg-pantry-green text-pantry-cream px-10 py-3.5 rounded-full font-bold text-sm hover:opacity-90 transition-opacity duration-200 shadow-sm mt-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-pantry-green focus-visible:ring-offset-2"
         >
           Start Cooking →
         </Link>

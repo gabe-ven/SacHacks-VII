@@ -54,7 +54,7 @@ export default function Footer() {
               target="_blank"
               rel="noopener noreferrer"
               aria-label={label}
-              className="w-8 h-8 rounded-full bg-pantry-cream/10 hover:bg-pantry-amber/30 text-pantry-cream hover:text-white flex items-center justify-center transition-all duration-200"
+              className="w-8 h-8 rounded-full bg-pantry-cream/10 hover:bg-pantry-amber/30 text-pantry-cream hover:text-pantry-cream flex items-center justify-center transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-pantry-amber focus-visible:ring-offset-2 focus-visible:ring-offset-pantry-green"
             >
               {icon}
             </a>

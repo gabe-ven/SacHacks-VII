@@ -332,7 +332,7 @@ export default function InventoryPage() {
                 {isFiltersActive(filters) && (
                   <button
                     onClick={handleClearFilters}
-                    className="mt-1 text-sm text-pantry-coral hover:text-pantry-green underline underline-offset-2 transition-colors focus:outline-none cursor-pointer"
+                    className="mt-1 text-sm text-pantry-coral hover:text-pantry-green underline underline-offset-2 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-pantry-green focus-visible:ring-offset-2 rounded cursor-pointer"
                   >
                     Clear all filters
                   </button>

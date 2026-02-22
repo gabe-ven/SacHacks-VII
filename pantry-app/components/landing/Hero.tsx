@@ -107,7 +107,7 @@ export default function Hero() {
           >
             <Link
               href="/inventory"
-              className="bg-pantry-green text-white px-7 py-3 rounded-full font-semibold text-sm hover:bg-pantry-coral transition-colors duration-200 shadow-sm text-center"
+              className="bg-pantry-green text-pantry-cream px-7 py-3 rounded-full font-semibold text-sm hover:opacity-90 transition-opacity duration-200 shadow-sm text-center focus:outline-none focus-visible:ring-2 focus-visible:ring-pantry-green focus-visible:ring-offset-2"
             >
               Start Cooking →
             </Link>
@@ -115,7 +115,7 @@ export default function Hero() {
               href="https://thepantry.ucdavis.edu/"
               target="_blank"
               rel="noopener noreferrer"
-              className="border border-border text-muted px-7 py-3 rounded-full font-semibold text-sm hover:border-pantry-green/50 hover:text-pantry-green transition-colors duration-200 text-center bg-surface-card/50 backdrop-blur-sm"
+              className="border border-border text-muted px-7 py-3 rounded-full font-semibold text-sm hover:border-pantry-green hover:text-pantry-green transition-colors duration-200 text-center bg-surface-card/50 backdrop-blur-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-pantry-green focus-visible:ring-offset-2"
             >
               About the Pantry ↗
             </a>

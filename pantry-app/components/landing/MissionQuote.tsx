@@ -35,7 +35,7 @@ export default function MissionQuote() {
             whileInView={{ opacity: 1, scale: 1, rotate: 0 }}
             viewport={{ once: true }}
             transition={{ ...springBouncy, delay: 0.4 }}
-            className="absolute -bottom-5 -right-5 bg-pantry-green rounded-2xl shadow-xl px-5 py-4 text-white"
+            className="absolute -bottom-5 -right-5 bg-pantry-green rounded-2xl shadow-xl px-5 py-4 text-pantry-cream"
           >
             <span className="block text-2xl font-black">50K+</span>
             <span className="text-[11px] text-pantry-cream/70 uppercase tracking-widest">visits</span>

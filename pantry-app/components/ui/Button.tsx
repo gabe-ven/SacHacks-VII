@@ -3,18 +3,18 @@ import type { ButtonHTMLAttributes } from "react";
 type Variant = "primary" | "secondary" | "ghost" | "selected";
 
 const VARIANTS: Record<Variant, string> = {
-  // Green pill — matches landing page "Start Cooking" CTA
+  // Primary — green pill, theme cream text, consistent hover
   primary:
-    "bg-pantry-green text-white hover:bg-pantry-coral",
-  // Outlined pill — matches landing page secondary button
+    "bg-pantry-green text-pantry-cream hover:opacity-90 shadow-sm",
+  // Outlined pill — matches filter/secondary style
   secondary:
-    "border border-border text-foreground/60 bg-transparent hover:border-pantry-green/50 hover:text-pantry-green",
-  // Text-only — for inline actions
+    "border border-border text-foreground bg-transparent hover:border-pantry-green hover:text-pantry-green",
+  // Text / destructive — coral for clear/remove actions
   ghost:
     "text-pantry-coral hover:text-pantry-green bg-transparent",
-  // Green fill — for "added" / active state
+  // Selected / active pill
   selected:
-    "bg-pantry-green text-pantry-cream hover:bg-pantry-green/90",
+    "bg-pantry-green text-pantry-cream hover:opacity-90",
 };
 
 const DISABLED =

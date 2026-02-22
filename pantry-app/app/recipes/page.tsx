@@ -314,7 +314,7 @@ function RecipesContent() {
                   type="button"
                   onClick={() => router.push("/recipes")}
                   aria-label="Clear selection"
-                  className="inline-flex items-center gap-1.5 rounded-full border border-border bg-surface-card px-2.5 py-1 text-[10px] font-semibold text-muted transition-colors cursor-pointer hover:border-red-200 hover:bg-red-50 hover:!text-[#b91c1c] focus:outline-none focus-visible:ring-2 focus-visible:ring-red-400/40 focus-visible:ring-offset-2"
+                  className="inline-flex items-center gap-1.5 rounded-full border border-border bg-surface-card px-2.5 py-1 text-[10px] font-semibold text-muted transition-colors cursor-pointer hover:border-pantry-coral/50 hover:bg-pantry-coral/10 hover:!text-pantry-coral focus:outline-none focus-visible:ring-2 focus-visible:ring-pantry-coral focus-visible:ring-offset-2"
                 >
                   <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5} aria-hidden>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -425,7 +425,7 @@ function RecipesContent() {
                       <button
                         type="button"
                         onClick={() => generateAI(displayNames)}
-                        className="inline-flex items-center gap-1.5 text-xs font-semibold text-pantry-green hover:underline"
+                        className="inline-flex items-center gap-1.5 text-xs font-semibold text-pantry-green hover:text-pantry-amber transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-pantry-green focus-visible:ring-offset-2 rounded-full px-3 py-1.5"
                       >
                         Try again
                       </button>

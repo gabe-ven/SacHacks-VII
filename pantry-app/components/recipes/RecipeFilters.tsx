@@ -45,7 +45,7 @@ export default function RecipeFilters({
           onChange={(e) => onSearchChange(e.target.value)}
           placeholder="Search recipes or ingredients…"
           aria-label="Search recipes"
-          className="w-full pl-10 pr-4 py-2.5 !rounded-full border-2 border-gray-300 bg-gray-100 text-sm text-foreground placeholder:text-muted focus:outline-none focus-visible:border-pantry-green transition"
+          className="w-full pl-10 pr-10 py-2.5 !rounded-full !bg-gray-100 border-2 border-gray-300 text-sm text-foreground placeholder:text-foreground/40 focus:outline-none focus-visible:border-pantry-green focus-visible:ring-2 focus-visible:ring-pantry-green/30 focus-visible:ring-offset-0"
         />
       </div>
 
