@@ -1,15 +1,16 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
-import { getInventory as fetchInventory } from "@/lib/getInventory";
+import { getDailyInventory } from "@/lib/getDailyInventory";
 import {
   filterInventory,
   getAllCategories,
   getAllTags,
   isFiltersActive,
 } from "@/lib/inventoryFilters";
+import { getLocalDayOfWeek, parseDayParam, toDayParam, wrapDay } from "@/lib/days";
 import type { FilterState, InventoryItem } from "@/types/inventory";
 
 import SearchBar from "@/components/inventory/SearchBar";
@@ -17,6 +18,7 @@ import FilterPanel from "@/components/inventory/FilterPanel";
 import InventoryCard from "@/components/inventory/InventoryCard";
 import SelectedItemsPanel from "@/components/inventory/SelectedItemsPanel";
 import SkeletonCard from "@/components/inventory/SkeletonCard";
+import DayCarousel from "@/components/DayCarousel";
 import Button from "@/components/ui/Button";
 import Card from "@/components/ui/Card";
 
@@ -35,11 +37,14 @@ const DEFAULT_FILTERS: FilterState = {
 // ── Page component ─────────────────────────────────────────────────────────
 export default function InventoryPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
 
   // ── Data state ────────────────────────────────────────────────────────────
   const [inventory, setInventory] = useState<InventoryItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
+  const [dayOfWeek, setDayOfWeek] = useState<number>(() => getLocalDayOfWeek());
+  const [dayInitialized, setDayInitialized] = useState(false);
 
   // ── Filter state ──────────────────────────────────────────────────────────
   const [filters, setFilters] = useState<FilterState>(DEFAULT_FILTERS);
@@ -52,14 +57,12 @@ export default function InventoryPage() {
   // ── Mobile UI toggles ─────────────────────────────────────────────────────
   const [showMobileSelected, setShowMobileSelected] = useState(false);
 
-  // ── Load inventory ────────────────────────────────────────────────────────
-  // TODO: When integrating a real API, replace fetchInventory() with your
-  //       actual service call. The error/loading state shape stays the same.
-  const loadInventory = useCallback(async () => {
+  // ── Load inventory for selected day ───────────────────────────────────────
+  const loadInventory = useCallback(async (targetDay: number) => {
     setLoading(true);
     setError(null);
     try {
-      const data = await fetchInventory();
+      const data = await getDailyInventory(targetDay);
       setInventory(data);
     } catch (err) {
       setError(err instanceof Error ? err : new Error("Unknown error"));
@@ -68,9 +71,29 @@ export default function InventoryPage() {
     }
   }, []);
 
+  // Initialize day from URL (?day=mon) or keep local current day.
   useEffect(() => {
-    loadInventory();
-  }, [loadInventory]);
+    const parsedDay = parseDayParam(searchParams.get("day"));
+    const nextDay = parsedDay ?? getLocalDayOfWeek();
+    setDayOfWeek((prev) => (prev === nextDay ? prev : nextDay));
+    setDayInitialized(true);
+  }, [searchParams]);
+
+  // Keep URL in sync with selected day for shareable links.
+  useEffect(() => {
+    if (!dayInitialized) return;
+    const desired = toDayParam(dayOfWeek);
+    const current = searchParams.get("day");
+    if (current === desired) return;
+    const next = new URLSearchParams(searchParams.toString());
+    next.set("day", desired);
+    router.replace(`/inventory?${next.toString()}`, { scroll: false });
+  }, [dayInitialized, dayOfWeek, router, searchParams]);
+
+  useEffect(() => {
+    if (!dayInitialized) return;
+    loadInventory(dayOfWeek);
+  }, [dayInitialized, dayOfWeek, loadInventory]);
 
   // ── Hydrate selection from localStorage ───────────────────────────────────
   useEffect(() => {
@@ -97,10 +120,15 @@ export default function InventoryPage() {
   // ── Derived values (memoised) ─────────────────────────────────────────────
   const allCategories = useMemo(() => getAllCategories(inventory), [inventory]);
   const allTags = useMemo(() => getAllTags(inventory), [inventory]);
-  const filteredItems = useMemo(
-    () => filterInventory(inventory, filters),
-    [inventory, filters]
-  );
+  const filteredItems = useMemo(() => {
+    const items = filterInventory(inventory, filters);
+    const stockOrder = { in_stock: 0, low_stock: 0, out_of_stock: 1 } as const;
+    return [...items].sort((a, b) => {
+      const diff = (stockOrder[a.stockStatus] ?? 2) - (stockOrder[b.stockStatus] ?? 2);
+      if (diff !== 0) return diff;
+      return a.name.localeCompare(b.name);
+    });
+  }, [inventory, filters]);
   const selectedItems = useMemo(
     () => inventory.filter((item) => selectedIds.has(item.id)),
     [inventory, selectedIds]
@@ -174,6 +202,14 @@ export default function InventoryPage() {
           </p>
         </div>
 
+        {/* ── Day selector ── */}
+        <div className="mb-4">
+          <DayCarousel
+            dayOfWeek={dayOfWeek}
+            onChange={(nextDay) => setDayOfWeek(wrapDay(nextDay))}
+          />
+        </div>
+
         {/* ── Search + filter bar — full width above the grid ── */}
         <div className="space-y-3 mb-6">
           <SearchBar
@@ -211,7 +247,7 @@ export default function InventoryPage() {
                 <p className="text-xs text-pantry-coral/80">
                   {error.message}
                 </p>
-                <Button variant="primary" onClick={loadInventory}>
+                <Button variant="primary" onClick={() => loadInventory(dayOfWeek)}>
                   Retry
                 </Button>
               </div>
@@ -253,7 +289,7 @@ export default function InventoryPage() {
             {/* Item grid */}
             {!error && !loading && filteredItems.length > 0 && (
               <div
-                className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4"
+                className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 auto-rows-[8rem]"
                 role="list"
                 aria-label={`${filteredItems.length} pantry items`}
               >
