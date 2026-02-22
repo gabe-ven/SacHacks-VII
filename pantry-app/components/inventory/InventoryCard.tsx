@@ -3,7 +3,6 @@
 import type { KeyboardEvent } from "react";
 import type { InventoryItem } from "@/types/inventory";
 import Badge from "@/components/ui/Badge";
-import StockBadge from "./StockBadge";
 
 type TagVariant = "green" | "tan" | "amber" | "coral";
 
