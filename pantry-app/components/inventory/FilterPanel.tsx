@@ -244,7 +244,7 @@ export default function FilterPanel({
                   </span>
                 )}
                 <svg
-                  className={`w-3.5 h-3.5 shrink-0 transition-transform ${dietaryExpanded ? "rotate-90" : "-rotate-90"}`}
+                  className={`w-3.5 h-3.5 shrink-0 transition-transform ${dietaryExpanded ? "-rotate-90" : ""}`}
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -312,7 +312,7 @@ export default function FilterPanel({
           aria-label="Clear all filters"
           aria-hidden={!hasActiveFilters}
           tabIndex={hasActiveFilters ? 0 : -1}
-          className={`text-sm text-pantry-coral hover:text-pantry-green underline underline-offset-2 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-pantry-green focus-visible:ring-offset-2 rounded cursor-pointer shrink-0 ${hasActiveFilters ? "" : "invisible pointer-events-none"}`}
+          className={`text-sm text-pantry-coral hover:!text-[#dc2626] underline underline-offset-2 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-pantry-green focus-visible:ring-offset-2 rounded cursor-pointer shrink-0 ${hasActiveFilters ? "" : "invisible pointer-events-none"}`}
         >
           Clear all filters
         </button>
