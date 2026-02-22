@@ -53,3 +53,8 @@ body {
   color: var(--foreground);
   font-family: "Rubik", sans-serif;
 }
+
+/* Fallback for browsers that don't handle Tailwind's rounded-full math syntax consistently. */
+.rounded-full {
+  border-radius: 9999px;
+}
