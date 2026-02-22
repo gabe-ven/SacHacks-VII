@@ -370,7 +370,7 @@ export default function InventoryPage() {
                       className={[
                         "w-9 h-9 flex items-center justify-center rounded-full border transition-colors focus:outline-none cursor-pointer",
                         currentPage === 1
-                          ? "border-[#1a1a1a]/10 text-[#1a1a1a]/30 cursor-not-allowed"
+                          ? "border-border text-muted cursor-not-allowed"
                           : "border-pantry-tan text-pantry-green hover:bg-pantry-tan/20",
                       ].join(" ")}
                     >
@@ -388,7 +388,7 @@ export default function InventoryPage() {
                       className={[
                         "w-9 h-9 flex items-center justify-center rounded-full border transition-colors focus:outline-none cursor-pointer",
                         currentPage === totalPages
-                          ? "border-[#1a1a1a]/10 text-[#1a1a1a]/30 cursor-not-allowed"
+                          ? "border-border text-muted cursor-not-allowed"
                           : "border-pantry-tan text-pantry-green hover:bg-pantry-tan/20",
                       ].join(" ")}
                     >

@@ -51,20 +51,30 @@ export default function MissionQuote() {
             className="flex flex-col gap-4"
           >
             <span className="text-pantry-coral text-[11px] font-bold uppercase tracking-[0.2em]">Our Mission</span>
-            <span className="text-7xl leading-none text-pantry-amber/40" style={{ fontFamily: "var(--font-display)" }}>&ldquo;</span>
-            <p className="text-2xl sm:text-[1.65rem] font-light text-foreground leading-snug -mt-4">
-              The Pantry aids UC Davis students in their pursuit of higher education by ensuring that{" "}
-              <motion.em
-                className="not-italic font-semibold text-pantry-green"
-                initial={{ opacity: 0 }}
-                animate={quoteInView ? { opacity: 1 } : {}}
-                transition={{ duration: 0.6, delay: 0.5 }}
-              >
-                no student ever has to miss a meal
-              </motion.em>{" "}
-              or lack basic necessities due to financial reasons.
-            </p>
-            <span className="text-7xl leading-none text-pantry-amber/40 self-end -mt-2" style={{ fontFamily: "var(--font-display)" }}>&rdquo;</span>
+            <div className="relative">
+              <span
+                className="absolute -top-4 -left-2 text-6xl leading-none text-pantry-amber/30 select-none pointer-events-none"
+                style={{ fontFamily: "var(--font-display)" }}
+                aria-hidden="true"
+              >&ldquo;</span>
+              <p className="text-2xl sm:text-[1.65rem] font-light text-foreground leading-snug pt-4">
+                The Pantry aids UC Davis students in their pursuit of higher education by ensuring that{" "}
+                <motion.em
+                  className="not-italic font-semibold text-pantry-green"
+                  initial={{ opacity: 0 }}
+                  animate={quoteInView ? { opacity: 1 } : {}}
+                  transition={{ duration: 0.6, delay: 0.5 }}
+                >
+                  no student ever has to miss a meal
+                </motion.em>{" "}
+                or lack basic necessities due to financial reasons.
+              </p>
+              <span
+                className="absolute -bottom-6 right-0 text-6xl leading-none text-pantry-amber/30 select-none pointer-events-none"
+                style={{ fontFamily: "var(--font-display)" }}
+                aria-hidden="true"
+              >&rdquo;</span>
+            </div>
             <span className="text-[11px] font-bold uppercase tracking-[0.2em] text-muted mt-1">
               Over 50,000 visits · 2018–2019 school year
             </span>
