@@ -61,6 +61,7 @@ export default function InventoryPage() {
   // ── Mobile UI toggles ─────────────────────────────────────────────────────
   const [showMobileSelected, setShowMobileSelected] = useState(false);
   const [selectionWarning, setSelectionWarning] = useState<string | null>(null);
+  const isWeekendView = dayOfWeek === 0 || dayOfWeek === 6;
 
   // ── Load inventory for selected day ───────────────────────────────────────
   const loadInventory = useCallback(async (targetDay: number) => {
@@ -231,7 +232,6 @@ export default function InventoryPage() {
             onChange={(nextDay) => setDayOfWeek(wrapDay(nextDay))}
           />
         </div>
-
         {/* ── Search + filter bar — full width above the grid ── */}
         <div className="space-y-3 mb-6">
           <SearchBar
@@ -262,6 +262,11 @@ export default function InventoryPage() {
 
           {/* ── Center: main content area ── */}
           <div className="flex-1 min-w-0 space-y-4">
+            {isWeekendView && 
+              <div className="rounded-xl border border-pantry-amber/40 bg-pantry-amber/15 px-4 py-2 text-sm font-medium text-pantry-green text-center font-bold">
+                Stock may vary during weekend.
+              </div>
+            }
 
             {/* ── Content states ── */}
 
