@@ -69,36 +69,6 @@ function SkeletonGrid({ count = 6, shimmer = false }: { count?: number; shimmer?
 const AI_RECIPES_STORAGE_KEY = "pantry_ai_recipes";
 const AI_RECIPES_BACK_KEY = "pantry_ai_recipes_back";
 
-// ── Section heading ───────────────────────────────────────────────────────────
-function SectionHeading({
-  title,
-  count,
-  accent,
-  loading,
-}: {
-  title: string;
-  count?: number;
-  accent: string;
-  loading?: boolean;
-}) {
-  return (
-    <div className="flex items-center gap-3">
-      <h2 className="font-semibold text-foreground text-base">{title}</h2>
-      {loading ? (
-        <span className="flex items-center gap-1.5 text-xs text-muted">
-          <svg className="animate-spin w-3 h-3" viewBox="0 0 24 24" fill="none">
-            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
-          </svg>
-          Building…
-        </span>
-      ) : count !== undefined && count > 0 ? (
-        <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${accent}`}>{count}</span>
-      ) : null}
-    </div>
-  );
-}
-
 // ── Browse all recipes (no selection) ────────────────────────────────────────
 function BrowseRecipes() {
   const [recipes, setRecipes] = useState<ScoredRecipe[]>([]);
@@ -366,14 +336,15 @@ function RecipesContent() {
 
             {/* DB results — only matched recipes when coming from Find recipes */}
             {!dbLoading && (
-              <div className="space-y-8">
+              <>
                 {matched.length > 0 ? (
                   <section className="space-y-4">
-                    <SectionHeading
-                      title="Best matches"
-                      count={matched.length}
-                      accent="text-pantry-green bg-pantry-green/12"
-                    />
+                    <div className="text-center space-y-1">
+                      <h2 className="text-3xl sm:text-4xl font-semibold text-foreground" style={{ fontFamily: "var(--font-display)" }}>
+                        Best matches
+                      </h2>
+                      <p className="text-sm text-muted">{matched.length} recipe{matched.length !== 1 ? "s" : ""}</p>
+                    </div>
                     <RecipeCardGrid className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                       {matched.map((r) => (
                         <RecipeCardItem key={r.id}>
@@ -388,63 +359,77 @@ function RecipesContent() {
                     <p className="text-sm text-muted">Try removing the difficulty filter or changing the search.</p>
                   </div>
                 )}
-              </div>
+
+                {/* Divider — less gap below (before Suggested for you) */}
+                <div className="pt-4 pb-2 sm:pt-5 sm:pb-2" aria-hidden>
+                  <div className="border-t border-border" />
+                </div>
+
+                {/* Suggested for you */}
+                <section className="space-y-4">
+                  <div className="text-center">
+                    <h2 className="text-3xl sm:text-4xl font-semibold text-foreground" style={{ fontFamily: "var(--font-display)" }}>
+                      Suggested for you
+                    </h2>
+                    <div className="mt-4 space-y-2">
+                      {aiLoading && (
+                        <span className="flex items-center justify-center gap-1.5 text-sm text-muted">
+                          <svg className="animate-spin w-4 h-4" viewBox="0 0 24 24" fill="none">
+                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
+                          </svg>
+                          Building…
+                        </span>
+                      )}
+                      {aiDone && !aiLoading && (
+                        <div className="flex flex-col items-center gap-2">
+                          <p className="text-sm text-muted">
+                            {aiRecipes.length} recipe{aiRecipes.length !== 1 ? "s" : ""} built around your ingredients
+                          </p>
+                          {aiRecipes.length > 0 && (
+                            <button
+                              type="button"
+                              onClick={() => generateAI(displayNames)}
+                              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-full text-sm font-semibold border-2 border-pantry-green text-pantry-green bg-pantry-green/10 hover:bg-pantry-green/20 transition-colors cursor-pointer"
+                            >
+                              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                              </svg>
+                              Regenerate
+                            </button>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {aiLoading && <SkeletonGrid count={3} />}
+
+                  {aiError && !aiLoading && (
+                    <div className="rounded-2xl border border-border bg-surface-card p-8 text-center space-y-3">
+                      <p className="text-sm text-muted">{aiError}</p>
+                      <button
+                        type="button"
+                        onClick={() => generateAI(displayNames)}
+                        className="inline-flex items-center gap-1.5 text-xs font-semibold text-pantry-green hover:underline"
+                      >
+                        Try again
+                      </button>
+                    </div>
+                  )}
+
+                  {aiDone && !aiLoading && (
+                    <RecipeCardGrid className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                      {aiRecipes.map((r) => (
+                        <RecipeCardItem key={r.id}>
+                          <RecipeCard recipe={r} href={`/recipes/generated/${r.id}`} />
+                        </RecipeCardItem>
+                      ))}
+                    </RecipeCardGrid>
+                  )}
+                </section>
+              </>
             )}
-
-            {/* Divider */}
-            {!dbLoading && <div className="border-t border-border" />}
-
-            {/* Generated suggestions section */}
-            <section className="rounded-3xl bg-pantry-green/5 border border-pantry-green/10 px-6 py-7 space-y-4">
-              <div className="flex items-start justify-between gap-4">
-                <div className="space-y-0.5">
-                  <SectionHeading
-                    title="✨ Suggested for you"
-                    count={aiDone ? aiRecipes.length : undefined}
-                    accent="text-pantry-green bg-pantry-green/12"
-                    loading={aiLoading}
-                  />
-                  <p className="text-xs text-muted">
-                    Recipes built specifically around your ingredients
-                  </p>
-                </div>
-                {aiDone && (
-                  <button
-                    onClick={() => generateAI(displayNames)}
-                    className="shrink-0 inline-flex items-center gap-1.5 text-xs text-muted hover:text-foreground transition-colors mt-1"
-                  >
-                    <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                    </svg>
-                    Regenerate
-                  </button>
-                )}
-              </div>
-
-              {aiLoading && <SkeletonGrid count={3} />}
-
-              {aiError && !aiLoading && (
-                <div className="rounded-2xl border border-border bg-surface-card p-8 text-center space-y-3">
-                  <p className="text-sm text-muted">{aiError}</p>
-                  <button
-                    onClick={() => generateAI(displayNames)}
-                    className="inline-flex items-center gap-1.5 text-xs font-semibold text-pantry-green hover:underline"
-                  >
-                    Try again
-                  </button>
-                </div>
-              )}
-
-              {aiDone && !aiLoading && (
-                <RecipeCardGrid className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {aiRecipes.map((r) => (
-                    <RecipeCardItem key={r.id}>
-                      <RecipeCard recipe={r} generated href={`/recipes/generated/${r.id}`} />
-                    </RecipeCardItem>
-                  ))}
-                </RecipeCardGrid>
-              )}
-            </section>
           </>
         )}
 

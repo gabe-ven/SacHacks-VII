@@ -49,16 +49,17 @@ export default function RecipeFilters({
         />
       </div>
 
-      {/* Difficulty pills */}
+      {/* Difficulty pills — same hover as inventory FilterPanel categories */}
       <div className="flex gap-1.5 shrink-0">
         {DIFFICULTIES.map((d) => (
           <button
             key={d}
+            type="button"
             onClick={() => onDifficultyChange(d)}
-            className={`px-3.5 py-2 rounded-full text-xs font-semibold transition-colors focus:outline-none cursor-pointer ${
+            className={`inline-flex items-center px-3.5 py-1.5 rounded-full text-sm font-medium border transition-colors duration-150 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-pantry-green ${
               difficulty === d
-                ? "bg-pantry-green text-white"
-                : "border border-border text-muted bg-surface-card hover:border-pantry-green/40 hover:text-pantry-green"
+                ? "border-transparent bg-pantry-green text-pantry-cream"
+                : "border-border text-muted bg-transparent hover:border-pantry-green hover:text-pantry-green"
             }`}
           >
             {d}
@@ -66,12 +67,12 @@ export default function RecipeFilters({
         ))}
       </div>
 
-      {/* Sort */}
+      {/* Sort — same hover as inventory pills */}
       <div className="relative shrink-0 group">
         <select
           value={sortKey}
           onChange={(e) => onSortChange(e.target.value as SortKey)}
-          className="appearance-none pl-4 pr-9 py-2.5 rounded-full border border-border bg-surface-card text-sm text-muted font-medium focus:outline-none transition-colors cursor-pointer hover:border-pantry-green/40 hover:text-pantry-green"
+          className="appearance-none pl-4 pr-9 py-2.5 rounded-full border border-border bg-transparent text-sm font-medium text-muted transition-colors duration-150 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-pantry-green hover:border-pantry-green hover:text-pantry-green"
         >
           {(Object.keys(SORT_LABELS) as SortKey[]).map((k) => (
             <option key={k} value={k}>{SORT_LABELS[k]}</option>

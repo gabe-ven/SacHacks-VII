@@ -9,8 +9,6 @@ interface Props {
   onSelect?: () => void;
   /** When provided, card links to this href (e.g. /recipes/generated/ai-1) */
   href?: string;
-  /** Shows a "Made for you" pill — use for custom-generated recipes */
-  generated?: boolean;
 }
 
 // Match badge — bottom right of card; green (high) / amber (medium) / coral (low), consistent with app colors
@@ -48,7 +46,7 @@ function DifficultyBadge({ difficulty }: { difficulty: Recipe["difficulty"] }) {
 const CARD_CLS =
   "group flex flex-col bg-surface-card border border-border rounded-2xl overflow-hidden hover:shadow-lg hover:border-pantry-green/30 transition-all duration-300 hover:-translate-y-0.5";
 
-function CardBody({ recipe, matchScore, generated }: { recipe: Recipe; matchScore?: number; generated?: boolean }) {
+function CardBody({ recipe, matchScore }: { recipe: Recipe; matchScore?: number }) {
   return (
     <>
       {/* Image area */}
@@ -58,11 +56,6 @@ function CardBody({ recipe, matchScore, generated }: { recipe: Recipe; matchScor
           alt={recipe.title}
           className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
         />
-        {generated && (
-          <span className="absolute top-2.5 left-2.5 z-10 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-black/40 text-white backdrop-blur-sm">
-            Made for you
-          </span>
-        )}
       </div>
 
       {/* Content */}
@@ -95,7 +88,7 @@ function CardBody({ recipe, matchScore, generated }: { recipe: Recipe; matchScor
   );
 }
 
-export default function RecipeCard({ recipe, matchScore, onSelect, href, generated }: Props) {
+export default function RecipeCard({ recipe, matchScore, onSelect, href }: Props) {
   if (onSelect) {
     return (
       <div
@@ -105,7 +98,7 @@ export default function RecipeCard({ recipe, matchScore, onSelect, href, generat
         onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && onSelect()}
         className={`${CARD_CLS} cursor-pointer`}
       >
-        <CardBody recipe={recipe} matchScore={matchScore} generated={generated} />
+        <CardBody recipe={recipe} matchScore={matchScore} />
       </div>
     );
   }
@@ -113,7 +106,7 @@ export default function RecipeCard({ recipe, matchScore, onSelect, href, generat
   const linkHref = href ?? `/recipes/${recipe.id}`;
   return (
     <Link href={linkHref} className={CARD_CLS}>
-      <CardBody recipe={recipe} matchScore={matchScore} generated={generated} />
+      <CardBody recipe={recipe} matchScore={matchScore} />
     </Link>
   );
 }

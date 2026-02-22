@@ -46,34 +46,24 @@ function findIngredientId(name: string, ingredientMap: Map<string, string>): str
   return null;
 }
 
-/** Searches TheMealDB for a food image matching the recipe name. Returns "" on miss. */
-async function fetchMealImage(recipeName: string): Promise<string> {
-  // Try progressively shorter keyword extracts from the recipe name
-  const stopWords = new Set([
-    "with","and","in","on","the","a","an","of","for","from",
-    "over","under","style","sauce","soup","salad","stir","fry",
-  ]);
-  const words = recipeName
-    .toLowerCase()
-    .split(/[\s\-,]+/)
-    .filter((w) => w.length > 2 && !stopWords.has(w));
-
-  for (const keyword of words.slice(0, 3)) {
-    try {
-      const res = await fetch(
-        `https://www.themealdb.com/api/json/v1/1/search.php?s=${encodeURIComponent(keyword)}`,
-        { next: { revalidate: 86400 } }
-      );
-      if (!res.ok) continue;
-      const data = await res.json();
-      if (data.meals && data.meals.length > 0) {
-        return (data.meals[0].strMealThumb as string) + "/preview";
-      }
-    } catch {
-      // ignore network errors, try next keyword
-    }
+/** Generates an image for the recipe using DALL·E 3. Returns URL or "" on error. */
+async function generateRecipeImage(recipeName: string, ingredients: string[]): Promise<string> {
+  try {
+    const shortList = ingredients.slice(0, 5).join(", ");
+    const prompt = `Appetizing, well-lit photo of "${recipeName}"${shortList ? ` with ${shortList}` : ""}. Home cooking style, single dish on a plate or in a bowl, no text, photorealistic.`;
+    const resp = await openai.images.generate({
+      model: "dall-e-3",
+      prompt,
+      n: 1,
+      size: "1024x1024",
+      quality: "standard",
+      response_format: "url",
+    });
+    const url = resp.data?.[0]?.url;
+    return typeof url === "string" ? url : "";
+  } catch {
+    return "";
   }
-  return "";
 }
 
 // ── POST /api/generate-recipes ─────────────────────────────────────────────
@@ -137,8 +127,11 @@ Respond ONLY with valid JSON:
       return NextResponse.json({ error: "No recipes returned" }, { status: 500 });
     }
 
-    // Fetch images in parallel from TheMealDB
-    const images = await Promise.all(generated.map((r) => fetchMealImage(r.name)));
+    const images = await Promise.all(
+      generated.map((r) =>
+        generateRecipeImage(r.name, [...r.haveIngredients, ...r.needIngredients])
+      )
+    );
 
     const recipesForClient = generated.map((r, i) => ({
       ...r,
