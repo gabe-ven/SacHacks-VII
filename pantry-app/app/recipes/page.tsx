@@ -323,11 +323,8 @@ function RecipesContent() {
                   type="button"
                   onClick={() => router.push("/recipes")}
                   aria-label="Clear selection"
-                  className="inline-flex items-center gap-1.5 rounded-full border border-border bg-surface-card px-2.5 py-1 text-[10px] font-semibold text-muted transition-colors cursor-pointer hover:border-pantry-coral/50 hover:bg-pantry-coral/10 hover:!text-pantry-coral focus:outline-none focus-visible:ring-2 focus-visible:ring-pantry-coral focus-visible:ring-offset-2"
+                  className="text-[10px] font-semibold text-muted underline underline-offset-2 transition-colors cursor-pointer hover:!text-[#dc2626] focus:outline-none focus-visible:ring-2 focus-visible:ring-pantry-coral focus-visible:ring-offset-2 rounded"
                 >
-                  <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5} aria-hidden>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                  </svg>
                   Clear
                 </button>
               </div>
