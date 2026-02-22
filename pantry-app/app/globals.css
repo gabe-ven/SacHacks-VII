@@ -40,6 +40,9 @@
 
   --hero-gradient: linear-gradient(to right, #fff 42%, rgba(255,255,255,0.85) 60%, rgba(255,255,255,0.35) 78%, transparent 100%);
   --hero-vignette: linear-gradient(to bottom, rgba(255,255,255,0.3), transparent 50%, rgba(255,255,255,0.6));
+
+  --search-bg: #f3f4f6;
+  --search-border: #d1d5db;
 }
 
 [data-theme="dark"] {
@@ -49,6 +52,9 @@
   --surface-card: #1a1a1a;
   --border: rgba(255, 255, 255, 0.07);
   --muted: rgba(255, 255, 255, 0.4);
+
+  --search-bg: var(--surface-card);
+  --search-border: rgba(255, 255, 255, 0.18);
 
   --hero-gradient: linear-gradient(to right, #0d0d0d 42%, rgba(13,13,13,0.85) 60%, rgba(13,13,13,0.35) 78%, transparent 100%);
   --hero-vignette: linear-gradient(to bottom, rgba(13,13,13,0.4), transparent 50%, rgba(13,13,13,0.6));
