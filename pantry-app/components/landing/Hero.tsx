@@ -67,13 +67,13 @@ export default function Hero() {
           </motion.div>
 
           {/* Headline — 3D flip in per line */}
-          <div style={{ perspective: "800px" }}>
+          <div style={{ perspective: "800px" }} className="mb-10 sm:mb-14">
             <motion.h1
               initial={{ opacity: 0, rotateX: 20, y: 30 }}
               animate={{ opacity: 1, rotateX: 0, y: 0 }}
               transition={{ ...spring, delay: 0.15 }}
               style={{ transformOrigin: "top left", fontFamily: "var(--font-display)" }}
-              className="text-5xl sm:text-6xl md:text-7xl leading-[1.05] tracking-tight"
+              className="text-5xl sm:text-6xl md:text-7xl leading-[1.12] tracking-tight"
             >
               <span className="text-pantry-green">No student</span>
               <br />
@@ -93,7 +93,7 @@ export default function Hero() {
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.45, ease }}
-            className="mt-4 max-w-sm text-sm sm:text-base text-muted leading-relaxed"
+            className="mt-6 max-w-sm text-sm sm:text-base text-muted leading-relaxed"
           >
             Turn your Pantry haul into a real meal — free, no questions asked, just your Aggie ID.
           </motion.p>

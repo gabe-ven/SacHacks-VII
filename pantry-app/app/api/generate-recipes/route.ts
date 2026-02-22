@@ -46,6 +46,36 @@ function findIngredientId(name: string, ingredientMap: Map<string, string>): str
   return null;
 }
 
+/** Searches TheMealDB for a food image matching the recipe name. Returns "" on miss. */
+async function fetchMealImage(recipeName: string): Promise<string> {
+  // Try progressively shorter keyword extracts from the recipe name
+  const stopWords = new Set([
+    "with","and","in","on","the","a","an","of","for","from",
+    "over","under","style","sauce","soup","salad","stir","fry",
+  ]);
+  const words = recipeName
+    .toLowerCase()
+    .split(/[\s\-,]+/)
+    .filter((w) => w.length > 2 && !stopWords.has(w));
+
+  for (const keyword of words.slice(0, 3)) {
+    try {
+      const res = await fetch(
+        `https://www.themealdb.com/api/json/v1/1/search.php?s=${encodeURIComponent(keyword)}`,
+        { next: { revalidate: 86400 } }
+      );
+      if (!res.ok) continue;
+      const data = await res.json();
+      if (data.meals && data.meals.length > 0) {
+        return (data.meals[0].strMealThumb as string) + "/preview";
+      }
+    } catch {
+      // ignore network errors, try next keyword
+    }
+  }
+  return "";
+}
+
 // ── POST /api/generate-recipes ─────────────────────────────────────────────
 
 export async function POST(req: NextRequest) {
@@ -104,10 +134,17 @@ Respond ONLY with valid JSON:
     const generated = parsed.recipes ?? [];
 
     if (generated.length === 0) {
-      return NextResponse.json({ error: "OpenAI returned no recipes" }, { status: 500 });
+      return NextResponse.json({ error: "No recipes returned" }, { status: 500 });
     }
 
-    const recipesForClient = generated.map((r, i) => ({ ...r, id: -(i + 1) }));
+    // Fetch images in parallel from TheMealDB
+    const images = await Promise.all(generated.map((r) => fetchMealImage(r.name)));
+
+    const recipesForClient = generated.map((r, i) => ({
+      ...r,
+      id: -(i + 1),
+      image_url: images[i] ?? "",
+    }));
 
     // Attempt background save — silently ignored if RLS blocks it
     persistToSupabase(generated, items).catch(() => {});

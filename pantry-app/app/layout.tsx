@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import { Dancing_Script, Rubik } from "next/font/google";
+import localFont from "next/font/local";
+import { Rubik } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -18,11 +19,10 @@ const rubik = Rubik({
   variable: "--font-rubik",
 });
 
-const dancingScript = Dancing_Script({
-  subsets: ["latin"],
-  weight: ["700"],
+const zingScript = localFont({
+  src: "../public/fonts/zingscriptrustr_baseg.otf",
+  variable: "--font-display",
   display: "swap",
-  variable: "--font-dancing-script",
 });
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -30,7 +30,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html
       lang="en"
       suppressHydrationWarning
-      className={`${rubik.variable} ${dancingScript.variable}`}
+      className={`${rubik.variable} ${zingScript.variable}`}
     >
       <body className={`${rubik.className} min-h-screen flex flex-col bg-background text-foreground`}>
         <ThemeProvider>

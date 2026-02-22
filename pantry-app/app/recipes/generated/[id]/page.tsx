@@ -1,32 +1,71 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import Link from "next/link";
-import { notFound } from "next/navigation";
-import { getRecipeById } from "@/lib/getRecipes";
+import { useParams, useRouter } from "next/navigation";
 import RecipeSteps from "@/components/recipes/RecipeSteps";
 import RecipeImage from "@/components/recipes/RecipeImage";
+import type { Recipe } from "@/types/recipe";
 
-export default async function RecipeDetailPage({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}) {
-  const { id } = await params;
-  const recipe = await getRecipeById(id);
-  if (!recipe) notFound();
+const STORAGE_KEY = "pantry_ai_recipes";
+const BACK_KEY = "pantry_ai_recipes_back";
+
+export default function GeneratedRecipePage() {
+  const params = useParams();
+  const router = useRouter();
+  const id = params.id as string;
+  const [recipe, setRecipe] = useState<Recipe | null>(null);
+  const [loaded, setLoaded] = useState(false);
+  const [backHref, setBackHref] = useState("/recipes");
+
+  useEffect(() => {
+    try {
+      const raw = typeof window !== "undefined" ? window.sessionStorage.getItem(STORAGE_KEY) : null;
+      const back = typeof window !== "undefined" ? window.sessionStorage.getItem(BACK_KEY) : null;
+      if (back) setBackHref(back.startsWith("?") ? `/recipes${back}` : `/recipes?${back}`);
+
+      if (!raw) {
+        router.replace("/recipes");
+        return;
+      }
+      const list: Recipe[] = JSON.parse(raw);
+      const found = list.find((r) => r.id === id);
+      if (!found) {
+        router.replace("/recipes");
+        return;
+      }
+      setRecipe(found);
+    } catch {
+      router.replace("/recipes");
+    } finally {
+      setLoaded(true);
+    }
+  }, [id, router]);
+
+  if (!loaded) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <p className="text-sm text-muted">Loading…</p>
+      </div>
+    );
+  }
+
+  if (!recipe) return null;
 
   const difficultyStyle =
     recipe.difficulty === "Easy"
       ? "bg-pantry-green/15 text-pantry-green-dark border-pantry-green/25"
       : recipe.difficulty === "Medium"
-        ? "bg-pantry-amber/15 text-pantry-amber-dark border-pantry-amber/25"
-        : "bg-pantry-coral/15 text-pantry-coral-dark border-pantry-coral/25";
+      ? "bg-pantry-amber/15 text-pantry-amber-dark border-pantry-amber/25"
+      : "bg-pantry-coral/15 text-pantry-coral-dark border-pantry-coral/25";
 
   return (
     <div className="min-h-screen bg-background">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 py-10 space-y-8">
 
-        {/* Back link */}
+        {/* Back link — same as /recipes/[id] */}
         <Link
-          href="/recipes"
+          href={backHref}
           className="inline-flex items-center gap-1.5 text-sm text-muted hover:text-foreground transition-colors"
         >
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} aria-hidden="true">
@@ -70,12 +109,10 @@ export default async function RecipeDetailPage({
           />
         </div>
 
-        {/* Two-column layout */}
+        {/* Two-column layout — clean, no boxes */}
         <div className="grid grid-cols-1 sm:grid-cols-[1fr_300px] gap-10 items-start">
 
-          {/* Left: instructions + substitutions — no boxes */}
           <div className="space-y-12">
-
             <section>
               <h2 className="text-sm font-semibold uppercase tracking-widest text-muted mb-10">Instructions</h2>
               <RecipeSteps steps={recipe.instructions} />
@@ -96,7 +133,6 @@ export default async function RecipeDetailPage({
             )}
           </div>
 
-          {/* Right: ingredients — organized with clear spacing */}
           <aside className="sm:pt-0 pt-2 sm:border-l sm:border-border sm:pl-10 sticky top-6 space-y-8">
             <div className="pb-4 border-b border-border">
               <h2 className="text-base font-semibold text-foreground">Ingredients</h2>
@@ -145,8 +181,6 @@ export default async function RecipeDetailPage({
             })()}
           </aside>
         </div>
-
-
       </div>
     </div>
   );
