@@ -1,8 +1,8 @@
 import { supabase } from "@/lib/supabase";
-import type { InventoryItem, StockStatus } from "@/types/inventory";
+import type { InventoryItem } from "@/types/inventory";
 
 type DailyInventoryRow = {
-  stock_status: StockStatus;
+  in_stock: boolean;
   ingredient: {
     id: string;
     name: string;
@@ -14,7 +14,7 @@ type DailyInventoryRow = {
 export async function getDailyInventory(dayOfWeek: number): Promise<InventoryItem[]> {
   const { data, error } = await supabase
     .from("daily_inventory")
-    .select("day_of_week, stock_status, ingredient:ingredients(id,name,category,item_tags)")
+    .select("in_stock, ingredient:ingredients(id,name,category,item_tags)")
     .eq("day_of_week", dayOfWeek);
 
   if (error) throw new Error(error.message);
@@ -28,7 +28,7 @@ export async function getDailyInventory(dayOfWeek: number): Promise<InventoryIte
         id: row.ingredient.id,
         name: row.ingredient.name,
         category: row.ingredient.category,
-        stockStatus: row.stock_status,
+        stockStatus: row.in_stock ? "in_stock" : "out_of_stock",
         tags: row.ingredient.item_tags ?? [],
       } satisfies InventoryItem;
     })

@@ -78,7 +78,11 @@ export default function SelectedItemsPanel({
               className="flex items-center gap-2.5 bg-surface rounded-xl border border-border overflow-hidden shadow-sm"
             >
               {/* Category color strip */}
-              <div className="w-1 self-stretch bg-pantry-amber shrink-0" aria-hidden="true" />
+              <div
+                className="w-1 self-stretch shrink-0"
+                style={{ backgroundColor: (CATEGORY_META[item.category] ?? { color: "#DDBE86" }).color }}
+                aria-hidden="true"
+              />
 
               {/* Name + category */}
               <div className="flex-1 min-w-0 py-2.5">

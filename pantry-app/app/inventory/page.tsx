@@ -166,13 +166,13 @@ export default function InventoryPage() {
   }, []);
 
   // ── Navigation ────────────────────────────────────────────────────────────
-  // Passes selected item IDs to /recipes via query string so the recipes page
-  // can read them with useSearchParams() or equivalent.
+  // Passes selected item names to /recipes via query string for ingredient matching.
   const handleFindRecipes = useCallback(() => {
     if (selectedIds.size === 0) return;
-    const ids = [...selectedIds].join(",");
-    router.push(`/recipes?items=${ids}`);
-  }, [selectedIds, router]);
+    const selectedItems = inventory.filter((item) => selectedIds.has(item.id));
+    const names = selectedItems.map((item) => encodeURIComponent(item.name)).join(",");
+    router.push(`/recipes?items=${names}`);
+  }, [selectedIds, inventory, router]);
 
   // ── Render ────────────────────────────────────────────────────────────────
   return (
