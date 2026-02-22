@@ -9,6 +9,7 @@ import { getRecipes, scoreRecipe } from "@/lib/getRecipes";
 import type { Recipe } from "@/types/recipe";
 import RecipeCard from "@/components/recipes/RecipeCard";
 import RecipeFilters, { type SortKey } from "@/components/recipes/RecipeFilters";
+import { RecipeCardGrid, RecipeCardItem } from "@/components/landing/animations";
 
 // ── Types ────────────────────────────────────────────────────────────────────
 type ScoredRecipe = Recipe & { matchScore: number };
@@ -144,9 +145,13 @@ function BrowseRecipes() {
         </div>
       )}
       {!loading && displayed.length > 0 && (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {displayed.map((r) => <RecipeCard key={r.id} recipe={r} />)}
-        </div>
+        <RecipeCardGrid className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {displayed.map((r) => (
+            <RecipeCardItem key={r.id}>
+              <RecipeCard recipe={r} />
+            </RecipeCardItem>
+          ))}
+        </RecipeCardGrid>
       )}
     </div>
   );
@@ -369,9 +374,13 @@ function RecipesContent() {
                       count={matched.length}
                       accent="text-pantry-green bg-pantry-green/12"
                     />
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                      {matched.map((r) => <RecipeCard key={r.id} recipe={r} matchScore={r.matchScore} />)}
-                    </div>
+                    <RecipeCardGrid className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                      {matched.map((r) => (
+                        <RecipeCardItem key={r.id}>
+                          <RecipeCard recipe={r} matchScore={r.matchScore} />
+                        </RecipeCardItem>
+                      ))}
+                    </RecipeCardGrid>
                   </section>
                 ) : (
                   <div className="rounded-2xl border border-border bg-surface-card p-10 text-center space-y-1">
@@ -427,11 +436,13 @@ function RecipesContent() {
               )}
 
               {aiDone && !aiLoading && (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                <RecipeCardGrid className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                   {aiRecipes.map((r) => (
-                    <RecipeCard key={r.id} recipe={r} generated href={`/recipes/generated/${r.id}`} />
+                    <RecipeCardItem key={r.id}>
+                      <RecipeCard recipe={r} generated href={`/recipes/generated/${r.id}`} />
+                    </RecipeCardItem>
                   ))}
-                </div>
+                </RecipeCardGrid>
               )}
             </section>
           </>
