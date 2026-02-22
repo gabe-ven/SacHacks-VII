@@ -11,19 +11,19 @@ interface Props {
   href?: string;
 }
 
-// Match badge — bottom right of card; green (high) / amber (medium) / coral (low), consistent with app colors
+// Match badge — solid theme colors so it stands out (green / amber / coral)
 function MatchBadge({ score }: { score: number }) {
   const cls =
     score >= 75
-      ? "bg-pantry-green/15 text-pantry-green-dark border border-pantry-green/25"
+      ? "bg-pantry-green text-pantry-cream"
       : score >= 40
-      ? "bg-pantry-amber/15 text-pantry-amber-dark border border-pantry-amber/25"
-      : "bg-pantry-coral/15 text-pantry-coral-dark border border-pantry-coral/25";
+      ? "bg-pantry-amber text-foreground"
+      : "bg-pantry-coral text-pantry-cream";
 
   return (
-    <span className={`inline-flex flex-col items-center justify-center rounded-lg min-w-[2.5rem] px-2 py-1 ${cls}`}>
+    <span className={`inline-flex flex-col items-center justify-center rounded-lg min-w-[2.5rem] px-2 py-1 shadow-sm ${cls}`}>
       <span className="text-sm font-bold leading-none tabular-nums">{score}%</span>
-      <span className="text-[8px] font-semibold uppercase tracking-wider opacity-90">match</span>
+      <span className="text-[8px] font-semibold uppercase tracking-wider opacity-95">match</span>
     </span>
   );
 }
