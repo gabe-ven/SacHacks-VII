@@ -35,8 +35,18 @@ export default async function RecipeDetailPage({
           Back to recipes
         </Link>
 
-        {/* Recipe info — clean, no box */}
-        <div className="space-y-4">
+        {/* Hero image — full size */}
+        <div className="w-full h-56 sm:h-80 rounded-2xl overflow-hidden relative bg-pantry-green/10">
+          <RecipeImage
+            src={recipe.image}
+            alt={recipe.title}
+            className="absolute inset-0 w-full h-full object-cover"
+            large
+          />
+        </div>
+
+        {/* Recipe info — below image */}
+        <div className="space-y-3">
           <div className="flex flex-wrap items-center gap-3">
             <span className={`px-4 py-2 rounded-full text-sm font-semibold border ${difficultyStyle}`}>
               {recipe.difficulty}
@@ -60,34 +70,25 @@ export default async function RecipeDetailPage({
           </h1>
         </div>
 
-        {/* Hero image */}
-        <div className="w-full h-56 sm:h-80 rounded-2xl overflow-hidden relative bg-pantry-green/10">
-          <RecipeImage
-            src={recipe.image}
-            alt={recipe.title}
-            className="absolute inset-0 w-full h-full object-cover"
-            large
-          />
-        </div>
+        {/* Two-column layout — compact for high efficiency */}
+        <div className="grid grid-cols-1 sm:grid-cols-[1fr_240px] gap-6 sm:gap-8 items-start">
 
-        {/* Two-column layout */}
-        <div className="grid grid-cols-1 sm:grid-cols-[1fr_300px] gap-10 items-start">
-
-          {/* Left: instructions + substitutions — no boxes */}
-          <div className="space-y-12">
-
+          {/* Left: instructions + substitutions */}
+          <div className="space-y-6">
             <section>
-              <h2 className="text-sm font-semibold uppercase tracking-widest text-muted mb-10">Instructions</h2>
-              <RecipeSteps steps={recipe.instructions} />
+              <h2 className="text-xs font-semibold uppercase tracking-widest text-muted mb-2">Instructions</h2>
+              <div className="pt-6">
+                <RecipeSteps steps={recipe.instructions} />
+              </div>
             </section>
 
             {recipe.substitutions.length > 0 && (
               <section>
-                <h2 className="text-sm font-semibold uppercase tracking-widest text-muted mb-4">Inventory substitutions</h2>
-                <ul className="space-y-2.5">
+                <h2 className="text-xs font-semibold uppercase tracking-widest text-muted mb-2">Substitutions</h2>
+                <ul className="space-y-1.5">
                   {recipe.substitutions.map((sub, i) => (
-                    <li key={i} className="flex items-start gap-3 text-base text-foreground/80 leading-relaxed">
-                      <span className="shrink-0 mt-2 w-1.5 h-1.5 rounded-full bg-pantry-amber/80" />
+                    <li key={i} className="flex items-start gap-2 text-sm text-foreground/80 leading-snug">
+                      <span className="shrink-0 mt-1.5 w-1 h-1 rounded-full bg-pantry-amber/80" />
                       {sub}
                     </li>
                   ))}
@@ -96,11 +97,11 @@ export default async function RecipeDetailPage({
             )}
           </div>
 
-          {/* Right: ingredients — organized with clear spacing */}
-          <aside className="sm:pt-0 pt-2 sm:border-l sm:border-border sm:pl-10 sticky top-6 space-y-8">
-            <div className="pb-4 border-b border-border">
-              <h2 className="text-base font-semibold text-foreground">Ingredients</h2>
-              <p className="text-sm text-muted mt-0.5 tabular-nums">{recipe.ingredients.length} items</p>
+          {/* Right: ingredients — compact list */}
+          <aside className="sm:pt-0 pt-4 sm:border-l sm:border-border sm:pl-6 sticky top-6 space-y-4">
+            <div className="pb-2 border-b border-border">
+              <h2 className="text-sm font-semibold text-foreground">Ingredients</h2>
+              <p className="text-xs text-muted tabular-nums mt-0.5">{recipe.ingredients.length} items</p>
             </div>
 
             {(() => {
@@ -115,12 +116,12 @@ export default async function RecipeDetailPage({
               return (
                 <>
                   {have.length > 0 && (
-                    <div className="space-y-3">
-                      <p className="text-xs font-semibold uppercase tracking-wider text-pantry-green">What I have</p>
-                      <ul className="space-y-3">
+                    <div className="space-y-1.5">
+                      <p className="text-[10px] font-semibold uppercase tracking-wider text-pantry-green">Have</p>
+                      <ul className="space-y-1.5">
                         {have.map((ing, i) => (
-                          <li key={`have-${i}`} className="flex items-start gap-3 text-sm leading-relaxed text-pantry-green font-medium">
-                            <span className="shrink-0 mt-2 w-2 h-2 rounded-full bg-pantry-green" />
+                          <li key={`have-${i}`} className="flex items-start gap-2 text-sm leading-snug text-pantry-green font-medium">
+                            <span className="shrink-0 mt-1.5 w-1.5 h-1.5 rounded-full bg-pantry-green" />
                             {ing}
                           </li>
                         ))}
@@ -128,12 +129,12 @@ export default async function RecipeDetailPage({
                     </div>
                   )}
                   {need.length > 0 && (
-                    <div className="space-y-3 pt-2">
-                      <p className="text-xs font-semibold uppercase tracking-wider text-muted">What I still need</p>
-                      <ul className="space-y-3">
+                    <div className="space-y-1.5 pt-1">
+                      <p className="text-[10px] font-semibold uppercase tracking-wider text-muted">Need</p>
+                      <ul className="space-y-1.5">
                         {need.map((ing, i) => (
-                          <li key={`need-${i}`} className="flex items-start gap-3 text-sm leading-relaxed text-foreground/75">
-                            <span className="shrink-0 mt-2 w-2 h-2 rounded-full bg-border" />
+                          <li key={`need-${i}`} className="flex items-start gap-2 text-sm leading-snug text-foreground/75">
+                            <span className="shrink-0 mt-1.5 w-1.5 h-1.5 rounded-full bg-border" />
                             {ing}
                           </li>
                         ))}
