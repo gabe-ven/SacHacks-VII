@@ -1,4 +1,4 @@
-# The Pantry at ASUCD — Recipe Finder
+# PantryPal
 
 **SacHacks VII** · Turn your Pantry picks into real meals.
 
