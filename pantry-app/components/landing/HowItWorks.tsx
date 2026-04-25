@@ -7,7 +7,7 @@ import { Reveal3D, spring, springBouncy } from "./animations";
 const steps = [
   { step: "1", title: "Visit the Pantry", body: "Walk in during open hours and swipe your student ID. No forms, no judgment.", color: "text-pantry-green", pill: "bg-pantry-green/10 text-pantry-green", shift: "ml-0 mr-auto", },
   { step: "2", title: "Pick Your Items", body: "3 points per student per day. Mix and match produce, snacks, canned goods, and more.", color: "text-pantry-amber", pill: "bg-pantry-amber/10 text-pantry-amber", shift: "sm:ml-[14%]", },
-  { step: "3", title: "Cook Something Real", body: "Tell us what you grabbed and we'll instantly generate a real recipe from it.", color: "text-pantry-coral", pill: "bg-pantry-coral/10 text-pantry-coral", shift: "sm:ml-[28%]", },
+  { step: "3", title: "Cook Something Real", body: "Tell us what you grabbed and we'll instantly match you with real pantry recipes.", color: "text-pantry-coral", pill: "bg-pantry-coral/10 text-pantry-coral", shift: "sm:ml-[28%]", },
 ];
 
 function Step({ step, title, body, color, pill, shift, index }: typeof steps[0] & { index: number }) {

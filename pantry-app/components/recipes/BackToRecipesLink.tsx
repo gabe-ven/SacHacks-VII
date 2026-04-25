@@ -2,9 +2,6 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
-
-const BACK_KEY = "pantry_ai_recipes_back";
 
 export default function BackToRecipesLink({
   className = "",
@@ -12,20 +9,10 @@ export default function BackToRecipesLink({
   className?: string;
 }) {
   const router = useRouter();
-  const [href, setHref] = useState("/recipes");
-
-  useEffect(() => {
-    try {
-      if (typeof window !== "undefined") {
-        const back = window.sessionStorage.getItem(BACK_KEY);
-        if (back) setHref(back.startsWith("?") ? `/recipes${back}` : `/recipes?${back}`);
-      }
-    } catch { /* ignore */ }
-  }, []);
 
   return (
     <Link
-      href={href}
+      href="/recipes"
       onClick={(e) => {
         e.preventDefault();
         router.back();

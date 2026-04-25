@@ -1,7 +1,6 @@
 "use client";
 
-import { Suspense, useEffect, useMemo, useRef, useState } from "react";
-import Link from "next/link";
+import { Suspense, useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
 import { getIngredientNames, getInventory } from "@/lib/getInventory";
@@ -11,34 +10,7 @@ import RecipeCard from "@/components/recipes/RecipeCard";
 import RecipeFilters, { type SortKey } from "@/components/recipes/RecipeFilters";
 import { RecipeCardGrid, RecipeCardItem } from "@/components/landing/animations";
 
-// ── Types ────────────────────────────────────────────────────────────────────
 type ScoredRecipe = Recipe & { matchScore: number };
-
-type AIRawRecipe = {
-  id: number;
-  name: string;
-  cookTime: string;
-  difficulty: "Easy" | "Medium" | "Hard";
-  haveIngredients: string[];
-  needIngredients: string[];
-  steps: string[];
-  image_url?: string;
-};
-
-function aiToRecipe(r: AIRawRecipe): ScoredRecipe {
-  return {
-    id: `ai-${-r.id}`,
-    title: r.name,
-    image: r.image_url ?? "",
-    cookTime: r.cookTime,
-    difficulty: r.difficulty,
-    ingredients: [...r.haveIngredients, ...r.needIngredients],
-    pantryIngredients: r.haveIngredients,
-    instructions: r.steps,
-    substitutions: [],
-    matchScore: 100,
-  };
-}
 
 function cookTimeMinutes(t: string): number {
   if (!t || t === "N/A") return Infinity;
@@ -46,19 +18,15 @@ function cookTimeMinutes(t: string): number {
   return m ? parseInt(m[1], 10) : Infinity;
 }
 
-// ── Skeleton cards ────────────────────────────────────────────────────────────
-function SkeletonGrid({ count = 6, shimmer = false }: { count?: number; shimmer?: boolean }) {
+function SkeletonGrid({ count = 6 }: { count?: number }) {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
       {Array.from({ length: count }).map((_, i) => (
-        <div
-          key={i}
-          className={`rounded-2xl border border-border overflow-hidden bg-surface-card ${shimmer ? "animate-pulse" : ""}`}
-        >
-          <div className={`h-40 ${shimmer ? "bg-border/40" : "bg-pantry-green/8"}`} />
+        <div key={i} className="rounded-2xl border border-border overflow-hidden bg-surface-card animate-pulse">
+          <div className="h-40 bg-border/40" />
           <div className="p-4 space-y-3">
-            <div className={`h-3.5 rounded-full w-3/4 ${shimmer ? "bg-border" : "bg-border/60"}`} />
-            <div className={`h-3 rounded-full w-1/2 ${shimmer ? "bg-border/70" : "bg-border/40"}`} />
+            <div className="h-3.5 rounded-full w-3/4 bg-border" />
+            <div className="h-3 rounded-full w-1/2 bg-border/70" />
           </div>
         </div>
       ))}
@@ -66,17 +34,22 @@ function SkeletonGrid({ count = 6, shimmer = false }: { count?: number; shimmer?
   );
 }
 
-const AI_RECIPES_BACK_KEY = "pantry_ai_recipes_back";
-/** Cache keyed by URL (?items=...) so we only restore recipes for this exact ingredient list. */
-const AI_RECIPES_CACHE_KEY = "pantry_ai_recipes_cache";
-const AI_CACHE_MAX_ENTRIES = 10;
+function SectionDivider({ label }: { label: string }) {
+  return (
+    <div className="flex items-center gap-4 py-2">
+      <div className="flex-1 h-px bg-border" />
+      <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted whitespace-nowrap">{label}</span>
+      <div className="flex-1 h-px bg-border" />
+    </div>
+  );
+}
 
 // ── Browse all recipes (no selection) ────────────────────────────────────────
 function BrowseRecipes({ dbIngredientNames }: { dbIngredientNames: string[] }) {
   const [recipes, setRecipes] = useState<ScoredRecipe[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
-  const [sortKey, setSortKey] = useState<SortKey>("match");
+  const [sortKey, setSortKey] = useState<SortKey>("alpha");
   const [difficulty, setDifficulty] = useState("All");
 
   useEffect(() => {
@@ -110,7 +83,7 @@ function BrowseRecipes({ dbIngredientNames }: { dbIngredientNames: string[] }) {
         onDifficultyChange={setDifficulty}
         ingredientSuggestions={dbIngredientNames}
       />
-      {loading && <SkeletonGrid count={9} shimmer />}
+      {loading && <SkeletonGrid count={9} />}
       {!loading && displayed.length === 0 && (
         <div className="rounded-2xl border border-border bg-surface-card p-12 text-center space-y-2">
           <p className="font-semibold text-pantry-green text-lg">No recipes found</p>
@@ -134,7 +107,6 @@ function BrowseRecipes({ dbIngredientNames }: { dbIngredientNames: string[] }) {
 function RecipesContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const searchString = searchParams.toString();
 
   const itemIds = useMemo(
     () =>
@@ -146,7 +118,6 @@ function RecipesContent() {
   );
   const hasSelection = itemIds.length > 0;
 
-  // ── DB recipes state ──────────────────────────────────────────────────────
   const [dbIngredientNames, setDbIngredientNames] = useState<string[]>([]);
   const [ingredientNames, setIngredientNames] = useState<string[]>([]);
   const [dbRecipes, setDbRecipes] = useState<ScoredRecipe[]>([]);
@@ -155,70 +126,16 @@ function RecipesContent() {
   const [sortKey, setSortKey] = useState<SortKey>("match");
   const [difficulty, setDifficulty] = useState("All");
 
-  // Load all ingredient names from DB once (for search autocomplete)
   useEffect(() => {
     getIngredientNames().then(setDbIngredientNames);
   }, []);
 
-  // ── AI recipes state ──────────────────────────────────────────────────────
-  const [aiRecipes, setAiRecipes] = useState<ScoredRecipe[]>([]);
-  const [aiLoading, setAiLoading] = useState(false);
-  const [aiError, setAiError] = useState<string | null>(null);
-  const [aiDone, setAiDone] = useState(false);
-  const aiRunning = useRef(false);
-
-  // Persist back URL whenever we have selection so "back" from any recipe returns to this list
-  useEffect(() => {
-    if (typeof window === "undefined" || !searchString) return;
-    try {
-      window.sessionStorage.setItem(AI_RECIPES_BACK_KEY, `?${searchString}`);
-    } catch { /* ignore */ }
-  }, [searchString]);
-
-  // Persist AI recipes keyed by current URL so we only restore for this exact ingredient list
-  useEffect(() => {
-    if (typeof window === "undefined" || !searchString || aiRecipes.length === 0) return;
-    try {
-      const key = `?${searchString}`;
-      const raw = window.sessionStorage.getItem(AI_RECIPES_CACHE_KEY);
-      const cache: Record<string, unknown> = raw ? JSON.parse(raw) : {};
-      cache[key] = aiRecipes;
-      const keys = Object.keys(cache);
-      if (keys.length > AI_CACHE_MAX_ENTRIES) {
-        keys.slice(0, keys.length - AI_CACHE_MAX_ENTRIES).forEach((k) => delete cache[k]);
-      }
-      window.sessionStorage.setItem(AI_RECIPES_CACHE_KEY, JSON.stringify(cache));
-    } catch { /* ignore */ }
-  }, [aiRecipes, searchString]);
-
-  // Load DB recipes + scores, then auto-trigger AI (or restore from sessionStorage when returning back)
   useEffect(() => {
     if (!hasSelection) return;
     let cancelled = false;
 
     async function load() {
-      const expectedBack = searchString ? `?${searchString}` : "";
-      let skipAI = false;
-      if (typeof window !== "undefined") {
-        try {
-          const raw = window.sessionStorage.getItem(AI_RECIPES_CACHE_KEY);
-          const cache = raw ? (JSON.parse(raw) as Record<string, unknown>) : {};
-          const cached = cache[expectedBack];
-          if (Array.isArray(cached) && cached.length > 0) {
-            skipAI = true;
-            setAiRecipes(cached as ScoredRecipe[]);
-            setAiDone(true);
-          }
-        } catch { /* ignore */ }
-      }
-
       setDbLoading(true);
-      if (!skipAI) {
-        setAiRecipes([]);
-        setAiDone(false);
-        setAiError(null);
-      }
-
       try {
         const [allItems, allRecipes] = await Promise.all([getInventory(), getRecipes()]);
         if (cancelled) return;
@@ -231,10 +148,7 @@ function RecipesContent() {
 
         const scored = allRecipes.map((r) => ({ ...r, matchScore: scoreRecipe(r, names) }));
         setDbRecipes(scored);
-        setDbLoading(false);
-
-        if (!cancelled && !skipAI) generateAI(names);
-      } catch {
+      } finally {
         if (!cancelled) setDbLoading(false);
       }
     }
@@ -244,37 +158,6 @@ function RecipesContent() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [itemIds.join(",")]);
 
-  async function generateAI(names: string[]) {
-    if (aiRunning.current) return;
-    aiRunning.current = true;
-    setAiLoading(true);
-    setAiError(null);
-    setAiDone(false);
-    setAiRecipes([]);
-    try {
-      const res = await fetch("/api/generate-recipes", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ items: names }),
-      });
-      const json = await res.json().catch(() => ({}));
-      if (!res.ok) {
-        const msg = typeof json?.error === "string" ? json.error : "Couldn't build suggestions — check your connection and try again.";
-        setAiError(msg);
-        return;
-      }
-      const raw: AIRawRecipe[] = json.recipes ?? [];
-      setAiRecipes(raw.map(aiToRecipe));
-      setAiDone(true);
-    } catch {
-      setAiError("Couldn't build suggestions — check your connection and try again.");
-    } finally {
-      setAiLoading(false);
-      aiRunning.current = false;
-    }
-  }
-
-  // Filter + sort DB recipes
   const displayedDb = useMemo(() => {
     let list = dbRecipes;
     if (search.trim()) {
@@ -294,15 +177,15 @@ function RecipesContent() {
   }, [dbRecipes, search, sortKey, difficulty]);
 
   const matched = displayedDb.filter((r) => r.matchScore > 0);
+  const unmatched = displayedDb.filter((r) => r.matchScore === 0);
   const displayNames = ingredientNames.length > 0 ? ingredientNames : itemIds;
 
   return (
     <div className="min-h-screen bg-background">
       <div className="max-w-screen-xl mx-auto px-4 sm:px-6 py-10 space-y-8">
 
-        {/* Hero */}
+        {/* Hero banner */}
         <div className="relative overflow-hidden rounded-3xl bg-pantry-green px-8 sm:px-10 py-14 sm:py-16 flex flex-col gap-2 sm:gap-3">
-          {/* Grid texture */}
           <div
             aria-hidden="true"
             className="absolute inset-0 opacity-[0.07] pointer-events-none"
@@ -324,12 +207,12 @@ function RecipesContent() {
           </h1>
           <p className="relative z-10 text-pantry-cream/85 max-w-lg text-sm sm:text-base leading-relaxed">
             {hasSelection
-              ? `Recipes matched and built around your ${itemIds.length} selected ingredient${itemIds.length !== 1 ? "s" : ""}.`
-              : "Browse all pantry recipes, or head back to select your ingredients for personalised suggestions."}
+              ? `Showing recipes matched to your ${itemIds.length} selected ingredient${itemIds.length !== 1 ? "s" : ""}.`
+              : "Browse all pantry recipes, or head back to inventory to select ingredients for personalised matches."}
           </p>
         </div>
 
-        {/* ── Selection mode ── */}
+        {/* Selection mode */}
         {hasSelection && (
           <>
             {/* Ingredient chips */}
@@ -339,10 +222,10 @@ function RecipesContent() {
                 <button
                   type="button"
                   onClick={() => router.push("/recipes")}
-                  aria-label="Clear selection"
-                  className="text-[10px] font-semibold text-muted underline underline-offset-2 transition-colors cursor-pointer hover:!text-[#dc2626] focus:outline-none focus-visible:ring-2 focus-visible:ring-pantry-coral focus-visible:ring-offset-2 rounded"
+                  aria-label="Clear selection and browse all recipes"
+                  className="text-[10px] font-semibold text-muted underline underline-offset-2 transition-colors cursor-pointer hover:!text-pantry-coral focus:outline-none focus-visible:ring-2 focus-visible:ring-pantry-coral focus-visible:ring-offset-2 rounded"
                 >
-                  Clear
+                  Browse all
                 </button>
               </div>
               <div className="flex flex-wrap gap-2">
@@ -369,19 +252,31 @@ function RecipesContent() {
               ingredientSuggestions={dbIngredientNames}
             />
 
-            {/* DB loading */}
-            {dbLoading && <SkeletonGrid count={6} shimmer />}
+            {dbLoading && <SkeletonGrid count={6} />}
 
-            {/* DB results — only matched recipes when coming from Find recipes */}
             {!dbLoading && (
               <>
+                {/* Best matches */}
                 {matched.length > 0 ? (
-                  <section className="space-y-4">
-                    <div className="text-center space-y-1">
-                      <h2 className="text-3xl sm:text-4xl font-semibold text-foreground" style={{ fontFamily: "var(--font-display)" }}>
-                        Best matches
-                      </h2>
-                      <p className="text-sm text-muted">{matched.length} recipe{matched.length !== 1 ? "s" : ""}</p>
+                  <section className="space-y-5">
+                    <div className="flex items-baseline justify-between gap-3">
+                      <div>
+                        <h2
+                          className="text-2xl sm:text-3xl font-semibold text-foreground"
+                          style={{ fontFamily: "var(--font-display)" }}
+                        >
+                          Best matches
+                        </h2>
+                        <p className="text-xs text-muted mt-0.5">
+                          {matched.length} recipe{matched.length !== 1 ? "s" : ""} using your ingredients
+                        </p>
+                      </div>
+                      <span className="shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-pantry-green/10 text-pantry-green text-xs font-semibold">
+                        <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                        </svg>
+                        Sorted by match
+                      </span>
                     </div>
                     <RecipeCardGrid className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                       {matched.map((r) => (
@@ -392,86 +287,36 @@ function RecipesContent() {
                     </RecipeCardGrid>
                   </section>
                 ) : (
-                  <div className="rounded-2xl border border-border bg-surface-card p-10 text-center space-y-1">
-                    <p className="font-semibold text-pantry-green">No matching recipes</p>
-                    <p className="text-sm text-muted">Try removing the difficulty filter or changing the search.</p>
+                  <div className="rounded-2xl border border-border bg-surface-card p-10 text-center space-y-2">
+                    <div className="w-12 h-12 rounded-full bg-pantry-amber/10 flex items-center justify-center mx-auto mb-3">
+                      <svg className="w-5 h-5 text-pantry-amber" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                    </div>
+                    <p className="font-semibold text-foreground">No recipes match your ingredients</p>
+                    <p className="text-sm text-muted">Try removing a filter, or explore all pantry recipes below.</p>
                   </div>
                 )}
 
-                {/* Divider — less gap below (before Suggested for you) */}
-                <div className="pt-4 pb-2 sm:pt-5 sm:pb-2" aria-hidden>
-                  <div className="border-t border-border" />
-                </div>
-
-                {/* Suggested for you */}
-                <section className="space-y-4">
-                  <div className="text-center">
-                    <h2 className="text-3xl sm:text-4xl font-semibold text-foreground" style={{ fontFamily: "var(--font-display)" }}>
-                      Suggested for you
-                    </h2>
-                    <div className="mt-4 space-y-2">
-                      {aiLoading && (
-                        <span className="flex items-center justify-center gap-1.5 text-sm text-muted">
-                          <svg className="animate-spin w-4 h-4" viewBox="0 0 24 24" fill="none">
-                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
-                          </svg>
-                          Building…
-                        </span>
-                      )}
-                      {aiDone && !aiLoading && (
-                        <div className="flex flex-col items-center gap-2">
-                          <p className="text-sm text-muted">
-                            {aiRecipes.length} recipe{aiRecipes.length !== 1 ? "s" : ""} built around your ingredients
-                          </p>
-                          {aiRecipes.length > 0 && (
-                            <button
-                              type="button"
-                              onClick={() => generateAI(displayNames)}
-                              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-full text-sm font-semibold bg-pantry-green text-pantry-cream hover:opacity-90 transition-opacity cursor-pointer shadow-sm"
-                            >
-                              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                              </svg>
-                              Regenerate
-                            </button>
-                          )}
-                        </div>
-                      )}
-                    </div>
-                  </div>
-
-                  {aiLoading && <SkeletonGrid count={3} />}
-
-                  {aiError && !aiLoading && (
-                    <div className="rounded-2xl border border-border bg-surface-card p-8 text-center space-y-3">
-                      <p className="text-sm text-muted">{aiError}</p>
-                      <button
-                        type="button"
-                        onClick={() => generateAI(displayNames)}
-                        className="inline-flex items-center gap-1.5 text-xs font-semibold text-pantry-green hover:text-pantry-amber transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-pantry-green focus-visible:ring-offset-2 rounded-full px-3 py-1.5"
-                      >
-                        Try again
-                      </button>
-                    </div>
-                  )}
-
-                  {aiDone && !aiLoading && (
+                {/* All other pantry recipes */}
+                {unmatched.length > 0 && (
+                  <section className="space-y-5 pt-2">
+                    <SectionDivider label="All pantry recipes" />
                     <RecipeCardGrid className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                      {aiRecipes.map((r) => (
+                      {unmatched.map((r) => (
                         <RecipeCardItem key={r.id}>
-                          <RecipeCard recipe={r} href={`/recipes/generated/${r.id}`} />
+                          <RecipeCard recipe={r} />
                         </RecipeCardItem>
                       ))}
                     </RecipeCardGrid>
-                  )}
-                </section>
+                  </section>
+                )}
               </>
             )}
           </>
         )}
 
-        {/* ── Browse mode ── */}
+        {/* Browse mode */}
         {!hasSelection && <BrowseRecipes dbIngredientNames={dbIngredientNames} />}
       </div>
     </div>

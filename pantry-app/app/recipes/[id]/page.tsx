@@ -24,7 +24,6 @@ export default async function RecipeDetailPage({
     <div className="min-h-screen bg-background">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 py-10 space-y-8">
 
-        {/* Back link — uses history so we return to recipes list with selection + generated */}
         <BackToRecipesLink className="inline-flex items-center gap-1.5 text-sm text-muted hover:text-foreground transition-colors" />
 
         {/* Hero image — full size */}

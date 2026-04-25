@@ -11,7 +11,7 @@ export default function CallToAction() {
           What&apos;s in your bag today?
         </h2>
         <p className="text-muted text-sm leading-relaxed max-w-xs">
-          Tell us what you picked up and we&apos;ll turn it into a real meal in seconds.
+          Tell us what you picked up and we&apos;ll match you with real pantry recipes instantly.
         </p>
         <Link
           href="/inventory"

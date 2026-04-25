@@ -248,7 +248,7 @@ function InventoryContent() {
             Browse the Pantry
           </h1>
           <p className="relative z-10 text-pantry-cream/85 max-w-lg text-sm sm:text-base leading-relaxed">
-            Pick the items you grabbed this week and we&apos;ll generate a real meal from them.
+            Pick the items you grabbed this week and we&apos;ll match you with real pantry recipes.
           </p>
         </div>
 
